@@ -1,6 +1,6 @@
 # The Lumen Collection
 
-The Lumen Collection is a dependency-free, responsive suite of four free-play slot games. Each game uses a published 99.00% long-run return model, a separate persistent bonus meter, finite autoplay, shared demo credits, and a SHA-256 commit/reveal receipt.
+The Lumen Collection is a dependency-free, responsive suite of four free-play slot games. It opens on a full-screen game chooser, then gives each title its own generated symbol art, reel treatment, spin action, persistent bonus rhythm, and sound palette. Every game uses a published 99.00% long-run return model, finite autoplay, shared demo credits, and a SHA-256 commit/reveal receipt.
 
 ## Included games
 
@@ -26,6 +26,7 @@ Open `http://localhost:4173`.
 
 The interface includes:
 
+- a first-entry four-game lobby that also performs the 18+ free-play confirmation;
 - a compact four-game switcher with progress retained per game;
 - bet controls and a maximum-bet shortcut;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;
@@ -70,11 +71,18 @@ The four project-bound background plates were generated with the built-in OpenAI
 - `assets/ember-crown-bg.jpg` — a monumental obsidian sky forge with molten channels and a crown furnace.
 - `assets/ufc-octagon-bg.jpg` — a cinematic logo-free mixed-martial-arts arena with an illuminated octagonal cage.
 
-All prompts required environment-only compositions, a low-detail center for readable reels, no text or logos, and no recognizable characters or copied game imagery. Symbols and interface graphics are original inline SVG/CSS assets. Any final UFC trademarks, logos, approved typography, fighter likenesses, event names, or sponsor material should come from the license holder's approved brand pack and legal review.
+Each game also has a dedicated transparent 1774×887 raster symbol sheet generated with the same built-in image tool:
+
+- `assets/symbols-astral-v3.png` — celestial orbs, comet, dewdrop, moonleaf, and Bloom.
+- `assets/symbols-neon-v2.png` — pearl, tide ring, starfish gem, coral spear, shell, and Pearl Key.
+- `assets/symbols-ember-v2.png` — sunsteel seal, forge ring, star anvil, ember spear, scale, and Crown Rune.
+- `assets/symbols-ufc-v2.png` — logo-free championship belt, octagon, event star, strike, clock, glove, and Fight Token.
+
+The background prompts required environment-only compositions, a low-detail center for readable reels, no text or logos, and no recognizable characters or copied game imagery. The symbol prompts required seven isolated glossy 3D game icons on a removable chroma background. Any final UFC trademarks, logos, approved typography, fighter likenesses, event names, or sponsor material should come from the license holder's approved brand pack and legal review.
 
 ## Render deployment
 
-`render.yaml` defines a Render Static Site. Connect the repository through **New → Blueprint** in Render, select the repository, and apply the `lumen-slot-collection` service. No environment variables or build dependencies are required.
+`render.yaml` defines the `aislots` Render Static Site. Connect the repository through **New → Blueprint** in Render, select the repository, and apply the Blueprint. No environment variables or build dependencies are required.
 
 ## Real-money production gate
 

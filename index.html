@@ -13,7 +13,7 @@
   <body>
     <div class="app-shell" id="appShell" inert>
       <header class="topbar">
-        <a class="brand" href="#game" aria-label="Lumen Collection home">
+        <a class="brand" id="brandLink" href="#game" aria-label="Open game lobby">
           <span class="brand-mark" aria-hidden="true">✦</span>
           <span>
             <strong id="brandName">Astral Bloom</strong>
@@ -111,7 +111,7 @@
               <button class="spin-button" id="spinButton" type="button" aria-label="Spin for 2 credits">
                 <span class="spin-rings" aria-hidden="true"></span>
                 <span class="spin-icon" aria-hidden="true">↻</span>
-                <span class="spin-label">Spin</span>
+                <span class="spin-label" id="spinLabel">Spin</span>
               </button>
 
               <div class="win-panel">
@@ -261,15 +261,15 @@
       </div>
     </div>
 
-    <div class="age-gate" id="ageGate" role="dialog" aria-modal="true" aria-labelledby="ageTitle">
-      <div class="age-card">
-        <span class="age-emblem">18+</span>
-        <p class="eyebrow">Free-play experience</p>
-        <h2 id="ageTitle">Enter the Lumen Collection</h2>
-        <p>Four entertainment-only games using credits with no cash value. Intended for adults.</p>
-        <button class="primary-button" id="enterDemo" type="button">I am 18+ · Enter free play</button>
-        <small>No deposit · No purchases · No cash prizes</small>
-      </div>
+    <div class="lobby-overlay" id="lobbyOverlay" aria-hidden="false">
+      <section class="lobby-shell" role="dialog" aria-modal="true" aria-labelledby="lobbyTitle">
+        <div class="lobby-heading">
+          <div><span class="eyebrow">The Lumen Collection · 18+</span><h2 id="lobbyTitle">Choose your slot.</h2></div>
+          <p>Four different worlds, four different feature rhythms. Choosing a game confirms you are 18+ and entering free play.</p>
+        </div>
+        <div class="lobby-games" id="lobbyGames" aria-label="Available slot games"></div>
+        <div class="lobby-foot"><span>99.00% theoretical RTP in every game</span><span>18+ · Free play · no cash value</span></div>
+      </section>
     </div>
 
     <script type="module" src="./app.js"></script>

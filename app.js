@@ -13,6 +13,7 @@ import {
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
 const INITIAL_BALANCE = 1000;
+const SYMBOL_SHEET_INDEX = { luma: 0, orbit: 1, nova: 2, comet: 3, dew: 4, leaf: 5, petal: 6 };
 
 const $ = (id) => document.getElementById(id);
 const ui = {
@@ -59,8 +60,8 @@ const ui = {
   autoButton: $("autoButton"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
-  ageGate: $("ageGate"),
-  enterDemo: $("enterDemo")
+  lobbyOverlay: $("lobbyOverlay"),
+  lobbyGames: $("lobbyGames")
 };
 
 const state = {
@@ -77,6 +78,7 @@ const state = {
   autoActive: false,
   autoRemaining: 0,
   autoStopRequested: false,
+  ageConfirmed: false,
   soundEnabled: false,
   lastOutcome: null,
   lastReceipt: null,
@@ -149,6 +151,15 @@ function symbolGlow(id) {
   return base;
 }
 
+function symbolGraphic(id) {
+  const index = SYMBOL_SHEET_INDEX[id];
+  const game = currentGame();
+  if (game.symbolSheet && Number.isInteger(index)) {
+    return `<span class="generated-symbol symbol-sheet-${index}" style="--symbol-sheet:url('${game.symbolSheet}')" aria-hidden="true"></span>`;
+  }
+  return symbolSvg(id);
+}
+
 function renderGrid(grid, { shuffling = false, winnerCells = new Set() } = {}) {
   const fragment = document.createDocumentFragment();
   for (let row = 0; row < ROWS; row += 1) {
@@ -166,7 +177,7 @@ function renderGrid(grid, { shuffling = false, winnerCells = new Set() } = {}) {
       cell.style.setProperty("--delay", `${col * 65 + row * 22}ms`);
       cell.style.setProperty("--symbol-glow", symbolGlow(id));
       cell.setAttribute("aria-label", currentSymbols().find((symbol) => symbol.id === id)?.name ?? id);
-      cell.innerHTML = symbolSvg(id);
+      cell.innerHTML = symbolGraphic(id);
       fragment.append(cell);
     }
   }
@@ -201,7 +212,7 @@ function updateUi() {
   const bet = BET_OPTIONS[state.betIndex];
   ui.balance.textContent = formatCredits(state.balance);
   ui.betAmount.textContent = formatCredits(bet);
-  ui.spinButton.setAttribute("aria-label", `Spin for ${formatCredits(bet)} credits`);
+  ui.spinButton.setAttribute("aria-label", `${currentGame().actionLabel} spin for ${formatCredits(bet)} credits`);
   const controlsLocked = state.isSpinning || state.autoActive;
   ui.betDown.disabled = controlsLocked || state.betIndex === 0;
   ui.betUp.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
@@ -252,7 +263,7 @@ function buildPaytable() {
   payingSymbols.forEach((symbol) => {
     const row = document.createElement("div");
     row.className = "paytable-row";
-    row.innerHTML = `${symbolSvg(symbol.id)}<div><strong>${symbol.name} · ${(symbol.weight / 100).toFixed(1)}% per cell</strong><div class="paytable-values"><span>3× <b>${Number(symbol.payouts[3].toFixed(2))}</b></span><span>4× <b>${symbol.payouts[4]}</b></span><span>5× <b>${symbol.payouts[5]}</b></span></div></div>`;
+    row.innerHTML = `${symbolGraphic(symbol.id)}<div><strong>${symbol.name} · ${(symbol.weight / 100).toFixed(1)}% per cell</strong><div class="paytable-values"><span>3× <b>${Number(symbol.payouts[3].toFixed(2))}</b></span><span>4× <b>${symbol.payouts[4]}</b></span><span>5× <b>${symbol.payouts[5]}</b></span></div></div>`;
     fragment.append(row);
   });
   $("paytable").replaceChildren(fragment);
@@ -285,6 +296,51 @@ function buildRules() {
   $("bonusRtpValue").textContent = `${(rtp.bonusRtp * 100).toFixed(3)}%`;
 }
 
+function buildLobby() {
+  const fragment = document.createDocumentFragment();
+  Object.values(GAMES).forEach((game) => {
+    const button = document.createElement("button");
+    button.className = `lobby-game lobby-game-${game.id}`;
+    button.type = "button";
+    button.dataset.lobbyGameId = game.id;
+    button.style.setProperty("--lobby-bg", `url("${game.background}")`);
+    button.style.setProperty("--lobby-accent", game.accent);
+    button.innerHTML = `
+      <span class="lobby-game-art" aria-hidden="true"></span>
+      <span class="lobby-game-shade" aria-hidden="true"></span>
+      <span class="lobby-game-content">
+        <span class="lobby-game-kicker">${game.lobbyTag}</span>
+        <strong>${game.name}</strong>
+        <span class="lobby-game-copy">${game.lobbyCopy}</span>
+        <span class="lobby-game-meta"><b>${game.volatility} rhythm</b><i>${game.threshold} ${game.collectionPlural}</i><i>${game.bonusDraws} reveals</i></span>
+        <span class="lobby-game-action">18+ · Play ${game.actionLabel} <b>→</b></span>
+      </span>`;
+    fragment.append(button);
+  });
+  ui.lobbyGames.replaceChildren(fragment);
+}
+
+function openLobby() {
+  if (state.isSpinning || state.autoActive) return;
+  ui.lobbyOverlay.hidden = false;
+  ui.lobbyOverlay.setAttribute("aria-hidden", "false");
+  $("appShell").inert = true;
+  document.body.classList.add("is-lobby-open");
+  window.requestAnimationFrame(() => ui.lobbyGames.querySelector("button")?.focus());
+}
+
+function chooseLobbyGame(gameId) {
+  if (!GAMES[gameId]) return;
+  state.ageConfirmed = true;
+  try { window.sessionStorage.setItem("lumen-collection-age-confirmed", "true"); } catch { /* storage may be unavailable */ }
+  if (gameId !== state.gameId) switchGame(gameId);
+  ui.lobbyOverlay.hidden = true;
+  ui.lobbyOverlay.setAttribute("aria-hidden", "true");
+  $("appShell").inert = false;
+  document.body.classList.remove("is-lobby-open");
+  ui.spinButton.focus();
+}
+
 function applyGameTheme({ resetGrid = false } = {}) {
   const game = currentGame();
   const titleParts = game.name.split(" ");
@@ -303,7 +359,9 @@ function applyGameTheme({ resetGrid = false } = {}) {
   $("meterThreshold").textContent = `/${game.threshold}`;
   $("gameIntro").textContent = game.intro;
   $("gameTitle").innerHTML = `${firstWord} <span>${titleParts.join(" ")}</span>`;
+  $("spinLabel").textContent = game.actionLabel;
   ui.winBannerLabel.textContent = `${game.shortName} win`;
+  ui.bonusOverlay.dataset.game = game.id;
   ui.bonusEyebrow.textContent = `${game.featureName} feature`;
   $("bonusTitle").textContent = game.bonusTitle;
   ui.bonusCopy.textContent = game.bonusCopy;
@@ -752,6 +810,13 @@ function openDialog(id) {
 }
 
 function bindEvents() {
+  $("brandLink").addEventListener("click", (event) => {
+    event.preventDefault();
+    openLobby();
+  });
+  document.querySelectorAll("[data-lobby-game-id]").forEach((button) => {
+    button.addEventListener("click", () => chooseLobbyGame(button.dataset.lobbyGameId));
+  });
   ui.betDown.addEventListener("click", () => {
     if (state.betIndex > 0) state.betIndex -= 1;
     updateUi();
@@ -835,18 +900,11 @@ function bindEvents() {
     updateUi();
   });
 
-  ui.enterDemo.addEventListener("click", () => {
-    ui.ageGate.classList.add("is-dismissed");
-    $("appShell").inert = false;
-    try { window.sessionStorage.setItem("lumen-collection-age-confirmed", "true"); } catch { /* storage may be unavailable */ }
-    ui.spinButton.focus();
-  });
-
   window.addEventListener("keydown", (event) => {
     if (event.code !== "Space" || event.repeat) return;
     const activeTag = document.activeElement?.tagName;
     const dialogOpen = Boolean(document.querySelector("dialog[open]"));
-    if (["INPUT", "BUTTON", "TEXTAREA"].includes(activeTag) || dialogOpen || !ui.bonusOverlay.hidden || !ui.ageGate.classList.contains("is-dismissed")) return;
+    if (["INPUT", "BUTTON", "TEXTAREA"].includes(activeTag) || dialogOpen || !ui.bonusOverlay.hidden || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
     event.preventDefault();
     spin();
   });
@@ -854,16 +912,15 @@ function bindEvents() {
 
 async function init() {
   applyGameTheme({ resetGrid: true });
+  buildLobby();
   ui.clientSeedInput.value = state.clientSeed;
   bindEvents();
   updateUi();
   try {
-    if (window.sessionStorage.getItem("lumen-collection-age-confirmed") === "true"
-      || window.sessionStorage.getItem("astral-bloom-age-confirmed") === "true") {
-      ui.ageGate.classList.add("is-dismissed");
-      $("appShell").inert = false;
-    }
+    state.ageConfirmed = window.sessionStorage.getItem("lumen-collection-age-confirmed") === "true"
+      || window.sessionStorage.getItem("astral-bloom-age-confirmed") === "true";
   } catch { /* session storage is optional */ }
+  openLobby();
 
   try {
     await rotateServerSeed();

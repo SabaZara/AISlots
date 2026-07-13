@@ -1,9 +1,9 @@
 {
-  "name": "lumen-slot-collection",
-  "version": "2.1.0",
+  "name": "aislots",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
-  "description": "The Lumen Collection — four transparent free-play slot game prototypes with exact published RTP.",
+  "description": "AISlots — four visually distinct free-play slot games with generated artwork and exact published RTP.",
   "scripts": {
     "dev": "python3 -m http.server 4173",
     "test": "node --test",
