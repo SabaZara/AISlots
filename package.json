@@ -1,0 +1,13 @@
+{
+  "name": "lumen-slot-collection",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The Lumen Collection — four transparent free-play slot game prototypes with exact published RTP.",
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "test": "node --test",
+    "check": "node --check app.js && node --check fairness.js && node --check game-model.js",
+    "audit:rtp": "node scripts/rtp-simulation.js"
+  }
+}

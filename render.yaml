@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: lumen-slot-collection
+    runtime: static
+    plan: free
+    staticPublishPath: .
+    buildCommand: echo "Static Lumen Collection ready"
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
