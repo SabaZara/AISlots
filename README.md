@@ -35,6 +35,9 @@ The interface includes:
 - animated win count-ups, highlighted winning symbols, collection bursts, and themed bonus reveals;
 - tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
 - themed reel-start, reel-stop, anticipation, collection, line-win, bonus, and celebration sound cues;
+- four sealed bonus presentations: Moonwell Free Spins, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
+- a visible session timer, configurable net-loss limit, 15-minute reality checks, and wagered/returned/net summaries;
+- honest partial-return messaging: a payout below the bet is shown as a net loss and never receives a win celebration;
 - bet controls and a maximum-bet shortcut;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;
 - balance, last win, session net, recent result details, and feature progression;
@@ -43,6 +46,8 @@ The interface includes:
 - a single compact fairness button in the top toolbar.
 
 Autoplay is present only for this no-value free-play prototype. Real-money rules differ by jurisdiction, and some markets prohibit online-slot autoplay entirely.
+
+The game does not engineer near-misses, amplify losses disguised as wins, fabricate winner feeds, sell bonus access, send re-engagement notifications, or change demo odds. Bonus choices are presentation controls only: every result and prize is sealed in the fairness receipt before the reveal animation starts.
 
 ## Published 99% return
 

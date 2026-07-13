@@ -9,17 +9,20 @@ import {
   theoreticalRtp,
   simulateSpin
 } from "./game-model.js";
-import { emptyGameStats, recordGameResult, winTierFor } from "./presentation.js";
+import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
 const INITIAL_BALANCE = 1000;
+const REALITY_CHECK_INTERVAL_MINUTES = 15;
 const SYMBOL_SHEET_INDEX = { luma: 0, orbit: 1, nova: 2, comet: 3, dew: 4, leaf: 5, petal: 6 };
 
 const $ = (id) => document.getElementById(id);
 const ui = {
   balance: $("balance"),
   sessionNet: $("sessionNet"),
+  sessionTime: $("sessionTime"),
+  sessionClockButton: $("sessionClockButton"),
   betAmount: $("betAmount"),
   betDown: $("betDown"),
   betUp: $("betUp"),
@@ -61,6 +64,9 @@ const ui = {
   bonusAction: $("bonusAction"),
   bonusEyebrow: $("bonusEyebrow"),
   bonusCopy: $("bonusCopy"),
+  bonusMechanicName: $("bonusMechanicName"),
+  bonusMechanicProgress: $("bonusMechanicProgress"),
+  bonusMechanicBar: $("bonusMechanicBar"),
   autoButton: $("autoButton"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
@@ -75,7 +81,18 @@ const ui = {
   celebrationMultiplier: $("celebrationMultiplier"),
   celebrationGame: $("celebrationGame"),
   celebrationKicker: $("celebrationKicker"),
-  celebrationCollect: $("celebrationCollect")
+  celebrationCollect: $("celebrationCollect"),
+  lossLimitSelect: $("lossLimitSelect"),
+  lossLimitStatus: $("lossLimitStatus"),
+  realityCheckDialog: $("realityCheckDialog"),
+  realityTime: $("realityTime"),
+  realitySpins: $("realitySpins"),
+  realityWagered: $("realityWagered"),
+  realityWon: $("realityWon"),
+  realityNet: $("realityNet"),
+  realityLimit: $("realityLimit"),
+  continueSession: $("continueSession"),
+  realityChooseGame: $("realityChooseGame")
 };
 
 const state = {
@@ -85,6 +102,12 @@ const state = {
   gameId: DEFAULT_GAME_ID,
   progress: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0])),
   gameStats: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()])),
+  sessionStartedAt: Date.now(),
+  sessionSpins: 0,
+  sessionWagered: 0,
+  sessionWon: 0,
+  lossLimit: 100,
+  lastRealityCheckMinute: 0,
   nonce: 0,
   serverSeed: "",
   serverHash: "",
@@ -117,6 +140,51 @@ function formatCredits(value) {
 
 function delay(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function formatElapsed(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor(totalSeconds % 3600 / 60);
+  const seconds = totalSeconds % 60;
+  return hours > 0
+    ? `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+    : `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function sessionLoss() {
+  return Math.max(0, -state.sessionNet);
+}
+
+function updateSessionSafetyUi() {
+  const elapsed = Date.now() - state.sessionStartedAt;
+  ui.sessionTime.textContent = formatElapsed(elapsed);
+  ui.lossLimitStatus.textContent = `${formatCredits(sessionLoss())} of ${formatCredits(state.lossLimit)} CR net loss`;
+  ui.lossLimitStatus.classList.toggle("is-close", sessionLoss() >= state.lossLimit * .75);
+}
+
+function renderRealityCheck() {
+  ui.realityTime.textContent = formatElapsed(Date.now() - state.sessionStartedAt);
+  ui.realitySpins.textContent = String(state.sessionSpins);
+  ui.realityWagered.textContent = `${formatCredits(state.sessionWagered)} CR`;
+  ui.realityWon.textContent = `${formatCredits(state.sessionWon)} CR`;
+  const sign = state.sessionNet > 0 ? "+" : "";
+  ui.realityNet.textContent = `${sign}${formatCredits(state.sessionNet)} CR`;
+  ui.realityNet.className = state.sessionNet > 0 ? "positive" : state.sessionNet < 0 ? "negative" : "neutral";
+  ui.realityLimit.textContent = `${formatCredits(state.lossLimit)} CR`;
+  if (!ui.realityCheckDialog.open) ui.realityCheckDialog.showModal();
+}
+
+function tickSessionClock() {
+  updateSessionSafetyUi();
+  const elapsedMinutes = Math.floor((Date.now() - state.sessionStartedAt) / 60000);
+  const scheduledMinute = state.lastRealityCheckMinute + REALITY_CHECK_INTERVAL_MINUTES;
+  const overlayOpen = !ui.lobbyOverlay.hidden || !ui.bonusOverlay.hidden || !ui.celebrationOverlay.hidden;
+  const otherDialogOpen = Boolean(document.querySelector("dialog[open]:not(#realityCheckDialog)"));
+  if (elapsedMinutes >= scheduledMinute && !state.isSpinning && !overlayOpen && !otherDialogOpen && !ui.realityCheckDialog.open) {
+    state.lastRealityCheckMinute = elapsedMinutes;
+    renderRealityCheck();
+  }
 }
 
 function symbolSvg(id) {
@@ -269,6 +337,7 @@ function updateUi() {
   ui.sessionNet.className = state.sessionNet > 0 ? "positive" : state.sessionNet < 0 ? "negative" : "neutral";
   renderPetalMeter();
   renderGameStats();
+  updateSessionSafetyUi();
 }
 
 function updateCommitmentUi() {
@@ -316,7 +385,7 @@ function buildRules() {
   $("rulesThreshold").textContent = String(game.threshold);
   $("rulesCollectorLabel").textContent = `${game.collectionPlural} to bonus`;
   $("rulesFeatureTitle").textContent = `${game.featureName} bonus`;
-  $("rulesFeatureCopy").textContent = `${game.collectionPlural} do not pay on lines. Every ${game.collectionName} anywhere on the grid fills one permanent meter position. At ${game.threshold}, the feature reveals ${game.bonusDraws} independently weighted prizes, then the meter rolls over.`;
+  $("rulesFeatureCopy").textContent = `${game.collectionPlural} do not pay on lines. Every ${game.collectionName} anywhere on the grid fills one permanent meter position. At ${game.threshold}, ${game.bonusMechanicCopy} The meter then rolls over.`;
   $("prizeOddsTitle").textContent = `${game.featureName} prize odds`;
   $("prizeOddsCopy").textContent = `${game.bonusDraws} prizes are drawn from this table. Values are multiplied by the total bet and added together.`;
 
@@ -395,6 +464,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   gameStage.style.setProperty("--game-accent", game.accent);
   gameStage.style.setProperty("--game-secondary", game.secondary);
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
+  ui.bonusOverlay.style.setProperty("--game-accent", game.accent);
   document.title = `${game.name} · Lumen Collection`;
   $("brandName").textContent = game.name;
   $("brandSubtitle").textContent = game.subtitle;
@@ -754,15 +824,19 @@ function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
   return new Promise((resolve) => {
     const game = currentGame();
     const picks = bonusRounds.flat();
+    ui.bonusOverlay.dataset.mode = game.bonusMode;
     ui.constellationPicks.replaceChildren();
     ui.bonusTotal.textContent = "0.00 CR";
-    ui.bonusAction.textContent = `Reveal ${game.bonusDraws} prizes`;
+    ui.bonusMechanicName.textContent = game.bonusMechanicName;
+    ui.bonusMechanicProgress.textContent = `0 / ${picks.length}`;
+    ui.bonusMechanicBar.style.width = "0%";
+    ui.bonusAction.textContent = game.bonusStartLabel;
     ui.bonusAction.disabled = false;
 
-    picks.forEach((multiplier) => {
+    picks.forEach((multiplier, index) => {
       const card = document.createElement("div");
       card.className = "constellation-pick";
-      card.innerHTML = `<span>${multiplier}×</span>`;
+      card.innerHTML = `<small>${game.bonusCardLabel} ${index + 1}</small><span>${multiplier}×</span>`;
       ui.constellationPicks.append(card);
     });
 
@@ -791,6 +865,8 @@ function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
         await delay(index === 0 ? 160 : 430);
         multiplierTotal += picks[index];
         cards[index].classList.add("is-revealed");
+        ui.bonusMechanicProgress.textContent = `${index + 1} / ${picks.length} · ${game.bonusProgressLabel}`;
+        ui.bonusMechanicBar.style.width = `${(index + 1) / picks.length * 100}%`;
         ui.bonusTotal.textContent = `${formatCredits(multiplierTotal * bet)} CR`;
         playTone(480 + index * 105, 0.35, ["ember", "ufc"].includes(state.gameId) ? "square" : "sine");
         burstParticles(7, .55);
@@ -817,6 +893,12 @@ async function spin({ fromAuto = false } = {}) {
   if (state.isSpinning || (state.autoActive && !fromAuto)) return false;
   const game = currentGame();
   const bet = BET_OPTIONS[state.betIndex];
+  if (sessionLoss() >= state.lossLimit) {
+    setStatus(`Session loss limit reached at ${formatCredits(state.lossLimit)} CR. Review the session before continuing.`);
+    state.autoStopRequested = true;
+    renderRealityCheck();
+    return false;
+  }
   if (state.balance < bet) {
     setStatus("Not enough demo credits. Reset the free-play balance below.");
     playTone(170, .2, "square");
@@ -827,6 +909,8 @@ async function spin({ fromAuto = false } = {}) {
   state.isSpinning = true;
   state.balance -= bet;
   state.sessionNet -= bet;
+  state.sessionSpins += 1;
+  state.sessionWagered += bet;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
   ui.reels.classList.remove("is-anticipating");
@@ -860,7 +944,7 @@ async function spin({ fromAuto = false } = {}) {
 
   const outcome = await outcomePromise;
   const remainingDelay = Math.max(0, MIN_RESULT_DISPLAY_MS - (performance.now() - startedAt));
-  const anticipation = outcome.bonusRounds.length > 0 || outcome.collectorCount >= 3;
+  const anticipation = outcome.bonusRounds.length > 0;
   if (anticipation && remainingDelay > 760) {
     await delay(remainingDelay - 760);
     ui.reels.classList.add("is-anticipating");
@@ -878,19 +962,24 @@ async function spin({ fromAuto = false } = {}) {
   state.balance += outcome.baseWin;
   state.sessionNet += outcome.baseWin;
   updateUi();
+  const baseOutcomeClass = outcomeClassFor(outcome.baseWin, bet);
 
   if (outcome.collectorCount > 0) {
     const collectorLabel = outcome.collectorCount === 1 ? game.collectionName : game.collectionPlural;
     setStatus(`${outcome.collectorCount} ${collectorLabel} collected · ${state.progress[state.gameId]}/${game.threshold} charged`);
     playCollectSound(outcome.collectorCount);
     burstParticles(8 + outcome.collectorCount * 3, .55);
-  } else if (outcome.baseWin > 0) {
+  } else if (baseOutcomeClass === "net-win") {
     setStatus(`${outcome.wins.length} line win${outcome.wins.length === 1 ? "" : "s"} illuminated`);
+  } else if (baseOutcomeClass === "break-even") {
+    setStatus(`Bet returned exactly · ${formatCredits(outcome.baseWin)} CR returned on ${formatCredits(bet)} CR bet`);
+  } else if (baseOutcomeClass === "partial-return") {
+    setStatus(`Partial return ${formatCredits(outcome.baseWin)} CR · net result −${formatCredits(bet - outcome.baseWin)} CR`);
   } else {
     setStatus(`No win this spin. ${game.featureName} keeps your progress.`);
   }
 
-  if (outcome.baseWin > 0) {
+  if (baseOutcomeClass === "net-win") {
     showWinBanner(outcome.baseWin, bet);
     playWinChord();
     burstParticles(outcome.baseWin >= bet * 10 ? 42 : 18, outcome.baseWin >= bet * 10 ? 1.25 : .75);
@@ -907,9 +996,11 @@ async function spin({ fromAuto = false } = {}) {
     updateUi();
   }
 
+  state.sessionWon += outcome.totalWin;
   state.gameStats[state.gameId] = recordGameResult(state.gameStats[state.gameId], outcome.totalWin, bet);
   updateUi();
-  if (outcome.bonusWin > 0) showWinBanner(outcome.totalWin, bet);
+  const totalOutcomeClass = outcomeClassFor(outcome.totalWin, bet);
+  if (outcome.bonusWin > 0 && totalOutcomeClass === "net-win") showWinBanner(outcome.totalWin, bet);
   await showCelebration(outcome.totalWin, bet, { autoAdvance: fromAuto });
 
   state.lastReceipt = {
@@ -931,8 +1022,13 @@ async function spin({ fromAuto = false } = {}) {
   state.isSpinning = false;
   updateUi();
 
-  if (outcome.totalWin > 0) {
-    setStatus(`Total win ${formatCredits(outcome.totalWin)} CR · receipt ready to verify`);
+  if (totalOutcomeClass === "net-win") setStatus(`Net win +${formatCredits(outcome.totalWin - bet)} CR · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
+  else if (totalOutcomeClass === "break-even") setStatus(`Break-even result · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
+  else if (totalOutcomeClass === "partial-return") setStatus(`Partial return ${formatCredits(outcome.totalWin)} CR · net −${formatCredits(bet - outcome.totalWin)} CR · receipt ready`);
+  else setStatus(`No return · net −${formatCredits(bet)} CR · receipt ready`);
+  if (sessionLoss() >= state.lossLimit) {
+    state.autoStopRequested = true;
+    renderRealityCheck();
   }
   if (!fromAuto) ui.spinButton.focus();
   return true;
@@ -980,6 +1076,17 @@ function openDialog(id) {
 }
 
 function bindEvents() {
+  ui.sessionClockButton.addEventListener("click", renderRealityCheck);
+  ui.lossLimitSelect.addEventListener("change", () => {
+    state.lossLimit = Number(ui.lossLimitSelect.value);
+    updateSessionSafetyUi();
+    setStatus(`Session loss limit set to ${formatCredits(state.lossLimit)} CR`);
+  });
+  ui.continueSession.addEventListener("click", () => ui.realityCheckDialog.close());
+  ui.realityChooseGame.addEventListener("click", () => {
+    ui.realityCheckDialog.close();
+    openLobby();
+  });
   $("brandLink").addEventListener("click", (event) => {
     event.preventDefault();
     openLobby();
@@ -1063,6 +1170,11 @@ function bindEvents() {
     state.sessionNet = 0;
     state.progress = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0]));
     state.gameStats = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()]));
+    state.sessionStartedAt = Date.now();
+    state.sessionSpins = 0;
+    state.sessionWagered = 0;
+    state.sessionWon = 0;
+    state.lastRealityCheckMinute = 0;
     state.lastOutcome = null;
     ui.lastWinButton.disabled = true;
     setStatus("Demo balance reset. All four feature meters start anew.");
@@ -1085,6 +1197,8 @@ async function init() {
   ui.clientSeedInput.value = state.clientSeed;
   bindEvents();
   updateUi();
+  tickSessionClock();
+  window.setInterval(tickSessionClock, 1000);
   try {
     state.ageConfirmed = window.sessionStorage.getItem("lumen-collection-age-confirmed") === "true"
       || window.sessionStorage.getItem("astral-bloom-age-confirmed") === "true";

@@ -135,6 +135,21 @@ a:focus-visible {
   border-right: 1px solid var(--line);
 }
 
+.session-clock {
+  min-width: 108px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  color: var(--ink);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.session-clock:hover {
+  color: var(--cyan);
+  background: rgba(107,228,255,.045);
+}
+
 .session-stat > span,
 .control-label,
 .hash-preview span {
@@ -1557,6 +1572,40 @@ a:focus-visible {
 .auto-options strong { color: var(--game-accent); font: 400 19px/1 var(--serif); }
 .auto-options span { margin-top: 4px; color: var(--muted); font-size: 7px; text-transform: uppercase; }
 
+.loss-limit-control {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+}
+
+.loss-limit-control label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.loss-limit-control select {
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--ink);
+  background: #0d1530;
+}
+
+.loss-limit-control small {
+  margin-top: 7px;
+  color: var(--positive);
+  font-size: 8px;
+}
+
+.loss-limit-control small.is-close { color: var(--negative); }
+
 .fx-layer {
   position: absolute;
   z-index: 14;
@@ -2211,6 +2260,40 @@ kbd {
   color: var(--ink);
 }
 
+.reality-copy {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.reality-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.reality-stats div {
+  min-width: 0;
+  padding: 14px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.reality-stats span,
+.reality-stats strong { display: block; }
+.reality-stats span { color: var(--muted); font-size: 8px; text-transform: uppercase; }
+.reality-stats strong { margin-top: 6px; font: 400 18px/1 var(--serif); }
+.reality-stats strong.positive { color: var(--positive); }
+.reality-stats strong.negative { color: var(--negative); }
+
+.reality-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 9px;
+}
+
 .bonus-overlay,
 .celebration-overlay,
 .age-gate {
@@ -2386,6 +2469,55 @@ kbd {
   line-height: 1.55;
 }
 
+.bonus-mechanic {
+  width: min(430px, 100%);
+  margin: 18px auto 0;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 7px 14px;
+  border: 1px solid rgba(188,215,255,.16);
+  background: rgba(255,255,255,.035);
+  text-align: left;
+}
+
+.bonus-mechanic > span {
+  color: var(--ink);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.bonus-mechanic > strong {
+  color: var(--gold);
+  font-size: 9px;
+}
+
+.bonus-mechanic > i {
+  grid-column: 1 / -1;
+  height: 5px;
+  display: block;
+  overflow: hidden;
+  background: rgba(255,255,255,.07);
+}
+
+.bonus-mechanic > i b {
+  width: 0;
+  height: 100%;
+  display: block;
+  background: linear-gradient(90deg, var(--game-accent, #6be4ff), var(--gold));
+  box-shadow: 0 0 10px var(--game-accent, #6be4ff);
+  transition: width 420ms ease;
+}
+
+.bonus-mechanic > small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 7px;
+  line-height: 1.4;
+}
+
 .constellation-picks {
   margin: 28px 0 22px;
   display: flex;
@@ -2423,6 +2555,19 @@ kbd {
   font: 400 24px/1 var(--serif);
   opacity: 0;
   transform: scale(.7);
+}
+
+.constellation-pick small {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  color: rgba(224,236,255,.72);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 .constellation-pick::after {
@@ -2502,6 +2647,33 @@ kbd {
   clip-path: polygon(28% 0, 72% 0, 100% 28%, 100% 72%, 72% 100%, 28% 100%, 0 72%, 0 28%);
   background: linear-gradient(145deg, rgba(244, 195, 91, .22), rgba(42, 8, 10, .92));
 }
+
+.bonus-overlay[data-mode="free-spins"] .constellation-pick::after { content: "↻"; }
+.bonus-overlay[data-mode="free-spins"] .constellation-pick.is-revealed { animation: freeSpinResolve 520ms cubic-bezier(.2,.9,.2,1) both; }
+
+.bonus-overlay[data-mode="cluster-cascade"] .constellation-picks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(90px, 126px));
+}
+.bonus-overlay[data-mode="cluster-cascade"] .constellation-pick { width: 100%; }
+.bonus-overlay[data-mode="cluster-cascade"] .constellation-pick::after { content: "●"; }
+.bonus-overlay[data-mode="cluster-cascade"] .constellation-pick.is-revealed { animation: clusterBurst 560ms cubic-bezier(.18,.9,.25,1) both; }
+
+.bonus-overlay[data-mode="multiplier-forge"] .constellation-pick::after { content: "×"; color: #ffca72; }
+.bonus-overlay[data-mode="multiplier-forge"] .constellation-pick.is-revealed { animation: forgeStrikeResolve 620ms cubic-bezier(.3,1.25,.4,1) both; }
+
+.bonus-overlay[data-mode="hold-and-win"] .constellation-pick::after {
+  content: "LOCK";
+  color: #f2c35b;
+  font: 900 11px/1 var(--sans);
+  letter-spacing: .12em;
+}
+.bonus-overlay[data-mode="hold-and-win"] .constellation-pick.is-revealed { animation: fightCardLock 480ms cubic-bezier(.18,.9,.25,1) both; }
+
+@keyframes freeSpinResolve { from { transform: perspective(500px) rotateY(90deg); opacity: .2; } to { transform: none; opacity: 1; } }
+@keyframes clusterBurst { 0% { transform: scale(.45); filter: brightness(2); } 65% { transform: scale(1.12); } 100% { transform: none; filter: none; } }
+@keyframes forgeStrikeResolve { 0% { transform: translateY(-34px) scaleY(1.2); filter: brightness(2); } 68% { transform: translateY(7px) scaleY(.85); } 100% { transform: none; filter: none; } }
+@keyframes fightCardLock { 0% { transform: translateX(-42px) rotate(-8deg); } 70% { transform: translateX(5px) rotate(1deg); } 100% { transform: none; } }
 
 .lobby-overlay {
   position: fixed;
@@ -3065,10 +3237,13 @@ kbd {
   .rules-hero span { font-size: 20px; }
   .paytable { grid-template-columns: 1fr; }
   .bonus-prize-table { grid-template-columns: repeat(4, 1fr); }
+  .reality-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reality-actions { flex-direction: column; }
   .receipt-grid { grid-template-columns: 1fr; }
   .verifier-actions { flex-direction: column; }
   .rtp-breakdown span { padding: 8px; }
   .bonus-scene { padding: 30px 16px; }
+  .bonus-mechanic { margin-top: 13px; }
   .celebration-overlay { padding: 8px; }
   .celebration-scene { min-height: calc(100dvh - 16px); padding: 34px 12px; }
   .constellation-picks { gap: 7px; }

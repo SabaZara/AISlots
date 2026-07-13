@@ -30,6 +30,10 @@
             <span>Session net</span>
             <strong id="sessionNet" class="neutral">0.00 CR</strong>
           </div>
+          <button class="session-stat session-clock" id="sessionClockButton" type="button" aria-label="Open session reality check">
+            <span>Session time</span>
+            <strong id="sessionTime">00:00</strong>
+          </button>
           <span class="rtp-pill">RTP 99.00%</span>
           <span class="demo-pill">Free play</span>
         </div>
@@ -138,6 +142,10 @@
                 <button type="button" data-auto-count="10"><strong>10</strong><span>spins</span></button>
                 <button type="button" data-auto-count="25"><strong>25</strong><span>spins</span></button>
                 <button type="button" data-auto-count="50"><strong>50</strong><span>spins</span></button>
+              </div>
+              <div class="loss-limit-control">
+                <label for="lossLimitSelect"><span>Session loss limit</span><select id="lossLimitSelect"><option value="25">25 CR</option><option value="50">50 CR</option><option value="100" selected>100 CR</option><option value="250">250 CR</option></select></label>
+                <small id="lossLimitStatus">0.00 of 100.00 CR net loss</small>
               </div>
             </div>
             <p class="keyboard-hint">Press <kbd>Space</kbd> to spin · Finite autoplay · Result shown for at least 2.5 seconds</p>
@@ -257,6 +265,28 @@
       <div class="modal-scroll" id="winDetailsContent"></div>
     </dialog>
 
+    <dialog class="modal reality-check-modal" id="realityCheckDialog">
+      <div class="modal-head">
+        <div><span class="eyebrow">Reality check</span><h2>Review this free-play session</h2></div>
+        <button class="modal-close" data-close-dialog="realityCheckDialog" type="button" aria-label="Close reality check">×</button>
+      </div>
+      <div class="modal-scroll">
+        <p class="reality-copy">Results are random and the 99% RTP is a long-run theoretical average, not a promise for this session.</p>
+        <div class="reality-stats">
+          <div><span>Time played</span><strong id="realityTime">00:00</strong></div>
+          <div><span>Spins</span><strong id="realitySpins">0</strong></div>
+          <div><span>Wagered</span><strong id="realityWagered">0.00 CR</strong></div>
+          <div><span>Returned</span><strong id="realityWon">0.00 CR</strong></div>
+          <div><span>Session net</span><strong id="realityNet">0.00 CR</strong></div>
+          <div><span>Loss limit</span><strong id="realityLimit">100.00 CR</strong></div>
+        </div>
+        <div class="reality-actions">
+          <button class="primary-button" id="continueSession" type="button">Continue free play</button>
+          <button class="secondary-button" id="realityChooseGame" type="button">Choose another game</button>
+        </div>
+      </div>
+    </dialog>
+
     <div class="celebration-overlay" id="celebrationOverlay" hidden aria-hidden="true">
       <section class="celebration-scene" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
         <div class="celebration-halo" aria-hidden="true"></div>
@@ -275,6 +305,12 @@
         <span class="eyebrow" id="bonusEyebrow">Moonwell feature</span>
         <h2 id="bonusTitle">The garden remembers.</h2>
         <p id="bonusCopy">Three constellations are already sealed into your spin receipt. Reveal their light.</p>
+        <div class="bonus-mechanic">
+          <span id="bonusMechanicName">Moonwell Free Spins</span>
+          <strong id="bonusMechanicProgress">0 / 3</strong>
+          <i><b id="bonusMechanicBar"></b></i>
+          <small>Outcome and prizes were sealed before this animation began.</small>
+        </div>
         <div class="constellation-picks" id="constellationPicks"></div>
         <div class="bonus-total"><span>Bonus win</span><strong id="bonusTotal">0.00 CR</strong></div>
         <button class="primary-button bonus-action" id="bonusAction" type="button">Reveal constellations</button>

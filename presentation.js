@@ -27,3 +27,10 @@ export function recordGameResult(stats, totalWin, bet) {
     lastMultiplier: multiplier
   };
 }
+
+export function outcomeClassFor(totalWin, bet) {
+  if (totalWin <= 0) return "loss";
+  if (Math.abs(totalWin - bet) < 1e-9) return "break-even";
+  if (totalWin < bet) return "partial-return";
+  return "net-win";
+}
