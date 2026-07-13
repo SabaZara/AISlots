@@ -9,6 +9,7 @@ import {
   theoreticalRtp,
   simulateSpin
 } from "./game-model.js";
+import { emptyGameStats, recordGameResult, winTierFor } from "./presentation.js";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -30,6 +31,9 @@ const ui = {
   winBanner: $("winBanner"),
   winBannerAmount: $("winBannerAmount"),
   winBannerLabel: $("winBannerLabel"),
+  winBannerMultiplier: $("winBannerMultiplier"),
+  featureCard: $("featureCard"),
+  featureVisual: $("featureVisual"),
   petalMeter: $("petalMeter"),
   petalCountLarge: $("petalCountLarge"),
   meterMessage: $("meterMessage"),
@@ -61,7 +65,17 @@ const ui = {
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
   lobbyOverlay: $("lobbyOverlay"),
-  lobbyGames: $("lobbyGames")
+  lobbyGames: $("lobbyGames"),
+  currentGameWon: $("currentGameWon"),
+  currentGameSpins: $("currentGameSpins"),
+  currentGameBest: $("currentGameBest"),
+  celebrationOverlay: $("celebrationOverlay"),
+  celebrationTitle: $("celebrationTitle"),
+  celebrationAmount: $("celebrationAmount"),
+  celebrationMultiplier: $("celebrationMultiplier"),
+  celebrationGame: $("celebrationGame"),
+  celebrationKicker: $("celebrationKicker"),
+  celebrationCollect: $("celebrationCollect")
 };
 
 const state = {
@@ -70,6 +84,7 @@ const state = {
   betIndex: 1,
   gameId: DEFAULT_GAME_ID,
   progress: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0])),
+  gameStats: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()])),
   nonce: 0,
   serverSeed: "",
   serverHash: "",
@@ -160,7 +175,7 @@ function symbolGraphic(id) {
   return symbolSvg(id);
 }
 
-function renderGrid(grid, { shuffling = false, winnerCells = new Set() } = {}) {
+function renderGrid(grid, { shuffling = false, settling = false, winnerCells = new Set() } = {}) {
   const fragment = document.createDocumentFragment();
   for (let row = 0; row < ROWS; row += 1) {
     for (let col = 0; col < COLS; col += 1) {
@@ -169,12 +184,17 @@ function renderGrid(grid, { shuffling = false, winnerCells = new Set() } = {}) {
       const cell = document.createElement("div");
       cell.className = "symbol-cell";
       if (shuffling) cell.classList.add("is-shuffling");
+      if (settling) cell.classList.add("is-settling");
       if (winnerCells.has(index)) cell.classList.add("is-winner");
       if (id === "petal") cell.classList.add("is-scatter");
       cell.dataset.symbol = id;
       cell.style.gridColumn = String(col + 1);
       cell.style.gridRow = String(row + 1);
       cell.style.setProperty("--delay", `${col * 65 + row * 22}ms`);
+      cell.style.setProperty("--col", String(col));
+      cell.style.setProperty("--row", String(row));
+      cell.style.setProperty("--motion-delay", `${-(col * 48 + row * 24)}ms`);
+      cell.style.setProperty("--stop-delay", `${col * currentGame().reelStopGap + row * 18}ms`);
       cell.style.setProperty("--symbol-glow", symbolGlow(id));
       cell.setAttribute("aria-label", currentSymbols().find((symbol) => symbol.id === id)?.name ?? id);
       cell.innerHTML = symbolGraphic(id);
@@ -192,7 +212,9 @@ function initialGrid() {
 function renderPetalMeter() {
   const game = currentGame();
   const progress = state.progress[state.gameId];
+  const fill = game.threshold > 0 ? progress / game.threshold * 100 : 0;
   ui.petalCountLarge.textContent = progress;
+  ui.featureCard.style.setProperty("--meter-fill", `${fill}%`);
   ui.petalMeter.setAttribute("aria-valuenow", String(progress));
   ui.petalMeter.setAttribute("aria-valuemax", String(game.threshold));
   ui.petalMeter.setAttribute("aria-label", `${game.collectionPlural} collected`);
@@ -201,7 +223,22 @@ function renderPetalMeter() {
   });
   const remaining = game.threshold - progress;
   const label = remaining === 1 ? game.collectionName : game.collectionPlural;
-  ui.meterMessage.innerHTML = `<strong>${remaining} ${label} to go</strong><span>Progress carries between spins</span>`;
+  ui.meterMessage.innerHTML = `<strong>${remaining} ${label} to go</strong><span>${game.meterCarryCopy}</span>`;
+}
+
+function renderGameStats() {
+  const stats = state.gameStats[state.gameId];
+  ui.currentGameWon.textContent = `${formatCredits(stats.totalWon)} CR`;
+  ui.currentGameSpins.textContent = String(stats.spins);
+  ui.currentGameBest.textContent = `${formatCredits(stats.biggestWin)} CR`;
+  ui.lastWin.textContent = formatCredits(stats.lastWin);
+  ui.lastMultiplier.textContent = stats.lastWin > 0 ? `${stats.lastMultiplier.toFixed(2)}× bet` : "—";
+  document.querySelectorAll("[data-game-won]").forEach((item) => {
+    item.textContent = formatCredits(state.gameStats[item.dataset.gameWon].totalWon);
+  });
+  document.querySelectorAll("[data-lobby-won]").forEach((item) => {
+    item.textContent = `${formatCredits(state.gameStats[item.dataset.lobbyWon].totalWon)} CR won`;
+  });
 }
 
 function setStatus(message) {
@@ -231,6 +268,7 @@ function updateUi() {
   ui.sessionNet.textContent = `${sign}${formatCredits(state.sessionNet)} CR`;
   ui.sessionNet.className = state.sessionNet > 0 ? "positive" : state.sessionNet < 0 ? "negative" : "neutral";
   renderPetalMeter();
+  renderGameStats();
 }
 
 function updateCommitmentUi() {
@@ -247,10 +285,12 @@ async function rotateServerSeed() {
 function createPips() {
   const game = currentGame();
   const fragment = document.createDocumentFragment();
+  ui.petalMeter.style.setProperty("--meter-columns", String(game.meterColumns));
   for (let index = 0; index < game.threshold; index += 1) {
     const pip = document.createElement("span");
     pip.className = "petal-pip";
-    pip.textContent = "✦";
+    pip.dataset.step = String(index + 1);
+    pip.textContent = game.meterMode === "fightcard" ? String(index + 1) : game.meterGlyph;
     pip.setAttribute("aria-hidden", "true");
     fragment.append(pip);
   }
@@ -313,6 +353,7 @@ function buildLobby() {
         <strong>${game.name}</strong>
         <span class="lobby-game-copy">${game.lobbyCopy}</span>
         <span class="lobby-game-meta"><b>${game.volatility} rhythm</b><i>${game.threshold} ${game.collectionPlural}</i><i>${game.bonusDraws} reveals</i></span>
+        <span class="lobby-game-won" data-lobby-won="${game.id}">0.00 CR won</span>
         <span class="lobby-game-action">18+ · Play ${game.actionLabel} <b>→</b></span>
       </span>`;
     fragment.append(button);
@@ -347,9 +388,13 @@ function applyGameTheme({ resetGrid = false } = {}) {
   const firstWord = titleParts.shift();
   const gameStage = $("game");
   gameStage.dataset.game = game.id;
+  ui.featureCard.dataset.game = game.id;
+  ui.featureVisual.dataset.meter = game.meterMode;
+  ui.reels.dataset.motion = game.reelMotion;
   gameStage.style.setProperty("--game-bg", `url("${game.background}")`);
   gameStage.style.setProperty("--game-accent", game.accent);
   gameStage.style.setProperty("--game-secondary", game.secondary);
+  ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
   document.title = `${game.name} · Lumen Collection`;
   $("brandName").textContent = game.name;
   $("brandSubtitle").textContent = game.subtitle;
@@ -361,6 +406,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   $("gameTitle").innerHTML = `${firstWord} <span>${titleParts.join(" ")}</span>`;
   $("spinLabel").textContent = game.actionLabel;
   ui.winBannerLabel.textContent = `${game.shortName} win`;
+  ui.winBanner.dataset.tier = "win";
   ui.bonusOverlay.dataset.game = game.id;
   ui.bonusEyebrow.textContent = `${game.featureName} feature`;
   $("bonusTitle").textContent = game.bonusTitle;
@@ -389,8 +435,6 @@ function switchGame(gameId) {
   if (state.isSpinning || state.autoActive || gameId === state.gameId) return;
   state.gameId = gameId;
   state.lastOutcome = null;
-  ui.lastWin.textContent = "0.00";
-  ui.lastMultiplier.textContent = "—";
   ui.lastWinButton.disabled = true;
   ui.winBanner.classList.remove("is-visible");
   applyGameTheme({ resetGrid: true });
@@ -414,6 +458,7 @@ function playTone(frequency, duration = 0.12, type = "sine", delaySeconds = 0) {
   if (!AudioContext) return;
   state.audioContext ??= new AudioContext();
   const context = state.audioContext;
+  if (context.state === "suspended") void context.resume();
   const start = context.currentTime + delaySeconds;
   const oscillator = context.createOscillator();
   const gain = context.createGain();
@@ -443,6 +488,7 @@ function playNoise(duration = 0.22, volume = 0.05) {
   if (!AudioContext) return;
   state.audioContext ??= new AudioContext();
   const context = state.audioContext;
+  if (context.state === "suspended") void context.resume();
   const frameCount = Math.floor(context.sampleRate * duration);
   const buffer = context.createBuffer(1, frameCount, context.sampleRate);
   const channel = buffer.getChannelData(0);
@@ -459,9 +505,14 @@ function playNoise(duration = 0.22, volume = 0.05) {
 }
 
 function playSpinSound() {
-  const roots = { astral: 230, neon: 180, ember: 120, ufc: 145 };
-  playNoise(.3, .055);
-  [0, 1, 2].forEach((index) => playTone(roots[state.gameId] * (1 + index * .22), .2, "triangle", index * .06));
+  const settings = {
+    astral: { roots: [230, 285, 350], type: "triangle", noise: .04 },
+    neon: { roots: [160, 205, 265], type: "sine", noise: .035 },
+    ember: { roots: [92, 118, 146], type: "sawtooth", noise: .075 },
+    ufc: { roots: [145, 218, 290], type: "square", noise: .055 }
+  }[state.gameId];
+  playNoise(.32, settings.noise);
+  settings.roots.forEach((frequency, index) => playTone(frequency, .22, settings.type, index * .055));
 }
 
 function playCollectSound(count = 1) {
@@ -475,8 +526,48 @@ function playGameChangeSound() {
 }
 
 function playBonusSting() {
-  playNoise(.45, .08);
-  [220, 330, 440, 660, 880].forEach((frequency, index) => playTone(frequency, .55, "triangle", index * .07));
+  const stings = {
+    astral: { notes: [261.63, 392, 523.25, 783.99, 1046.5], type: "triangle" },
+    neon: { notes: [196, 293.66, 440, 659.25, 987.77], type: "sine" },
+    ember: { notes: [110, 164.81, 220, 329.63, 440], type: "sawtooth" },
+    ufc: { notes: [220, 440, 880, 660, 990], type: "square" }
+  }[state.gameId];
+  playNoise(.5, .085);
+  stings.notes.forEach((frequency, index) => playTone(frequency, .58, stings.type, index * .075));
+}
+
+function playReelStopSound(reelIndex) {
+  if (state.gameId === "astral") {
+    playTone(880 - reelIndex * 65, .18, "triangle");
+  } else if (state.gameId === "neon") {
+    playTone(310 + reelIndex * 42, .2, "sine");
+    playTone(620 + reelIndex * 55, .09, "sine", .03);
+  } else if (state.gameId === "ember") {
+    playNoise(.1, .035);
+    playTone(82 + reelIndex * 8, .2, "sawtooth");
+  } else {
+    playTone(reelIndex === 4 ? 880 : 180 + reelIndex * 24, reelIndex === 4 ? .42 : .13, reelIndex === 4 ? "sine" : "square");
+  }
+}
+
+function playAnticipationSound() {
+  const roots = { astral: 420, neon: 330, ember: 150, ufc: 220 };
+  const types = { astral: "triangle", neon: "sine", ember: "sawtooth", ufc: "square" };
+  for (let index = 0; index < 5; index += 1) {
+    playTone(roots[state.gameId] * (1 + index * .17), .22, types[state.gameId], index * .12);
+  }
+}
+
+function playWinTierSound(tierId) {
+  const strength = { big: 1, mega: 2, epic: 3 }[tierId] ?? 0;
+  if (!strength) return;
+  playNoise(.35 + strength * .12, .055 + strength * .018);
+  const base = { astral: 392, neon: 329.63, ember: 164.81, ufc: 220 }[state.gameId];
+  for (let run = 0; run <= strength; run += 1) {
+    [1, 1.25, 1.5, 2].forEach((ratio, index) => {
+      playTone(base * ratio, .45, state.gameId === "ember" ? "sawtooth" : state.gameId === "ufc" ? "square" : "triangle", run * .28 + index * .055);
+    });
+  }
 }
 
 function burstParticles(count = 18, intensity = 1) {
@@ -497,10 +588,77 @@ function burstParticles(count = 18, intensity = 1) {
   }
 }
 
-function showWinBanner(amount) {
-  ui.winBannerAmount.textContent = `${formatCredits(amount)} CR`;
+function animateCreditValue(element, amount, duration = 900) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || duration <= 0) {
+    element.textContent = `${formatCredits(amount)} CR`;
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    const start = performance.now();
+    const draw = (now) => {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - (1 - progress) ** 3;
+      element.textContent = `${formatCredits(amount * eased)} CR`;
+      if (progress < 1) window.requestAnimationFrame(draw);
+      else resolve();
+    };
+    window.requestAnimationFrame(draw);
+  });
+}
+
+function showWinBanner(amount, bet) {
+  const tier = winTierFor(amount, bet);
+  ui.winBanner.dataset.tier = tier.id;
+  ui.winBannerLabel.textContent = tier.id === "nice" ? `Nice ${currentGame().shortName} win` : `${currentGame().shortName} win`;
+  ui.winBannerMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
+  ui.winBannerAmount.textContent = "0.00 CR";
   ui.winBanner.classList.add("is-visible");
-  window.setTimeout(() => ui.winBanner.classList.remove("is-visible"), 1550);
+  void animateCreditValue(ui.winBannerAmount, amount, tier.id === "nice" ? 1050 : 720);
+  window.setTimeout(() => ui.winBanner.classList.remove("is-visible"), tier.id === "nice" ? 2100 : 1650);
+}
+
+function showCelebration(amount, bet, { autoAdvance = false } = {}) {
+  const tier = winTierFor(amount, bet);
+  if (!["big", "mega", "epic"].includes(tier.id)) return Promise.resolve();
+  const game = currentGame();
+  return new Promise((resolve) => {
+    let closed = false;
+    const close = () => {
+      if (closed) return;
+      closed = true;
+      ui.celebrationOverlay.hidden = true;
+      ui.celebrationOverlay.setAttribute("aria-hidden", "true");
+      $("appShell").inert = false;
+      resolve();
+    };
+    ui.celebrationOverlay.dataset.game = game.id;
+    ui.celebrationOverlay.dataset.tier = tier.id;
+    ui.celebrationTitle.textContent = game.winLabels[tier.id];
+    ui.celebrationKicker.textContent = tier.id === "big" ? "10× bet or more" : tier.id === "mega" ? "25× bet or more" : "50× bet or more";
+    ui.celebrationAmount.textContent = "0.00 CR";
+    ui.celebrationMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
+    ui.celebrationGame.textContent = game.name;
+    ui.celebrationCollect.textContent = `Collect ${formatCredits(amount)} CR`;
+    ui.celebrationCollect.onclick = close;
+    ui.celebrationOverlay.hidden = false;
+    ui.celebrationOverlay.setAttribute("aria-hidden", "false");
+    $("appShell").inert = true;
+    ui.celebrationCollect.focus();
+    playWinTierSound(tier.id);
+    burstParticles(tier.id === "epic" ? 90 : tier.id === "mega" ? 68 : 50, tier.id === "epic" ? 1.8 : 1.4);
+    void animateCreditValue(ui.celebrationAmount, amount, tier.id === "epic" ? 2600 : tier.id === "mega" ? 2100 : 1600);
+    if (autoAdvance) window.setTimeout(close, tier.id === "epic" ? 3200 : 2600);
+  });
+}
+
+async function settleOutcome(outcome) {
+  const game = currentGame();
+  ui.reels.classList.remove("is-anticipating");
+  renderGrid(outcome.grid, { settling: true, winnerCells: winningCells(outcome) });
+  for (let reel = 0; reel < COLS; reel += 1) {
+    window.setTimeout(() => playReelStopSound(reel), reel * game.reelStopGap);
+  }
+  await delay(game.reelStopGap * (COLS - 1) + 800);
 }
 
 function receiptOutcomeLabel(outcome) {
@@ -671,6 +829,7 @@ async function spin({ fromAuto = false } = {}) {
   state.sessionNet -= bet;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
+  ui.reels.classList.remove("is-anticipating");
   ui.winBanner.classList.remove("is-visible");
   ui.lastWinButton.disabled = true;
   setStatus(`${game.name} is aligning…`);
@@ -697,14 +856,23 @@ async function spin({ fromAuto = false } = {}) {
     shuffleTick += 1;
     renderGrid(cosmeticGrid(shuffleTick), { shuffling: true });
     if (shuffleTick % 4 === 0) playTone(220 + (shuffleTick % 7) * 24, .055, "triangle");
-  }, 190);
+  }, game.spinInterval);
 
   const outcome = await outcomePromise;
   const remainingDelay = Math.max(0, MIN_RESULT_DISPLAY_MS - (performance.now() - startedAt));
-  await delay(remainingDelay);
+  const anticipation = outcome.bonusRounds.length > 0 || outcome.collectorCount >= 3;
+  if (anticipation && remainingDelay > 760) {
+    await delay(remainingDelay - 760);
+    ui.reels.classList.add("is-anticipating");
+    setStatus(game.anticipationCopy);
+    playAnticipationSound();
+    await delay(760);
+  } else {
+    await delay(remainingDelay);
+  }
   window.clearInterval(shuffleTimer);
 
-  renderGrid(outcome.grid, { winnerCells: winningCells(outcome) });
+  await settleOutcome(outcome);
   state.progress[state.gameId] = outcome.progressAfter;
   state.lastOutcome = outcome;
   state.balance += outcome.baseWin;
@@ -723,7 +891,7 @@ async function spin({ fromAuto = false } = {}) {
   }
 
   if (outcome.baseWin > 0) {
-    showWinBanner(outcome.baseWin);
+    showWinBanner(outcome.baseWin, bet);
     playWinChord();
     burstParticles(outcome.baseWin >= bet * 10 ? 42 : 18, outcome.baseWin >= bet * 10 ? 1.25 : .75);
     if (outcome.baseWin >= bet * 10) document.querySelector(".machine").classList.add("is-big-win");
@@ -739,6 +907,11 @@ async function spin({ fromAuto = false } = {}) {
     updateUi();
   }
 
+  state.gameStats[state.gameId] = recordGameResult(state.gameStats[state.gameId], outcome.totalWin, bet);
+  updateUi();
+  if (outcome.bonusWin > 0) showWinBanner(outcome.totalWin, bet);
+  await showCelebration(outcome.totalWin, bet, { autoAdvance: fromAuto });
+
   state.lastReceipt = {
     serverSeed: spinServerSeed,
     serverHash: spinServerHash,
@@ -751,8 +924,6 @@ async function spin({ fromAuto = false } = {}) {
     outcome
   };
   state.nonce += 1;
-  ui.lastWin.textContent = formatCredits(outcome.totalWin);
-  ui.lastMultiplier.textContent = outcome.totalWin > 0 ? `${(outcome.totalWin / bet).toFixed(2)}× bet` : "No win";
   ui.lastWinButton.disabled = false;
   renderReceipt();
   await rotateServerSeed();
@@ -762,7 +933,6 @@ async function spin({ fromAuto = false } = {}) {
 
   if (outcome.totalWin > 0) {
     setStatus(`Total win ${formatCredits(outcome.totalWin)} CR · receipt ready to verify`);
-    if (outcome.bonusWin > 0) showWinBanner(outcome.totalWin);
   }
   if (!fromAuto) ui.spinButton.focus();
   return true;
@@ -892,9 +1062,8 @@ function bindEvents() {
     state.balance = INITIAL_BALANCE;
     state.sessionNet = 0;
     state.progress = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0]));
+    state.gameStats = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()]));
     state.lastOutcome = null;
-    ui.lastWin.textContent = "0.00";
-    ui.lastMultiplier.textContent = "—";
     ui.lastWinButton.disabled = true;
     setStatus("Demo balance reset. All four feature meters start anew.");
     updateUi();

@@ -28,6 +28,13 @@ The interface includes:
 
 - a first-entry four-game lobby that also performs the 18+ free-play confirmation;
 - a compact four-game switcher with progress retained per game;
+- four distinct bonus-meter machines: Astral constellation orbit, Neon pearl-current tank, Ember forge-heat chamber, and UFC ten-step fight card;
+- four distinct reel-motion systems: celestial cascade, underwater wave, heavy forge slam, and left-to-right fight strike;
+- permanent per-game ledgers showing total credits won, spins played, and each title's biggest win;
+- reel-stop anticipation for strong collector results and feature triggers;
+- animated win count-ups, highlighted winning symbols, collection bursts, and themed bonus reveals;
+- tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
+- themed reel-start, reel-stop, anticipation, collection, line-win, bonus, and celebration sound cues;
 - bet controls and a maximum-bet shortcut;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;
 - balance, last win, session net, recent result details, and feature progression;

@@ -51,14 +51,16 @@
         <div class="ambient-stars" aria-hidden="true"></div>
         <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
         <section class="game-layout" aria-label="Lumen Collection game">
-          <aside class="feature-card glass-panel" aria-labelledby="moonwellTitle">
+          <aside class="feature-card glass-panel" id="featureCard" data-game="astral" aria-labelledby="moonwellTitle">
             <div class="eyebrow"><span class="eyebrow-dot"></span><span id="featureEyebrow">Persistent feature</span></div>
             <h2 id="moonwellTitle">Moonwell Bloom</h2>
             <p class="feature-copy" id="featureCopy">Every Bloom symbol is yours to keep. Collect 12 to open the constellation bonus.</p>
 
-            <div class="moonwell-visual" aria-hidden="true">
+            <div class="moonwell-visual" id="featureVisual" data-meter="constellation" aria-hidden="true">
               <div class="moon-orbit moon-orbit-one"></div>
               <div class="moon-orbit moon-orbit-two"></div>
+              <div class="meter-energy meter-energy-one"></div>
+              <div class="meter-energy meter-energy-two"></div>
               <div class="moon-core"><span id="petalCountLarge">0</span><small id="meterThreshold">/12</small></div>
             </div>
 
@@ -66,6 +68,11 @@
             <p class="meter-message" id="meterMessage"><strong>12 Blooms to go</strong><span>Progress carries between spins</span></p>
 
             <div class="feature-steps" id="featureSteps" aria-label="Bonus journey"></div>
+            <div class="game-performance" aria-label="Current game results">
+              <div><span>Total won</span><strong id="currentGameWon">0.00 CR</strong></div>
+              <div><span>Spins played</span><strong id="currentGameSpins">0</strong></div>
+              <div><span>Best win</span><strong id="currentGameBest">0.00 CR</strong></div>
+            </div>
           </aside>
 
           <section class="machine" aria-labelledby="gameTitle">
@@ -87,6 +94,7 @@
               <div class="win-banner" id="winBanner" aria-hidden="true">
                 <span id="winBannerLabel">Celestial win</span>
                 <strong id="winBannerAmount">0.00 CR</strong>
+                <small id="winBannerMultiplier">0.00× bet</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">
@@ -141,16 +149,16 @@
             <p>One shared free-play balance. Each world keeps its own bonus progress.</p>
             <div class="game-list" role="group" aria-label="Choose a game">
               <button class="game-choice is-active" type="button" data-game-id="astral">
-                <span class="game-choice-art astral-art"></span><span><strong>Astral Bloom</strong><small>3-reveal Moonwell</small></span><b>99%</b>
+                <span class="game-choice-art astral-art"></span><span><strong>Astral Bloom</strong><small>3-reveal Moonwell</small></span><span class="game-choice-score"><b>99%</b><em><i data-game-won="astral">0.00</i> CR won</em></span>
               </button>
               <button class="game-choice" type="button" data-game-id="neon">
-                <span class="game-choice-art neon-art"></span><span><strong>Neon Tides</strong><small>4-orb Pearl Current</small></span><b>99%</b>
+                <span class="game-choice-art neon-art"></span><span><strong>Neon Tides</strong><small>4-orb Pearl Current</small></span><span class="game-choice-score"><b>99%</b><em><i data-game-won="neon">0.00</i> CR won</em></span>
               </button>
               <button class="game-choice" type="button" data-game-id="ember">
-                <span class="game-choice-art ember-art"></span><span><strong>Ember Crown</strong><small>2-seal Crown Forge</small></span><b>99%</b>
+                <span class="game-choice-art ember-art"></span><span><strong>Ember Crown</strong><small>2-seal Crown Forge</small></span><span class="game-choice-score"><b>99%</b><em><i data-game-won="ember">0.00</i> CR won</em></span>
               </button>
               <button class="game-choice" type="button" data-game-id="ufc">
-                <span class="game-choice-art ufc-art"></span><span><strong>UFC Octagon Gold</strong><small>3-card Fight Night</small></span><b>99%</b>
+                <span class="game-choice-art ufc-art"></span><span><strong>UFC Octagon Gold</strong><small>3-card Fight Night</small></span><span class="game-choice-score"><b>99%</b><em><i data-game-won="ufc">0.00</i> CR won</em></span>
               </button>
             </div>
             <div class="collection-note"><span>Fairness</span><p>Use the single shield button in the top bar to verify any spin.</p></div>
@@ -248,6 +256,18 @@
       </div>
       <div class="modal-scroll" id="winDetailsContent"></div>
     </dialog>
+
+    <div class="celebration-overlay" id="celebrationOverlay" hidden aria-hidden="true">
+      <section class="celebration-scene" role="dialog" aria-modal="true" aria-labelledby="celebrationTitle">
+        <div class="celebration-halo" aria-hidden="true"></div>
+        <div class="celebration-burst" aria-hidden="true"><i></i><i></i><i></i></div>
+        <span class="celebration-kicker" id="celebrationKicker">10× bet or more</span>
+        <h2 id="celebrationTitle">Big win</h2>
+        <strong class="celebration-amount" id="celebrationAmount">0.00 CR</strong>
+        <p><span id="celebrationMultiplier">0.00× bet</span> · <span id="celebrationGame">Astral Bloom</span></p>
+        <button class="primary-button celebration-collect" id="celebrationCollect" type="button">Collect win</button>
+      </section>
+    </div>
 
     <div class="bonus-overlay" id="bonusOverlay" hidden aria-hidden="true">
       <div class="bonus-scene" role="dialog" aria-modal="true" aria-labelledby="bonusTitle">
