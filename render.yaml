@@ -2,7 +2,6 @@ services:
   - type: web
     name: lumen-slot-collection
     runtime: static
-    plan: free
     staticPublishPath: .
     buildCommand: echo "Static Lumen Collection ready"
     headers:
