@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lumen-slot-collection
+    name: aislots
     runtime: static
     staticPublishPath: .
     buildCommand: echo "Static Lumen Collection ready"
