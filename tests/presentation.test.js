@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { GAMES } from "../game-model.js";
-import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "../presentation.js";
+import { cellIndex, GAMES, PAYLINES } from "../game-model.js";
+import { emptyGameStats, naturalNearMissFor, outcomeClassFor, recordGameResult, winTierFor } from "../presentation.js";
 
 test("win presentation tiers follow bet multipliers", () => {
   assert.equal(winTierFor(0, 2).id, "none");
@@ -43,4 +43,16 @@ test("partial returns are not classified as wins", () => {
   assert.equal(outcomeClassFor(1.5, 2), "partial-return");
   assert.equal(outcomeClassFor(2, 2), "break-even");
   assert.equal(outcomeClassFor(2.01, 2), "net-win");
+});
+
+test("near-miss tracing reports only a natural two-symbol connection", () => {
+  const grid = Array(20).fill("dew");
+  grid[cellIndex(0, 0)] = "luma";
+  grid[cellIndex(1, 0)] = "luma";
+  grid[cellIndex(2, 0)] = "orbit";
+  const result = naturalNearMissFor(grid, PAYLINES, cellIndex);
+  assert.equal(result.line, 1);
+  assert.equal(result.symbolId, "luma");
+  assert.equal(result.breakSymbolId, "orbit");
+  assert.deepEqual(result.matchCells, [cellIndex(0, 0), cellIndex(1, 0)]);
 });

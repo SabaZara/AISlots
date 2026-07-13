@@ -38,6 +38,11 @@ The interface includes:
 - four sealed bonus presentations: Moonwell Free Spins, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
 - a visible session timer, configurable net-loss limit, 15-minute reality checks, and wagered/returned/net summaries;
 - honest partial-return messaging: a payout below the bet is shown as a net loss and never receives a win celebration;
+- high-contrast neutral reel tiles with always-visible symbol names and per-symbol color coding;
+- animated SVG payline traces that connect every winning symbol directly across the reels;
+- truthful natural near-miss traces for unmodified RNG results where two leftmost symbols connect and reel three breaks the line;
+- larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
+- four distinct continuous spin-tick patterns plus themed reel-stop cues instead of one shared generic tick;
 - bet controls and a maximum-bet shortcut;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;
 - balance, last win, session net, recent result details, and feature progression;

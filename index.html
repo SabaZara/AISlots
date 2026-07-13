@@ -94,11 +94,19 @@
                 <span><i></i> 20 lines active</span>
                 <span id="reelCommitment">Next result locked</span>
               </div>
-              <div class="reels" id="reels" aria-label="Five reels and four rows" aria-live="off"></div>
+              <div class="reel-viewport">
+                <div class="reels" id="reels" aria-label="Five reels and four rows" aria-live="off"></div>
+                <svg class="payline-overlay" id="paylineOverlay" viewBox="0 0 500 400" preserveAspectRatio="none" aria-hidden="true"></svg>
+              </div>
               <div class="win-banner" id="winBanner" aria-hidden="true">
                 <span id="winBannerLabel">Celestial win</span>
                 <strong id="winBannerAmount">0.00 CR</strong>
                 <small id="winBannerMultiplier">0.00× bet</small>
+              </div>
+              <div class="near-miss-banner" id="nearMissBanner" hidden aria-hidden="true">
+                <strong>One symbol short</strong>
+                <span id="nearMissCopy">Line connection stopped on reel 3.</span>
+                <small>Natural RNG result · no payout · frequency is not increased</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">

@@ -34,3 +34,24 @@ export function outcomeClassFor(totalWin, bet) {
   if (totalWin < bet) return "partial-return";
   return "net-win";
 }
+
+export function naturalNearMissFor(grid, paylines, toCellIndex, excludedSymbol = "petal") {
+  for (let lineIndex = 0; lineIndex < paylines.length; lineIndex += 1) {
+    const rows = paylines[lineIndex];
+    const firstCell = toCellIndex(0, rows[0]);
+    const secondCell = toCellIndex(1, rows[1]);
+    const breakCell = toCellIndex(2, rows[2]);
+    const symbolId = grid[firstCell];
+    if (symbolId !== excludedSymbol && grid[secondCell] === symbolId && grid[breakCell] !== symbolId) {
+      return {
+        line: lineIndex + 1,
+        rows,
+        symbolId,
+        breakSymbolId: grid[breakCell],
+        matchCells: [firstCell, secondCell],
+        breakCell
+      };
+    }
+  }
+  return null;
+}
