@@ -28,7 +28,7 @@ The interface includes:
 
 - a first-entry four-game lobby that also performs the 18+ free-play confirmation;
 - a four-game lobby reachable from the top-left brand, with progress retained per game;
-- four distinct bonus-meter machines: Astral constellation orbit, Neon pearl-current tank, Ember forge-heat chamber, and UFC ten-step fight card;
+- four generated bonus HUDs with real progress lights: Astral moonstone constellation, Neon pearl-and-coral current, Ember black-steel forge, and UFC red/gold arena frame;
 - four distinct reel-motion systems: celestial cascade, underwater wave, heavy forge slam, and left-to-right fight strike;
 - permanent per-game ledgers showing total credits won, spins played, and each title's biggest win;
 - reel-stop anticipation for strong collector results and feature triggers;
@@ -43,6 +43,7 @@ The interface includes:
 - a generic, non-quantified “Almost” cue on naturally occurring unmodified RNG results, without revealing a line, reel, symbol count, or how close the result was;
 - larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
 - four distinct continuous spin-tick patterns plus themed reel-stop cues instead of one shared generic tick;
+- four original opt-in ambient music motifs—celestial arpeggio, underwater pulse, forge ostinato, and arena rhythm—generated live by Web Audio rather than copied music;
 - a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
 - synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
 - an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a no-wager preview button for immediate review;
@@ -53,11 +54,12 @@ The interface includes:
 - balance, last win, session net, recent result details, and feature progression;
 - themed synthesized sound effects, win chords, collection tones, particles, bonus reveals, and big-win motion;
 - reduced-motion support and keyboard spinning;
-- viewport-locked phone and iPad gameplay with no page scrolling, dynamic-viewport sizing, safe-area padding, compact portrait controls, and a dedicated horizontal cabinet after rotation;
+- viewport-locked desktop, phone, and iPad gameplay with no page scrolling, dynamic-viewport sizing, safe-area padding, compact portrait controls, and a dedicated horizontal cabinet after rotation;
+- overflow-safe winning-symbol breakouts on phones, plus a compact portrait HUD that replaces the redundant machine title so character faces stay unobstructed;
 - a no-scroll responsive lobby that uses a 2×2 chooser in portrait and a four-card row in landscape;
 - a single compact fairness button in the top toolbar.
 
-Responsive QA covers 320×568, 360×740, and 390×844 phone portraits; 667×375 and 844×390 phone landscapes; 768×1024 iPad portrait; and 1024×768 iPad landscape. The document remains exactly viewport-sized at each breakpoint.
+Responsive QA covers 320×568, 360×740, and 390×844 phone portraits; 667×375 and 844×390 phone landscapes; 768×1024 iPad portrait; 1024×768 iPad landscape; and desktop cabinets. The document remains exactly viewport-sized at each breakpoint.
 
 Autoplay is present only for this no-value free-play prototype. Real-money rules differ by jurisdiction, and some markets prohibit online-slot autoplay entirely.
 
@@ -115,6 +117,13 @@ Each game also has a dedicated 1774×887 raster symbol sheet generated with the 
 - `assets/symbols-neon-v2.png` — pearl, tide ring, starfish gem, coral spear, shell, and Pearl Key.
 - `assets/symbols-ember-v2.png` — sunsteel seal, forge ring, star anvil, ember spear, scale, and Crown Rune.
 - `assets/symbols-ufc-v2.png` — logo-free championship belt, octagon, event star, strike, clock, glove, and Fight Token.
+
+Each persistent collection meter now uses a dedicated transparent generated HUD plate with a live HTML count and deterministic progress lights layered over it:
+
+- `assets/astral-bonusbar-frame-v1.png` — silver moonstone and constellation frame.
+- `assets/neon-bonusbar-frame-v1.png` — pearl shell, coral, and sapphire current frame.
+- `assets/ember-bonusbar-frame-v1.png` — blackened steel, bronze, and molten rune frame.
+- `assets/ufc-bonusbar-frame-v1.png` — original logo-free red, black, and gold combat-arena frame.
 
 The background prompts required environment-only compositions, a low-detail center for readable reels, no text or logos, and no recognizable characters or copied game imagery. The symbol prompts required seven isolated glossy 3D game icons on a removable chroma background. Any final UFC trademarks, logos, approved typography, fighter likenesses, event names, or sponsor material should come from the license holder's approved brand pack and legal review.
 

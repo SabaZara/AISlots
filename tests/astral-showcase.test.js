@@ -88,10 +88,45 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /height: 100dvh/);
   assert.match(css, /env\(safe-area-inset-top\)/);
   assert.match(css, /orientation: landscape/);
-  assert.match(css, /grid-template-columns: clamp\(56px, 9vw, 70px\) minmax\(0, 1fr\)/);
-  assert.match(readme, /viewport-locked phone and iPad gameplay/i);
+  assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
+  assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.10.0");
+  assert.equal(JSON.parse(packageJson).version, "2.11.0");
+});
+
+test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
+  const [model, app, css] = await Promise.all([
+    readFile(new URL("game-model.js", root), "utf8"),
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("styles.css", root), "utf8")
+  ]);
+  const paths = [
+    "assets/astral-bonusbar-frame-v1.png",
+    "assets/neon-bonusbar-frame-v1.png",
+    "assets/ember-bonusbar-frame-v1.png",
+    "assets/ufc-bonusbar-frame-v1.png"
+  ];
+  for (const path of paths) {
+    assert.match(model, new RegExp(path.replaceAll("/", "\\/").replace(".png", "\\.png")));
+    const image = await readFile(new URL(path, root));
+    assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.equal(image[25], 6, `${path} must use RGBA PNG color type 6`);
+    assert.ok(image.length > 500_000);
+  }
+  assert.match(app, /--bonus-bar-art/);
+  assert.match(app, /classList\.toggle\("has-winners"/);
+  assert.match(css, /\.reels\.has-winners/);
+  assert.match(css, /winningSymbolBreakout/);
+});
+
+test("all audio profiles provide distinct synthesized music motifs", async () => {
+  const audioEngine = await readFile(new URL("experience-engine.js", root), "utf8");
+  assert.match(audioEngine, /playMusicStep\(\)/);
+  assert.match(audioEngine, /startMusic\(\)/);
+  assert.match(audioEngine, /restartMusic\(\)/);
+  for (const percussion of ["shimmer", "bubble", "forge", "arena"]) {
+    assert.match(audioEngine, new RegExp(`percussion: ["']${percussion}["']`));
+  }
 });
 
 test("licensed Astral spin and win samples include source attribution", async () => {

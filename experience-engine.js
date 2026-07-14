@@ -7,7 +7,18 @@ export const AUDIO_PROFILES = Object.freeze({
     tickNotes: [523.25, 659.25, 783.99, 987.77],
     stopBase: 920,
     winBase: 392,
-    wet: 0.28
+    wet: 0.28,
+    music: Object.freeze({
+      bpm: 76,
+      wave: "sine",
+      root: 196,
+      lead: [0, 7, 12, 16, 12, 7, 4, 11],
+      bass: [-12, null, -7, null, -9, null, -5, null],
+      filter: 1900,
+      wet: 0.42,
+      level: 0.021,
+      percussion: "shimmer"
+    })
   }),
   neon: Object.freeze({
     wave: "sine",
@@ -17,7 +28,18 @@ export const AUDIO_PROFILES = Object.freeze({
     tickNotes: [329.63, 440, 554.37, 659.25, 880],
     stopBase: 310,
     winBase: 329.63,
-    wet: 0.36
+    wet: 0.36,
+    music: Object.freeze({
+      bpm: 92,
+      wave: "triangle",
+      root: 164.81,
+      lead: [0, 4, 7, 11, 14, 11, 7, 4],
+      bass: [-12, null, -5, null, -9, null, -7, null],
+      filter: 1500,
+      wet: 0.5,
+      level: 0.019,
+      percussion: "bubble"
+    })
   }),
   ember: Object.freeze({
     wave: "sawtooth",
@@ -27,7 +49,18 @@ export const AUDIO_PROFILES = Object.freeze({
     tickNotes: [82.41, 98, 110, 123.47],
     stopBase: 92,
     winBase: 164.81,
-    wet: 0.16
+    wet: 0.16,
+    music: Object.freeze({
+      bpm: 84,
+      wave: "sawtooth",
+      root: 82.41,
+      lead: [0, 0, 3, 0, 7, 5, 3, -2],
+      bass: [-12, null, -12, null, -9, null, -7, null],
+      filter: 720,
+      wet: 0.12,
+      level: 0.017,
+      percussion: "forge"
+    })
   }),
   ufc: Object.freeze({
     wave: "square",
@@ -37,7 +70,18 @@ export const AUDIO_PROFILES = Object.freeze({
     tickNotes: [146.83, 174.61, 220, 293.66],
     stopBase: 142,
     winBase: 220,
-    wet: 0.12
+    wet: 0.12,
+    music: Object.freeze({
+      bpm: 104,
+      wave: "square",
+      root: 110,
+      lead: [0, 7, 10, 7, 12, 10, 7, 5],
+      bass: [-12, null, -5, null, -12, null, -2, null],
+      filter: 980,
+      wet: 0.1,
+      level: 0.014,
+      percussion: "arena"
+    })
   })
 });
 
@@ -56,6 +100,8 @@ export class SlotAudioEngine {
     this.sampleBuffers = new Map();
     this.samplePromises = new Map();
     this.lastWinVoiceAt = 0;
+    this.musicTimer = null;
+    this.musicStep = 0;
   }
 
   profile() {
@@ -64,11 +110,15 @@ export class SlotAudioEngine {
 
   setEnabled(enabled) {
     this.enabled = enabled;
-    if (!enabled) this.stopSpinLoop({ immediate: true });
+    if (!enabled) {
+      this.stopSpinLoop({ immediate: true });
+      this.stopMusic();
+    }
     if (enabled) {
       const context = this.ensure();
       if (context?.state === "suspended") void context.resume();
       void this.preloadSamples();
+      this.startMusic();
     }
   }
 
@@ -83,6 +133,7 @@ export class SlotAudioEngine {
     const reverbGain = context.createGain();
     const dryBus = context.createGain();
     const spinBus = context.createGain();
+    const musicBus = context.createGain();
 
     master.gain.value = 0.68;
     compressor.threshold.value = -20;
@@ -92,14 +143,16 @@ export class SlotAudioEngine {
     compressor.release.value = 0.24;
     reverbGain.gain.value = 0.2;
     spinBus.gain.value = 0.86;
+    musicBus.gain.value = 0.72;
 
     reverb.buffer = this.makeImpulse(context, 1.35, 2.7);
     dryBus.connect(master);
     spinBus.connect(master);
+    musicBus.connect(master);
     reverb.connect(reverbGain).connect(master);
     master.connect(compressor).connect(context.destination);
     this.context = context;
-    this.graph = { master, compressor, reverb, reverbGain, dryBus, spinBus };
+    this.graph = { master, compressor, reverb, reverbGain, dryBus, spinBus, musicBus };
     return context;
   }
 
@@ -115,12 +168,12 @@ export class SlotAudioEngine {
     return impulse;
   }
 
-  connectVoice(node, { pan = 0, wet = this.profile().wet, spin = false } = {}) {
+  connectVoice(node, { pan = 0, wet = this.profile().wet, spin = false, music = false } = {}) {
     const context = this.context;
     const panner = context.createStereoPanner ? context.createStereoPanner() : context.createGain();
     if (panner.pan) panner.pan.value = Math.max(-1, Math.min(1, pan));
     node.connect(panner);
-    panner.connect(spin ? this.graph.spinBus : this.graph.dryBus);
+    panner.connect(music ? this.graph.musicBus : spin ? this.graph.spinBus : this.graph.dryBus);
     if (!spin && wet > 0) {
       const reverbSend = context.createGain();
       reverbSend.gain.value = Math.max(0, Math.min(0.65, wet));
@@ -190,7 +243,8 @@ export class SlotAudioEngine {
       frequencyEnd = frequency,
       filter = 0,
       filterEnd = filter,
-      detune = 0
+      detune = 0,
+      music = false
     } = options;
     const start = context.currentTime + delay;
     const stop = start + Math.max(0.03, duration);
@@ -213,7 +267,7 @@ export class SlotAudioEngine {
     } else {
       oscillator.connect(gain);
     }
-    this.connectVoice(gain, { pan, wet });
+    this.connectVoice(gain, { pan, wet, music });
     oscillator.start(start);
     oscillator.stop(stop + 0.03);
     return oscillator;
@@ -230,7 +284,8 @@ export class SlotAudioEngine {
       wet = 0.08,
       filterType = this.profile().spinNoise,
       frequency = this.profile().spinFilter,
-      frequencyEnd = frequency
+      frequencyEnd = frequency,
+      music = false
     } = options;
     const start = context.currentTime + delay;
     const frames = Math.max(1, Math.floor(context.sampleRate * duration));
@@ -251,9 +306,81 @@ export class SlotAudioEngine {
     gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
     source.buffer = buffer;
     source.connect(filter).connect(gain);
-    this.connectVoice(gain, { pan, wet });
+    this.connectVoice(gain, { pan, wet, music });
     source.start(start);
     return source;
+  }
+
+  musicFrequency(root, semitones) {
+    return root * 2 ** (semitones / 12);
+  }
+
+  playMusicStep() {
+    if (!this.enabled) return;
+    const music = this.profile().music;
+    if (!music) return;
+    const step = this.musicStep % music.lead.length;
+    const lead = music.lead[step];
+    const bass = music.bass[step];
+    const beatSeconds = 60 / (music.bpm * 2);
+
+    if (Number.isFinite(lead)) {
+      this.tone(this.musicFrequency(music.root, lead), beatSeconds * 1.35, {
+        type: music.wave,
+        volume: music.level,
+        attack: 0.025,
+        pan: Math.sin(step * 1.7) * 0.34,
+        wet: music.wet,
+        filter: music.filter,
+        filterEnd: music.filter * 0.72,
+        music: true
+      });
+    }
+
+    if (Number.isFinite(bass)) {
+      this.tone(this.musicFrequency(music.root, bass), beatSeconds * 1.7, {
+        type: music.percussion === "forge" ? "sawtooth" : "triangle",
+        volume: music.level * 1.35,
+        attack: 0.012,
+        pan: 0,
+        wet: music.wet * 0.4,
+        filter: Math.max(260, music.filter * 0.42),
+        filterEnd: Math.max(180, music.filter * 0.26),
+        music: true
+      });
+    }
+
+    if (music.percussion === "arena" && (step === 0 || step === 4)) {
+      this.noise(0.12, { volume: 0.018, wet: 0.04, filterType: "lowpass", frequency: 220, frequencyEnd: 74, music: true });
+    } else if (music.percussion === "forge" && step % 2 === 0) {
+      this.noise(0.09, { volume: 0.009, wet: 0.03, filterType: "bandpass", frequency: 680, frequencyEnd: 210, music: true });
+    } else if (music.percussion === "bubble" && (step === 2 || step === 6)) {
+      this.tone(this.musicFrequency(music.root, lead + 19), 0.16, { type: "sine", volume: 0.009, frequencyEnd: this.musicFrequency(music.root, lead + 24), wet: 0.55, music: true });
+    } else if (music.percussion === "shimmer" && step === 7) {
+      this.noise(0.22, { volume: 0.006, wet: 0.54, filterType: "highpass", frequency: 2600, frequencyEnd: 5200, music: true });
+    }
+    this.musicStep += 1;
+  }
+
+  startMusic() {
+    this.stopMusic();
+    if (!this.enabled || !this.ensure()) return;
+    const music = this.profile().music;
+    if (!music) return;
+    this.musicStep = 0;
+    this.playMusicStep();
+    const stepMilliseconds = Math.round(60000 / (music.bpm * 2));
+    this.musicTimer = window.setInterval(() => this.playMusicStep(), stepMilliseconds);
+  }
+
+  stopMusic() {
+    if (this.musicTimer !== null) window.clearInterval(this.musicTimer);
+    this.musicTimer = null;
+    this.musicStep = 0;
+  }
+
+  restartMusic() {
+    if (this.enabled) this.startMusic();
   }
 
   startSpinLoop() {
@@ -443,6 +570,7 @@ export class SlotAudioEngine {
 
   gameChange() {
     const profile = this.profile();
+    this.restartMusic();
     [1, 1.5, 2.25].forEach((ratio, index) => this.tone(profile.winBase * ratio, 0.28, { delay: index * 0.055, volume: 0.045, wet: profile.wet + 0.08 }));
   }
 

@@ -301,6 +301,7 @@ function renderGrid(grid, { shuffling = false, settling = false, winnerCells = n
       fragment.append(cell);
     }
   }
+  ui.reels.classList.toggle("has-winners", winnerCells.size > 0);
   ui.reels.replaceChildren(fragment);
 }
 
@@ -498,6 +499,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.reels.dataset.motion = game.reelMotion;
   gameStage.style.setProperty("--game-bg", `url("${game.background}")`);
   gameStage.style.setProperty("--game-characters", `url("${game.characterLayer}")`);
+  gameStage.style.setProperty("--bonus-bar-art", `url("${game.bonusBarArt}")`);
   gameStage.style.setProperty("--game-accent", game.accent);
   gameStage.style.setProperty("--game-secondary", game.secondary);
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);

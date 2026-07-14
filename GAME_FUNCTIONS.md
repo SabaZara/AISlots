@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.10.0**
+Version reviewed: **2.11.0**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -53,6 +53,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Reel motion changes by world: cascade, wave, slam, or strike.
 - Collector landings receive a different impact treatment from standard symbol landings.
 - Winning symbols animate and remain visually readable without a drawn payline.
+- Settled winners put the reel board into an overflow-safe breakout state, allowing the symbol art to jump beyond its cell without being clipped on phones.
 - Returned credits count upward with synchronized payout notes.
 - Nice, Big, Mega, and Epic tiers use different labels, timing, particles, scale, lighting, and full-screen celebration intensity.
 - Feature prizes are sealed before any bonus choice or reveal animation begins; selections are presentation only.
@@ -66,11 +67,13 @@ All characters are transparent foreground cutouts placed independently over envi
 - Multiple collectors in one spin add multiple positions.
 - Crossing the threshold can resolve one or more complete bonus rounds, with remainder progress carried forward.
 - Each bonus uses its own draw count, prize weights, presentation name, sound sequence, and visual meter.
+- Each world uses a transparent generated HUD frame with a live count and one deterministic progress light per required collector.
 - Bonus payout equals the sum of the pre-sealed prize multipliers multiplied by the spin’s total bet.
 
 ## Audio and effects
 
 - Web Audio engine with separate profiles for Astral, Neon, Ember, and UFC.
+- Four original low-volume music loops are synthesized in the browser: celestial arpeggio, underwater pulse, forge ostinato, and arena rhythm. Switching worlds restarts the matching motif; disabling sound stops it.
 - Per-world spin-start, spin-bed, tick rhythm, reel-stop, anticipation, collection, win, payout-count, bonus-start, bonus-reveal, and celebration cues.
 - Stereo movement, dynamics compression, synthesized room/reverb treatment, impact noise, musical win chords, particles, reel flashes, cabinet shake, and screen-level big-win scenes.
 - Astral can use the locally stored licensed wheel and “you win” samples. Sources and license notes are recorded in `assets/audio/LICENSES.md`.
@@ -97,7 +100,8 @@ All characters are transparent foreground cutouts placed independently over envi
 - Reduced-motion media query support.
 - Keyboard operation, focus states, ARIA labels, live result status, and dialog close controls.
 - Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, turbo, autoplay, sound, lobby, and verification controls.
-- Phone and iPad gameplay is locked to the dynamic viewport with no document scrolling. Portrait keeps the cabinet centered with the bonus meter floating inside it; short landscape rotation switches to a horizontal meter–reels–controls layout.
+- Desktop, phone, and iPad gameplay is locked to the dynamic viewport with no document scrolling. Portrait keeps the cabinet centered with the generated bonus HUD floating in the character-safe center; short landscape rotation places the HUD above the horizontal reels-and-controls cabinet.
+- Phone portrait removes the redundant in-cabinet title while retaining the game name in the top bar, preventing title text from covering character faces.
 - Safe-area insets protect controls around notches and home indicators. The lobby fits as a 2×2 portrait chooser or a four-card landscape row without page scrolling.
 
 ### Responsive verification matrix
@@ -111,6 +115,7 @@ All characters are transparent foreground cutouts placed independently over envi
 | Modern phone rotated | 844×390 | Landscape | None | Horizontal meter–reels–controls cabinet fits. |
 | iPad | 768×1024 | Portrait | None | Centered full cabinet, meter, controls, and footer fit. |
 | iPad rotated | 1024×768 | Landscape | None | Compact landscape cabinet, meter, controls, and footer fit. |
+| Desktop | 1440×900 and larger | Landscape | None | Header, cabinet, bonus HUD, controls, preview row, and footer remain inside the viewport. |
 
 The same rotation checks verify that the four-card lobby stays inside its shell: 2×2 in portrait and one row in landscape.
 
