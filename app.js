@@ -77,6 +77,8 @@ const ui = {
   bonusMechanicProgress: $("bonusMechanicProgress"),
   bonusMechanicBar: $("bonusMechanicBar"),
   autoButton: $("autoButton"),
+  spinOptions: $("spinOptions"),
+  showcaseRow: $("showcaseRow"),
   turboButton: $("turboButton"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
@@ -362,6 +364,7 @@ function updateUi() {
   ui.clientSeedInput.disabled = controlsLocked;
   ui.autoButton.disabled = state.isSpinning && !state.autoActive;
   ui.autoButton.classList.toggle("is-running", state.autoActive);
+  ui.autoButton.setAttribute("aria-label", state.autoActive ? `Stop autoplay after the current spin · ${state.autoRemaining} remaining` : "Open autoplay options");
   ui.autoButton.innerHTML = state.autoActive
     ? `<span aria-hidden="true">■</span><strong>${state.autoRemaining}</strong>`
     : `<span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong>`;
@@ -494,6 +497,10 @@ function applyGameTheme({ resetGrid = false } = {}) {
   const firstWord = titleParts.shift();
   const gameStage = $("game");
   gameStage.dataset.game = game.id;
+  const autoplayHome = game.id === "astral" ? ui.showcaseRow : ui.spinOptions;
+  if (ui.autoButton.parentElement !== autoplayHome) autoplayHome.append(ui.autoButton);
+  ui.autoplayMenu.hidden = true;
+  ui.autoButton.setAttribute("aria-expanded", "false");
   ui.featureCard.dataset.game = game.id;
   ui.featureVisual.dataset.meter = game.meterMode;
   ui.reels.dataset.motion = game.reelMotion;

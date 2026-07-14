@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.11.1**
+Version reviewed: **2.11.2**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -58,6 +58,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Nice, Big, Mega, and Epic tiers use different labels, timing, particles, scale, lighting, and full-screen celebration intensity.
 - Feature prizes are sealed before any bonus choice or reveal animation begins; selections are presentation only.
 - Astral includes a clearly labeled no-wager **Bonus demo** for reviewing the cinematic free-spin sequence. It does not spend credits, award credits, advance the meter, or replace the real triggered bonus.
+- Astral places **Bonus demo** in the upper-right game area and gives **Autoplay** its own centered utility dock below the main controls; short landscape layouts keep the Autoplay dock visible as a compact floating control.
 - Astral winning tiles remain stationary and transparent while only the isolated symbol artwork jumps. The other three games retain their existing winner treatment.
 
 ## Persistent meters and bonuses

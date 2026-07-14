@@ -83,6 +83,9 @@
           </aside>
 
           <section class="machine" aria-labelledby="gameTitle">
+            <div class="machine-top-actions" id="machineTopActions">
+              <button class="showcase-button" id="astralShowcaseButton" type="button" aria-label="Play the no-wager Moonwell bonus demo" title="Shows the Moonwell bonus animation without spending credits or changing progress."><span>✦</span> Bonus demo</button>
+            </div>
             <div class="machine-title">
               <div class="title-flourish" aria-hidden="true"></div>
               <div>
@@ -146,9 +149,9 @@
                   <strong><span id="lastWin">0.00</span><small> CR</small></strong>
                   <span id="lastMultiplier">—</span>
                 </div>
-                <div class="spin-options">
+                <div class="spin-options" id="spinOptions">
                   <button class="turbo-button" id="turboButton" type="button" aria-label="Turn turbo spins on" aria-pressed="false"><span aria-hidden="true">⚡</span></button>
-                  <button class="auto-button" id="autoButton" type="button" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong></button>
+                  <button class="auto-button" id="autoButton" type="button" aria-label="Open autoplay options" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong></button>
                 </div>
               </div>
             </div>
@@ -165,9 +168,8 @@
                 <small id="lossLimitStatus">0.00 of 100.00 CR net loss</small>
               </div>
             </div>
-            <div class="showcase-row">
+            <div class="showcase-row" id="showcaseRow">
               <p class="keyboard-hint">Press <kbd>Space</kbd> to spin · Finite autoplay · Result shown for at least 2.5 seconds</p>
-              <button class="showcase-button" id="astralShowcaseButton" type="button" aria-label="Play the no-wager Moonwell bonus demo" title="Shows the Moonwell bonus animation without spending credits or changing progress."><span>✦</span> Bonus demo</button>
             </div>
           </section>
 

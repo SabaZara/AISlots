@@ -46,10 +46,11 @@ The interface includes:
 - four original opt-in ambient music motifs—celestial arpeggio, underwater pulse, forge ostinato, and arena rhythm—generated live by Web Audio rather than copied music;
 - a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
 - synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
-- an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a clearly labeled no-wager **Bonus demo** button for reviewing the animation without changing credits or progress;
+- an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a clearly labeled no-wager **Bonus demo** button at the top of the game for reviewing the animation without changing credits or progress;
 - an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, turbo timing, and visibly dancing winning symbols;
 - opt-in licensed Astral audio samples for the reel wheel and “you win” voice, with source and license records in `assets/audio/LICENSES.md`;
 - bet controls and a maximum-bet shortcut;
+- an Astral-only Autoplay dock below the main controls while the other games retain their original inline Autoplay placement;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;
 - balance, last win, session net, recent result details, and feature progression;
 - themed synthesized sound effects, win chords, collection tones, particles, bonus reveals, and big-win motion;

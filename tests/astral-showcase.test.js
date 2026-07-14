@@ -25,6 +25,8 @@ test("Astral cinematic showcase markup and styles stay fully connected", async (
   assert.match(app, /no credits or feature progress changed/i);
   assert.match(html, /Bonus demo/i);
   assert.match(html, /without spending credits or changing progress/i);
+  assert.match(html, /machine-top-actions[\s\S]*?astralShowcaseButton/);
+  assert.match(app, /game\.id === "astral" \? ui\.showcaseRow : ui\.spinOptions/);
 });
 
 test("generated Astral guardian asset is a project-local PNG", async () => {
@@ -94,7 +96,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.11.1");
+  assert.equal(JSON.parse(packageJson).version, "2.11.2");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
