@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.14.0**
+Version reviewed: **2.16.1**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -12,10 +12,10 @@ This is the team-review checklist for the current build. “Implemented” means
 | First-entry game lobby | Implemented | Opens before gameplay and presents all four worlds as large image cards. |
 | World selection | Implemented | Astral Bloom, Neon Tides, Ember Crown, and UFC Octagon Gold can be selected from the lobby. The top-left game brand returns to the lobby. |
 | Free-play age gate | Implemented | The lobby confirms 18+ free-play entry for the browser session. |
-| Spin | Implemented | Large central button starts one committed RNG result. Spacebar also spins when no dialog or text field has focus. |
+| Spin | Implemented | Large central button starts one committed RNG result. During a manual spin, the same button or Spacebar immediately settles the reels without changing the committed outcome. |
 | Bet decrease / increase | Implemented | Large `−` and `+` buttons select 1, 2, 5, 10, or 20 CR. Controls lock while a result is resolving. |
 | Maximum bet | Implemented | `MAX` selects 20 CR. There is no real-money purchase or deposit path. |
-| Turbo | Implemented | Shortens the presentation wait while preserving the exact same outcome generation and RTP. |
+| Spin speed | Implemented | One compact control cycles Normal 1×, Turbo 2×, and Quick 4×. The selection persists between visits and changes presentation timing only; outcome generation and RTP are unchanged. |
 | Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits or a feature presentation. |
 | Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. The panel explains that the higher price guarantees meter progress; exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
 | Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet opens three sealed Moon Balloon flights immediately using demo credits only. Each flight is launched separately; purchase prizes remain scaled to 99.00% theoretical RTP and receive a fairness receipt. |
@@ -82,10 +82,10 @@ All characters are transparent foreground cutouts placed independently over envi
 ## Audio and effects
 
 - Web Audio engine with separate profiles for Astral, Neon, Ember, and UFC.
-- Astral uses a licensed seamless WOW Sound background loop; Neon, Ember, and UFC retain their original synthesized underwater, forge, and arena motifs. Switching worlds restarts the matching soundtrack; disabling sound stops it.
+- Astral uses a licensed, high-energy WOW Sound cinematic track in looping playback; Neon, Ember, and UFC retain their original synthesized underwater, forge, and arena motifs. Switching worlds restarts the matching soundtrack; disabling sound stops it.
 - Per-world spin-start, spin-bed, tick rhythm, reel-stop, anticipation, collection, win, payout-count, bonus-start, bonus-reveal, and celebration cues.
 - Stereo movement, dynamics compression, synthesized room/reverb treatment, impact noise, musical win chords, particles, reel flashes, cabinet shake, and screen-level big-win scenes.
-- Astral uses locally stored WOW Sound layers for background music, spin launch, reel ticks, regular victories, and a 13-second cinematic big-win cue. The background automatically ducks during the big-win cue and returns after the cue or Collect action. Source, credit, and license records are stored in `assets/audio/LICENSES.md`.
+- Astral uses locally stored WOW Sound layers for background music, spin launch, reel ticks, regular victories, and a 13-second cinematic big-win cue. Bright casino sparkle runs, high-pass risers, stereo coin-like ticks, and upper-register fanfare chords are synthesized around the unmodified licensed recordings. The background automatically ducks during the big-win cue and returns after the cue or Collect action. Source, credit, and license records are stored in `assets/audio/LICENSES.md`.
 - Audio remains off until the player explicitly enables it.
 
 ## Provable fairness

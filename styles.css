@@ -3826,6 +3826,9 @@ kbd {
 .turbo-button {
   width: 48px;
   min-height: 52px;
+  display: grid;
+  place-content: center;
+  gap: 3px;
   border: 1px solid rgba(201,224,255,.22);
   color: #dce8ff;
   background: rgba(255,255,255,.045);
@@ -3834,11 +3837,41 @@ kbd {
   transition: 180ms ease;
 }
 
+.turbo-button > span { font-size: 17px; line-height: 1; }
+.turbo-button > strong { font-size: 9px; line-height: 1; letter-spacing: .05em; }
+
 .turbo-button.is-active {
   border-color: #fff09c;
   color: #fff5b9;
   background: radial-gradient(circle, rgba(255,224,86,.28), rgba(107,74,183,.18));
   box-shadow: 0 0 18px rgba(255,220,91,.24), inset 0 0 12px rgba(255,255,255,.09);
+}
+
+.turbo-button.is-quick {
+  border-color: #7ff7ff;
+  color: #e6feff;
+  background: radial-gradient(circle, rgba(65,236,255,.32), rgba(117,69,222,.25));
+  box-shadow: 0 0 22px rgba(74,230,255,.34), inset 0 0 14px rgba(255,255,255,.12);
+}
+
+.spin-button.can-quick-stop {
+  border-color: rgba(255,239,145,.92);
+  filter: brightness(1.16);
+  animation: quickStopPulse .52s ease-in-out infinite alternate;
+}
+
+@keyframes quickStopPulse {
+  to { transform: scale(.96); box-shadow: 0 0 30px rgba(255,224,93,.58), inset 0 0 22px rgba(255,255,255,.22); }
+}
+
+.game-stage[data-speed="turbo"] .symbol-cell.is-settling .generated-symbol,
+.game-stage[data-speed="turbo"] .symbol-cell.is-settling svg { animation-duration: 340ms !important; }
+.game-stage[data-speed="quick"] .symbol-cell.is-settling .generated-symbol,
+.game-stage[data-speed="quick"] .symbol-cell.is-settling svg { animation-duration: 165ms !important; }
+.reel-viewport.is-quick-stopping .symbol-cell.is-settling .generated-symbol,
+.reel-viewport.is-quick-stopping .symbol-cell.is-settling svg {
+  animation-duration: 90ms !important;
+  animation-delay: 0ms !important;
 }
 
 .turbo-button:disabled { opacity: .45; cursor: default; }

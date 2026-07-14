@@ -17,6 +17,12 @@ import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from ".
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
 const INITIAL_BALANCE = 1000;
+const SPIN_SPEED_STORAGE_KEY = "aislots-spin-speed";
+const SPIN_SPEEDS = Object.freeze([
+  Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
+  Object.freeze({ id: "turbo", name: "Turbo", label: "2×", resultDisplayMs: 1100, settleScale: 0.55, shuffleScale: 0.72, autoplayGapMs: 220 }),
+  Object.freeze({ id: "quick", name: "Quick", label: "4×", resultDisplayMs: 480, settleScale: 0.25, shuffleScale: 0.5, autoplayGapMs: 80 })
+]);
 const SYMBOL_SHEET_INDEX = { luma: 0, orbit: 1, nova: 2, comet: 3, dew: 4, leaf: 5, petal: 6 };
 
 const $ = (id) => document.getElementById(id);
@@ -76,8 +82,10 @@ const ui = {
   bonusMechanicBar: $("bonusMechanicBar"),
   autoButton: $("autoButton"),
   spinOptions: $("spinOptions"),
+  spinLabel: $("spinLabel"),
   showcaseRow: $("showcaseRow"),
   turboButton: $("turboButton"),
+  speedLabel: $("speedLabel"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
   lobbyOverlay: $("lobbyOverlay"),
@@ -131,7 +139,9 @@ const state = {
   autoStopRequested: false,
   ageConfirmed: false,
   soundEnabled: false,
-  turboMode: false,
+  speedIndex: 0,
+  quickStopRequested: false,
+  canQuickStop: false,
   specialBetBoost: 0,
   lastOutcome: null,
   lastReceipt: null
@@ -193,6 +203,51 @@ function updateAstralFeatureUi(controlsLocked = false) {
 
 function delay(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function currentSpinSpeed() {
+  return SPIN_SPEEDS[state.speedIndex] ?? SPIN_SPEEDS[0];
+}
+
+async function waitForSpinDelay(milliseconds) {
+  const deadline = performance.now() + Math.max(0, milliseconds);
+  while (!state.quickStopRequested) {
+    const remaining = deadline - performance.now();
+    if (remaining <= 0) break;
+    await delay(Math.min(50, remaining));
+  }
+}
+
+function saveSpinSpeed() {
+  try { window.localStorage.setItem(SPIN_SPEED_STORAGE_KEY, currentSpinSpeed().id); } catch { /* local storage is optional */ }
+}
+
+function restoreSpinSpeed() {
+  try {
+    const saved = window.localStorage.getItem(SPIN_SPEED_STORAGE_KEY);
+    const savedIndex = SPIN_SPEEDS.findIndex((speed) => speed.id === saved);
+    if (savedIndex >= 0) state.speedIndex = savedIndex;
+  } catch { /* local storage is optional */ }
+}
+
+function cycleSpinSpeed() {
+  if (state.isSpinning || state.autoActive) return;
+  state.speedIndex = (state.speedIndex + 1) % SPIN_SPEEDS.length;
+  saveSpinSpeed();
+  updateUi();
+  const speed = currentSpinSpeed();
+  setStatus(`${speed.name} spins · ${speed.label}`);
+  playTone(speed.id === "quick" ? 1320 : speed.id === "turbo" ? 990 : 520, .12, "triangle");
+}
+
+function requestQuickStop() {
+  if (!state.isSpinning || !state.canQuickStop || state.autoActive) return;
+  state.quickStopRequested = true;
+  state.canQuickStop = false;
+  ui.reelViewport.classList.add("is-quick-stopping");
+  audio.stopSpinLoop();
+  setStatus("Quick stop");
+  updateUi();
 }
 
 function jumpText(element) {
@@ -260,6 +315,7 @@ function symbolGraphic(id) {
 
 function renderGrid(grid, { shuffling = false, settling = false, winnerCells = new Set() } = {}) {
   const fragment = document.createDocumentFragment();
+  const settleScale = state.quickStopRequested ? 0.05 : currentSpinSpeed().settleScale;
   for (let row = 0; row < ROWS; row += 1) {
     for (let col = 0; col < COLS; col += 1) {
       const index = cellIndex(col, row);
@@ -279,7 +335,7 @@ function renderGrid(grid, { shuffling = false, settling = false, winnerCells = n
       cell.style.setProperty("--col", String(col));
       cell.style.setProperty("--row", String(row));
       cell.style.setProperty("--motion-delay", `${-(col * 48 + row * 24)}ms`);
-      cell.style.setProperty("--stop-delay", `${col * currentGame().reelStopGap + row * 18}ms`);
+      cell.style.setProperty("--stop-delay", `${Math.round((col * currentGame().reelStopGap + row * 18) * settleScale)}ms`);
       cell.style.setProperty("--symbol-glow", symbolGlow(id));
       const symbolName = currentSymbols().find((symbol) => symbol.id === id)?.name ?? id;
       cell.setAttribute("aria-label", symbolName);
@@ -336,14 +392,20 @@ function setStatus(message) {
 function updateUi() {
   const bet = currentBaseBet();
   const spinWager = currentSpinWager();
+  const speed = currentSpinSpeed();
+  const nextSpeed = SPIN_SPEEDS[(state.speedIndex + 1) % SPIN_SPEEDS.length];
   ui.balance.textContent = formatCredits(state.balance);
   ui.betAmount.textContent = formatCredits(bet);
-  ui.spinButton.setAttribute("aria-label", `${currentGame().actionLabel} spin for ${formatCredits(spinWager)} credits${state.gameId === "astral" && state.specialBetBoost ? ` with ${state.specialBetBoost} bonus meter boost` : ""}`);
+  ui.spinButton.setAttribute("aria-label", state.canQuickStop
+    ? "Stop the reels now"
+    : `${currentGame().actionLabel} spin for ${formatCredits(spinWager)} credits${state.gameId === "astral" && state.specialBetBoost ? ` with ${state.specialBetBoost} bonus meter boost` : ""}`);
   const controlsLocked = state.isSpinning || state.autoActive;
   ui.betDown.disabled = controlsLocked || state.betIndex === 0;
   ui.betUp.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.maxBetButton.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
-  ui.spinButton.disabled = controlsLocked;
+  ui.spinButton.disabled = state.autoActive || (state.isSpinning && !state.canQuickStop);
+  ui.spinButton.classList.toggle("can-quick-stop", state.canQuickStop);
+  ui.spinLabel.textContent = state.canQuickStop ? "Stop" : currentGame().actionLabel;
   ui.astralShowcaseButton.disabled = controlsLocked || state.gameId !== "astral";
   updateAstralFeatureUi(controlsLocked);
   ui.saveClientSeed.disabled = controlsLocked;
@@ -354,10 +416,13 @@ function updateUi() {
   ui.autoButton.innerHTML = state.autoActive
     ? `<span aria-hidden="true">■</span><strong>${state.autoRemaining}</strong>`
     : `<span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong>`;
-  ui.turboButton.classList.toggle("is-active", state.turboMode);
-  ui.turboButton.setAttribute("aria-pressed", String(state.turboMode));
-  ui.turboButton.setAttribute("aria-label", state.turboMode ? "Turn turbo spins off" : "Turn turbo spins on");
+  ui.turboButton.dataset.speed = speed.id;
+  ui.turboButton.classList.toggle("is-active", speed.id !== "normal");
+  ui.turboButton.classList.toggle("is-quick", speed.id === "quick");
+  ui.turboButton.setAttribute("aria-label", `Spin speed ${speed.name} ${speed.label}. Activate for ${nextSpeed.name}.`);
+  ui.speedLabel.textContent = speed.label;
   ui.turboButton.disabled = controlsLocked;
+  $("game").dataset.speed = speed.id;
   document.querySelectorAll(".game-choice").forEach((button) => { button.disabled = controlsLocked; });
 
   renderPetalMeter();
@@ -757,27 +822,32 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
 
 async function settleOutcome(outcome) {
   const game = currentGame();
+  const speed = currentSpinSpeed();
+  const reelGap = Math.max(20, Math.round(game.reelStopGap * speed.settleScale));
+  const settleTail = Math.max(140, Math.round(620 * speed.settleScale));
   setAnticipationUi(false);
   audio.stopSpinLoop();
   ui.reelViewport.classList.remove("is-spinning");
   ui.reelViewport.classList.add("is-stopping");
   if (state.gameId === "astral") {
     ui.reels.classList.add("is-board-clearing");
-    await cinematicDelay(280);
+    await waitForSpinDelay(Math.max(40, Math.round(280 * speed.settleScale)));
   }
   renderGrid(outcome.grid, { settling: true, winnerCells: winningCells(outcome) });
   ui.reels.classList.remove("is-board-clearing");
   if (state.gameId === "astral") ui.reels.classList.add("is-cinematic-drop");
   for (let reel = 0; reel < COLS; reel += 1) {
+    if (reel > 0) await waitForSpinDelay(reelGap);
     const collector = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).includes("petal");
-    window.setTimeout(() => {
-      playReelStopSound(reel);
-      flashReelStop(reel, { collector, final: reel === COLS - 1 });
-    }, reel * game.reelStopGap);
+    playReelStopSound(reel);
+    flashReelStop(reel, { collector, final: reel === COLS - 1 });
   }
-  await delay(game.reelStopGap * (COLS - 1) + 620);
+  await waitForSpinDelay(settleTail);
   ui.reels.classList.remove("is-cinematic-drop");
   ui.reelViewport.classList.remove("is-stopping");
+  ui.reelViewport.classList.remove("is-quick-stopping");
+  state.canQuickStop = false;
+  updateUi();
   sequenceLineWinSounds(outcome, BET_OPTIONS[state.betIndex]);
 }
 
@@ -1277,6 +1347,8 @@ async function spin({ fromAuto = false } = {}) {
   }
 
   state.isSpinning = true;
+  state.quickStopRequested = false;
+  state.canQuickStop = !fromAuto;
   state.balance -= wager;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
@@ -1311,20 +1383,22 @@ async function spin({ fromAuto = false } = {}) {
     shuffleTick += 1;
     renderGrid(cosmeticGrid(shuffleTick), { shuffling: true });
     playSpinTick(shuffleTick);
-  }, game.spinInterval);
+  }, Math.max(45, Math.round(game.spinInterval * currentSpinSpeed().shuffleScale)));
 
   const outcome = await outcomePromise;
-  const resultDisplayMs = state.turboMode ? 900 : MIN_RESULT_DISPLAY_MS;
+  const resultDisplayMs = currentSpinSpeed().resultDisplayMs;
   const remainingDelay = Math.max(0, resultDisplayMs - (performance.now() - startedAt));
   const anticipation = outcome.bonusRounds.length > 0;
   if (anticipation && remainingDelay > 760) {
-    await delay(remainingDelay - 760);
-    setAnticipationUi(true, game.anticipationCopy);
-    setStatus(game.anticipationCopy);
-    playAnticipationSound();
-    await delay(760);
+    await waitForSpinDelay(remainingDelay - 760);
+    if (!state.quickStopRequested) {
+      setAnticipationUi(true, game.anticipationCopy);
+      setStatus(game.anticipationCopy);
+      playAnticipationSound();
+      await waitForSpinDelay(760);
+    }
   } else {
-    await delay(remainingDelay);
+    await waitForSpinDelay(remainingDelay);
   }
   window.clearInterval(shuffleTimer);
 
@@ -1393,6 +1467,9 @@ async function spin({ fromAuto = false } = {}) {
   await rotateServerSeed();
   ui.spinButton.classList.remove("is-spinning");
   state.isSpinning = false;
+  state.quickStopRequested = false;
+  state.canQuickStop = false;
+  ui.reelViewport.classList.remove("is-quick-stopping");
   updateUi();
 
   if (totalOutcomeClass === "net-win") setStatus(`${formatCredits(outcome.totalWin)} CR returned on ${formatCredits(wager)} CR bet · receipt ready`);
@@ -1427,7 +1504,7 @@ async function startAutoplay(count) {
     if (!completed) break;
     state.autoRemaining -= 1;
     updateUi();
-    if (state.autoRemaining > 0 && state.autoActive && !state.autoStopRequested) await delay(state.turboMode ? 180 : 650);
+    if (state.autoRemaining > 0 && state.autoActive && !state.autoStopRequested) await delay(currentSpinSpeed().autoplayGapMs);
   }
 
   const completedAll = state.autoRemaining === 0;
@@ -1483,14 +1560,8 @@ function bindEvents() {
   document.querySelectorAll("[data-buy-feature]").forEach((button) => {
     button.addEventListener("click", () => buyAstralFeature(Number(button.dataset.buyFeature)));
   });
-  ui.spinButton.addEventListener("click", () => spin());
-  ui.turboButton.addEventListener("click", () => {
-    if (state.isSpinning || state.autoActive) return;
-    state.turboMode = !state.turboMode;
-    updateUi();
-    setStatus(state.turboMode ? "Turbo on" : "Turbo off");
-    playTone(state.turboMode ? 880 : 440, .12, "triangle");
-  });
+  ui.spinButton.addEventListener("click", () => state.isSpinning ? requestQuickStop() : spin());
+  ui.turboButton.addEventListener("click", cycleSpinSpeed);
   ui.autoButton.addEventListener("click", () => {
     if (state.autoActive) {
       stopAutoplay("Autoplay will stop after the current spin");
@@ -1569,13 +1640,20 @@ function bindEvents() {
     if (event.code !== "Space" || event.repeat) return;
     const activeTag = document.activeElement?.tagName;
     const dialogOpen = Boolean(document.querySelector("dialog[open]"));
-    if (["INPUT", "BUTTON", "TEXTAREA"].includes(activeTag) || dialogOpen || !ui.featureMarketOverlay.hidden || !ui.bonusOverlay.hidden || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
+    const overlayOpen = dialogOpen || !ui.featureMarketOverlay.hidden || !ui.bonusOverlay.hidden || !state.ageConfirmed || !ui.lobbyOverlay.hidden;
+    if (state.canQuickStop && !overlayOpen) {
+      event.preventDefault();
+      requestQuickStop();
+      return;
+    }
+    if (["INPUT", "BUTTON", "TEXTAREA"].includes(activeTag) || overlayOpen) return;
     event.preventDefault();
     spin();
   });
 }
 
 async function init() {
+  restoreSpinSpeed();
   applyGameTheme({ resetGrid: true });
   buildLobby();
   ui.clientSeedInput.value = state.clientSeed;

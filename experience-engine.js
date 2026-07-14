@@ -1,13 +1,13 @@
 export const AUDIO_PROFILES = Object.freeze({
   astral: Object.freeze({
     wave: "triangle",
-    spinBase: 196,
-    spinFilter: 1450,
-    spinNoise: "bandpass",
-    tickNotes: [523.25, 659.25, 783.99, 987.77],
-    stopBase: 920,
-    winBase: 392,
-    wet: 0.28,
+    spinBase: 246.94,
+    spinFilter: 3200,
+    spinNoise: "highpass",
+    tickNotes: [1046.5, 1318.51, 1567.98, 1975.53],
+    stopBase: 1480,
+    winBase: 523.25,
+    wet: 0.22,
     music: Object.freeze({
       bpm: 94,
       wave: "triangle",
@@ -90,7 +90,7 @@ export function audioProfileFor(gameId) {
 }
 
 export const ASTRAL_SAMPLE_LIBRARY = Object.freeze({
-  background: "./assets/audio/wow-astral-background-safe-haven-loop.ogg",
+  background: "./assets/audio/wow-astral-background-modern-edgy.ogg",
   spinStart: "./assets/audio/wow-astral-spin-start.ogg",
   reelTick: "./assets/audio/wow-astral-reel-tick.ogg",
   victory: "./assets/audio/wow-astral-victory-sting.ogg",
@@ -253,7 +253,8 @@ export class SlotAudioEngine {
       filter = 0,
       filterEnd = filter,
       detune = 0,
-      music = false
+      music = false,
+      spin = false
     } = options;
     const start = context.currentTime + delay;
     const stop = start + Math.max(0.03, duration);
@@ -276,7 +277,7 @@ export class SlotAudioEngine {
     } else {
       oscillator.connect(gain);
     }
-    this.connectVoice(gain, { pan, wet, music });
+    this.connectVoice(gain, { pan, wet, music, spin });
     oscillator.start(start);
     oscillator.stop(stop + 0.03);
     return oscillator;
@@ -294,7 +295,8 @@ export class SlotAudioEngine {
       filterType = this.profile().spinNoise,
       frequency = this.profile().spinFilter,
       frequencyEnd = frequency,
-      music = false
+      music = false,
+      spin = false
     } = options;
     const start = context.currentTime + delay;
     const frames = Math.max(1, Math.floor(context.sampleRate * duration));
@@ -315,9 +317,34 @@ export class SlotAudioEngine {
     gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
     source.buffer = buffer;
     source.connect(filter).connect(gain);
-    this.connectVoice(gain, { pan, wet, music });
+    this.connectVoice(gain, { pan, wet, music, spin });
     source.start(start);
     return source;
+  }
+
+  casinoSparkles({ delay = 0, strength = 1, count = 8, base = 1046.5 } = {}) {
+    if (this.getGameId() !== "astral") return;
+    const ratios = [1, 1.25, 1.5, 1.875, 2, 2.5, 3, 4];
+    for (let index = 0; index < count; index += 1) {
+      const note = base * ratios[index % ratios.length];
+      this.tone(note, 0.1 + strength * 0.055, {
+        type: index % 3 === 0 ? "triangle" : "sine",
+        delay: delay + index * Math.max(0.025, 0.055 - strength * 0.012),
+        volume: (0.014 + index / Math.max(1, count - 1) * 0.012) * strength,
+        pan: Math.sin(index * 1.9) * 0.72,
+        wet: 0.2 + strength * 0.08,
+        filter: 9800,
+        filterEnd: 6200
+      });
+    }
+    this.noise(0.2 + strength * 0.16, {
+      delay,
+      volume: 0.012 + strength * 0.012,
+      wet: 0.16,
+      filterType: "highpass",
+      frequency: 3800,
+      frequencyEnd: 9800
+    });
   }
 
   musicFrequency(root, semitones) {
@@ -377,7 +404,7 @@ export class SlotAudioEngine {
     this.stopMusic();
     if (!this.enabled || !this.ensure()) return;
     if (this.getGameId() === "astral") {
-      const voice = this.playSample("wowAstralBackground", { volume: 0.3, wet: 0, music: true, loop: true });
+      const voice = this.playSample("wowAstralBackground", { volume: 0.36, wet: 0, music: true, loop: true });
       if (voice) {
         this.musicSample = voice;
       } else {
@@ -439,14 +466,14 @@ export class SlotAudioEngine {
     filter.Q.value = profile.spinNoise === "bandpass" ? 2.4 : 0.8;
     filter.frequency.value = profile.spinFilter;
     windGain.gain.setValueAtTime(0.0001, now);
-    const windLevel = this.getGameId() === "astral" ? 0.012 : this.getGameId() === "ember" ? 0.052 : 0.034;
+    const windLevel = this.getGameId() === "astral" ? 0.03 : this.getGameId() === "ember" ? 0.052 : 0.034;
     windGain.gain.exponentialRampToValueAtTime(windLevel, now + 0.14);
     motor.type = profile.wave;
     motor.frequency.value = profile.spinBase;
     motorFilter.type = "lowpass";
     motorFilter.frequency.value = Math.max(240, profile.spinFilter * 0.72);
     motorGain.gain.setValueAtTime(0.0001, now);
-    motorGain.gain.exponentialRampToValueAtTime(this.getGameId() === "ufc" ? 0.022 : 0.014, now + 0.12);
+    motorGain.gain.exponentialRampToValueAtTime(this.getGameId() === "astral" ? 0.022 : this.getGameId() === "ufc" ? 0.022 : 0.014, now + 0.12);
     wind.connect(filter).connect(windGain).connect(panner);
     motor.connect(motorFilter).connect(motorGain).connect(panner);
     panner.connect(this.graph.spinBus);
@@ -493,6 +520,9 @@ export class SlotAudioEngine {
     this.startSpinLoop();
     if (this.getGameId() === "astral") {
       this.spinSample = this.playSample("wowAstralSpinStart", { volume: 0.34, spin: true });
+      this.noise(0.38, { volume: 0.034, frequency: 1800, frequencyEnd: 9200, filterType: "highpass", wet: 0.12, spin: true });
+      this.tone(740, 0.28, { frequencyEnd: 1760, volume: 0.04, filter: 9000, filterEnd: 7200, wet: 0.1, spin: true });
+      this.tone(1110, 0.32, { delay: 0.035, frequencyEnd: 2640, volume: 0.028, filter: 10500, filterEnd: 7800, wet: 0.14, spin: true });
     }
   }
 
@@ -502,19 +532,29 @@ export class SlotAudioEngine {
     if (now - this.lastWinVoiceAt < 2800) return;
     this.lastWinVoiceAt = now;
     this.playSample("wowAstralVictory", { volume: 0.54, wet: 0.08 });
+    this.casinoSparkles({ strength: 1.15, count: 11, base: 1046.5 });
+    [1, 1.25, 1.5, 2].forEach((ratio, index) => {
+      this.tone(698.46 * ratio, 0.48, { delay: index * 0.06, volume: 0.052, wet: 0.2, pan: index / 1.5 - 1, filter: 9200, filterEnd: 6800 });
+    });
   }
 
   spinTick(tick) {
     this.updateSpin(tick);
     if (tick % 2 !== 0) return;
     if (this.getGameId() === "astral") {
-      const sample = this.playSample("wowAstralReelTick", {
+      this.playSample("wowAstralReelTick", {
         volume: 0.22,
         pan: (tick % 10) / 5 - 1,
         wet: 0.05,
         spin: true
       });
-      if (sample) return;
+      const profile = this.profile();
+      const note = profile.tickNotes[Math.floor(tick / 2) % profile.tickNotes.length];
+      this.tone(note, 0.055, { volume: 0.027, pan: (tick % 10) / 5 - 1, wet: 0.08, filter: 10800, filterEnd: 7600, spin: true });
+      if (tick % 4 === 0) {
+        this.noise(0.045, { volume: 0.012, pan: (tick % 10) / 5 - 1, wet: 0.04, filterType: "highpass", frequency: 6200, frequencyEnd: 9800, spin: true });
+      }
+      return;
     }
     const profile = this.profile();
     const note = profile.tickNotes[Math.floor(tick / 2) % profile.tickNotes.length];
@@ -527,6 +567,9 @@ export class SlotAudioEngine {
     const thud = this.getGameId() === "ember" || this.getGameId() === "ufc";
     if (this.getGameId() === "astral") {
       this.playSample("wowAstralReelTick", { volume: 0.3, pan, wet: 0.08 });
+      this.tone(profile.stopBase + reelIndex * 120, 0.13, { volume: 0.048, pan, wet: 0.12, frequencyEnd: profile.stopBase * 1.18 + reelIndex * 150, filter: 11000, filterEnd: 7800 });
+      this.tone((profile.stopBase + reelIndex * 90) * 1.5, 0.16, { delay: 0.025, volume: 0.03, pan: -pan * 0.4, wet: 0.16, filter: 12000, filterEnd: 8200 });
+      this.noise(0.1, { volume: 0.02, pan, wet: 0.08, filterType: "highpass", frequency: 4200, frequencyEnd: 9600 });
     }
     this.noise(thud ? 0.15 : 0.09, { volume: thud ? 0.075 : 0.042, pan, wet: 0.08, frequency: thud ? 260 : 1450, frequencyEnd: thud ? 90 : 720, filterType: thud ? "lowpass" : "bandpass" });
     this.tone(profile.stopBase + reelIndex * (this.getGameId() === "astral" ? -58 : 18), thud ? 0.21 : 0.16, {
@@ -539,6 +582,7 @@ export class SlotAudioEngine {
     });
     if (isFinal) {
       this.tone(profile.winBase * 2, 0.34, { delay: 0.035, volume: 0.05, wet: profile.wet + 0.12, pan: 0 });
+      if (this.getGameId() === "astral") this.casinoSparkles({ delay: 0.03, strength: 0.62, count: 5, base: 987.77 });
     }
   }
 
@@ -546,6 +590,15 @@ export class SlotAudioEngine {
     const profile = this.profile();
     this.updateSpin(0, true);
     this.noise(0.8, { volume: 0.055, frequency: profile.spinFilter * 0.65, frequencyEnd: profile.spinFilter * 2.3, wet: profile.wet });
+    if (this.getGameId() === "astral") {
+      this.noise(0.92, { volume: 0.04, frequency: 1700, frequencyEnd: 11200, filterType: "highpass", wet: 0.18 });
+      for (let index = 0; index < 12; index += 1) {
+        const frequency = 659.25 * 2 ** (index / 12);
+        this.tone(frequency, 0.16, { delay: index * 0.07, frequencyEnd: frequency * 1.12, volume: 0.034 + index * 0.002, pan: index / 5.5 - 1, wet: 0.2, filter: 10800, filterEnd: 7600 });
+      }
+      this.casinoSparkles({ delay: 0.48, strength: 0.82, count: 7, base: 1174.66 });
+      return;
+    }
     for (let index = 0; index < 7; index += 1) {
       this.tone(profile.winBase * (1 + index * 0.13), 0.18, { delay: index * 0.105, volume: 0.045 + index * 0.004, pan: index / 3 - 1, wet: profile.wet, filter: profile.winBase * 4 });
     }
@@ -556,6 +609,9 @@ export class SlotAudioEngine {
     const lift = Math.min(2.2, 1 + Math.log2(Math.max(1, amountRatio)) * 0.1);
     this.tone(profile.winBase * lift, 0.23, { volume: 0.05, pan: lineIndex % 2 ? 0.35 : -0.35, wet: profile.wet });
     this.tone(profile.winBase * 1.5 * lift, 0.26, { delay: 0.055, volume: 0.035, pan: lineIndex % 2 ? -0.2 : 0.2, wet: profile.wet + 0.08 });
+    if (this.getGameId() === "astral") {
+      this.casinoSparkles({ delay: 0.03, strength: Math.min(1.1, 0.42 + amountRatio * 0.035), count: 5, base: 1046.5 * lift });
+    }
   }
 
   payoutTick(progress, tierId = "nice") {
@@ -564,6 +620,9 @@ export class SlotAudioEngine {
     const scale = [1, 1.125, 1.25, 1.5, 1.68, 2];
     const note = scale[Math.min(scale.length - 1, Math.floor(progress * scale.length))];
     this.tone(profile.winBase * note * tierLift, 0.07, { volume: 0.028 + progress * 0.018, wet: profile.wet, pan: Math.sin(progress * 18) * 0.28 });
+    if (this.getGameId() === "astral") {
+      this.tone(profile.winBase * note * tierLift * 2, 0.055, { volume: 0.016 + progress * 0.015, wet: 0.12, pan: -Math.sin(progress * 18) * 0.45, filter: 11800, filterEnd: 8400 });
+    }
   }
 
   winTier(tierId) {
@@ -575,6 +634,10 @@ export class SlotAudioEngine {
       [1, 1.25, 1.5, 2].forEach((ratio, index) => {
         this.tone(profile.winBase * ratio, 0.5, { delay: run * 0.29 + index * 0.055, volume: 0.065, wet: profile.wet + 0.1, pan: index / 1.5 - 1 });
       });
+    }
+    if (this.getGameId() === "astral") {
+      this.casinoSparkles({ strength: 1.05 + strength * 0.2, count: 10 + strength * 3, base: 1046.5 });
+      this.noise(0.8 + strength * 0.22, { volume: 0.028 + strength * 0.01, wet: 0.2, filterType: "highpass", frequency: 3600, frequencyEnd: 11800 });
     }
   }
 
@@ -624,6 +687,7 @@ export class SlotAudioEngine {
     [1, 1.5, 2, 2.5, 3].forEach((ratio, index) => {
       this.tone(profile.winBase * ratio, 0.64, { delay: index * 0.075, volume: 0.068, wet: profile.wet + 0.15, pan: index / 2 - 1 });
     });
+    if (this.getGameId() === "astral") this.casinoSparkles({ strength: 1.25, count: 14, base: 880 });
   }
 
   bonusReveal(index, multiplier) {
@@ -631,6 +695,7 @@ export class SlotAudioEngine {
     const lift = 1 + Math.min(1.2, Math.log2(Math.max(1, multiplier)) * 0.16);
     this.noise(0.18, { volume: 0.045, frequency: 760, frequencyEnd: 2200, pan: index % 2 ? 0.45 : -0.45, wet: profile.wet });
     this.tone(profile.winBase * (1.5 + index * 0.18) * lift, 0.42, { volume: 0.065, wet: profile.wet + 0.1, pan: index % 2 ? 0.35 : -0.35 });
+    if (this.getGameId() === "astral") this.casinoSparkles({ strength: Math.min(1.35, 0.72 + lift * 0.22), count: 6, base: 1174.66 });
   }
 
   nearMiss() {

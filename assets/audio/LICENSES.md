@@ -12,7 +12,7 @@ Downloaded on 2026-07-14. These files are bundled as synchronized parts of the g
 
 | Game role | Bundled file | Original pack file |
 | --- | --- | --- |
-| Seamless background music | `wow-astral-background-safe-haven-loop.ogg` | `CS_Safe Haven - Short Loop.ogg` |
+| High-energy background music | `wow-astral-background-modern-edgy.ogg` | `Modern Edgy Trailer Music.ogg` |
 | Reel launch | `wow-astral-spin-start.ogg` | `CGM3_Save_Load_02_2.ogg` |
 | Rolling and reel-stop tick | `wow-astral-reel-tick.ogg` | `CGM3_Cute_Chirpy_Button_03_2.ogg` |
 | Regular victory sting | `wow-astral-victory-sting.ogg` | `LQ_Win_Sting_01_3.ogg` |
