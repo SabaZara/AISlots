@@ -20,8 +20,7 @@ const INITIAL_BALANCE = 1000;
 const SPIN_SPEED_STORAGE_KEY = "aislots-spin-speed";
 const SPIN_SPEEDS = Object.freeze([
   Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
-  Object.freeze({ id: "turbo", name: "Turbo", label: "2×", resultDisplayMs: 1100, settleScale: 0.55, shuffleScale: 0.72, autoplayGapMs: 220 }),
-  Object.freeze({ id: "quick", name: "Quick", label: "4×", resultDisplayMs: 480, settleScale: 0.25, shuffleScale: 0.5, autoplayGapMs: 80 })
+  Object.freeze({ id: "fast", name: "Fast", label: "3×", resultDisplayMs: 780, settleScale: 0.4, shuffleScale: 0.58, autoplayGapMs: 140 })
 ]);
 const SYMBOL_SHEET_INDEX = { luma: 0, orbit: 1, nova: 2, comet: 3, dew: 4, leaf: 5, petal: 6 };
 
@@ -84,8 +83,7 @@ const ui = {
   spinOptions: $("spinOptions"),
   spinLabel: $("spinLabel"),
   showcaseRow: $("showcaseRow"),
-  turboButton: $("turboButton"),
-  speedLabel: $("speedLabel"),
+  speedButtons: document.querySelectorAll("[data-spin-speed]"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
   lobbyOverlay: $("lobbyOverlay"),
@@ -140,8 +138,6 @@ const state = {
   ageConfirmed: false,
   soundEnabled: false,
   speedIndex: 0,
-  quickStopRequested: false,
-  canQuickStop: false,
   specialBetBoost: 0,
   lastOutcome: null,
   lastReceipt: null
@@ -209,13 +205,8 @@ function currentSpinSpeed() {
   return SPIN_SPEEDS[state.speedIndex] ?? SPIN_SPEEDS[0];
 }
 
-async function waitForSpinDelay(milliseconds) {
-  const deadline = performance.now() + Math.max(0, milliseconds);
-  while (!state.quickStopRequested) {
-    const remaining = deadline - performance.now();
-    if (remaining <= 0) break;
-    await delay(Math.min(50, remaining));
-  }
+function waitForSpinDelay(milliseconds) {
+  return delay(Math.max(0, milliseconds));
 }
 
 function saveSpinSpeed() {
@@ -224,30 +215,23 @@ function saveSpinSpeed() {
 
 function restoreSpinSpeed() {
   try {
-    const saved = window.localStorage.getItem(SPIN_SPEED_STORAGE_KEY);
+    const stored = window.localStorage.getItem(SPIN_SPEED_STORAGE_KEY);
+    const saved = stored === "turbo" || stored === "quick" ? "fast" : stored;
     const savedIndex = SPIN_SPEEDS.findIndex((speed) => speed.id === saved);
     if (savedIndex >= 0) state.speedIndex = savedIndex;
   } catch { /* local storage is optional */ }
 }
 
-function cycleSpinSpeed() {
+function selectSpinSpeed(speedId) {
   if (state.isSpinning || state.autoActive) return;
-  state.speedIndex = (state.speedIndex + 1) % SPIN_SPEEDS.length;
+  const selectedIndex = SPIN_SPEEDS.findIndex((speed) => speed.id === speedId);
+  if (selectedIndex < 0 || selectedIndex === state.speedIndex) return;
+  state.speedIndex = selectedIndex;
   saveSpinSpeed();
   updateUi();
   const speed = currentSpinSpeed();
-  setStatus(`${speed.name} spins · ${speed.label}`);
-  playTone(speed.id === "quick" ? 1320 : speed.id === "turbo" ? 990 : 520, .12, "triangle");
-}
-
-function requestQuickStop() {
-  if (!state.isSpinning || !state.canQuickStop || state.autoActive) return;
-  state.quickStopRequested = true;
-  state.canQuickStop = false;
-  ui.reelViewport.classList.add("is-quick-stopping");
-  audio.stopSpinLoop();
-  setStatus("Quick stop");
-  updateUi();
+  setStatus(`${speed.name} reel speed selected`);
+  playTone(speed.id === "fast" ? 1120 : 620, .12, "triangle");
 }
 
 function jumpText(element) {
@@ -315,7 +299,7 @@ function symbolGraphic(id) {
 
 function renderGrid(grid, { shuffling = false, settling = false, winnerCells = new Set() } = {}) {
   const fragment = document.createDocumentFragment();
-  const settleScale = state.quickStopRequested ? 0.05 : currentSpinSpeed().settleScale;
+  const settleScale = currentSpinSpeed().settleScale;
   for (let row = 0; row < ROWS; row += 1) {
     for (let col = 0; col < COLS; col += 1) {
       const index = cellIndex(col, row);
@@ -393,19 +377,15 @@ function updateUi() {
   const bet = currentBaseBet();
   const spinWager = currentSpinWager();
   const speed = currentSpinSpeed();
-  const nextSpeed = SPIN_SPEEDS[(state.speedIndex + 1) % SPIN_SPEEDS.length];
   ui.balance.textContent = formatCredits(state.balance);
   ui.betAmount.textContent = formatCredits(bet);
-  ui.spinButton.setAttribute("aria-label", state.canQuickStop
-    ? "Stop the reels now"
-    : `${currentGame().actionLabel} spin for ${formatCredits(spinWager)} credits${state.gameId === "astral" && state.specialBetBoost ? ` with ${state.specialBetBoost} bonus meter boost` : ""}`);
+  ui.spinButton.setAttribute("aria-label", `${currentGame().actionLabel} spin for ${formatCredits(spinWager)} credits${state.gameId === "astral" && state.specialBetBoost ? ` with ${state.specialBetBoost} bonus meter boost` : ""}`);
   const controlsLocked = state.isSpinning || state.autoActive;
   ui.betDown.disabled = controlsLocked || state.betIndex === 0;
   ui.betUp.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.maxBetButton.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
-  ui.spinButton.disabled = state.autoActive || (state.isSpinning && !state.canQuickStop);
-  ui.spinButton.classList.toggle("can-quick-stop", state.canQuickStop);
-  ui.spinLabel.textContent = state.canQuickStop ? "Stop" : currentGame().actionLabel;
+  ui.spinButton.disabled = controlsLocked;
+  ui.spinLabel.textContent = currentGame().actionLabel;
   ui.astralShowcaseButton.disabled = controlsLocked || state.gameId !== "astral";
   updateAstralFeatureUi(controlsLocked);
   ui.saveClientSeed.disabled = controlsLocked;
@@ -416,12 +396,12 @@ function updateUi() {
   ui.autoButton.innerHTML = state.autoActive
     ? `<span aria-hidden="true">■</span><strong>${state.autoRemaining}</strong>`
     : `<span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong>`;
-  ui.turboButton.dataset.speed = speed.id;
-  ui.turboButton.classList.toggle("is-active", speed.id !== "normal");
-  ui.turboButton.classList.toggle("is-quick", speed.id === "quick");
-  ui.turboButton.setAttribute("aria-label", `Spin speed ${speed.name} ${speed.label}. Activate for ${nextSpeed.name}.`);
-  ui.speedLabel.textContent = speed.label;
-  ui.turboButton.disabled = controlsLocked;
+  ui.speedButtons.forEach((button) => {
+    const selected = button.dataset.spinSpeed === speed.id;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+    button.disabled = controlsLocked;
+  });
   $("game").dataset.speed = speed.id;
   document.querySelectorAll(".game-choice").forEach((button) => { button.disabled = controlsLocked; });
 
@@ -738,19 +718,24 @@ function animateCreditValue(element, amount, duration = 900, { sound = false, ti
   });
 }
 
-function showWinBanner(amount, bet) {
+function showWinBanner(amount, bet, { outcomeClass = outcomeClassFor(amount, bet), total = false } = {}) {
   const tier = winTierFor(amount, bet);
   ui.winBanner.dataset.tier = tier.id;
-  ui.winBannerLabel.textContent = tier.id === "nice" ? `Nice ${currentGame().shortName} win` : `${currentGame().shortName} win`;
+  if (outcomeClass === "partial-return") ui.winBannerLabel.textContent = `${currentGame().shortName} payout`;
+  else if (outcomeClass === "break-even") ui.winBannerLabel.textContent = `${currentGame().shortName} bet returned`;
+  else if (total) ui.winBannerLabel.textContent = `${currentGame().shortName} total win`;
+  else ui.winBannerLabel.textContent = tier.id === "nice" ? `Nice ${currentGame().shortName} win` : `${currentGame().shortName} win`;
   ui.winBannerMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
   ui.winBannerAmount.textContent = "0.00 CR";
   ui.winBanner.classList.add("is-visible");
   jumpText(ui.winBannerLabel);
   jumpText(ui.winBannerAmount);
-  audio.winVoice();
-  void animateCreditValue(ui.winBannerAmount, amount, tier.id === "nice" ? 1050 : 720, { sound: true, tierId: tier.id })
+  if (outcomeClass === "net-win") audio.winVoice();
+  else audio.payoutTick(1, "win");
+  const amountAnimation = animateCreditValue(ui.winBannerAmount, amount, tier.id === "nice" ? 1050 : 720, { sound: true, tierId: tier.id })
     .then(() => jumpText(ui.winBannerAmount));
   window.setTimeout(() => ui.winBanner.classList.remove("is-visible"), tier.id === "nice" ? 2100 : 1650);
+  return amountAnimation;
 }
 
 function hideReturnChip() {
@@ -845,8 +830,6 @@ async function settleOutcome(outcome) {
   await waitForSpinDelay(settleTail);
   ui.reels.classList.remove("is-cinematic-drop");
   ui.reelViewport.classList.remove("is-stopping");
-  ui.reelViewport.classList.remove("is-quick-stopping");
-  state.canQuickStop = false;
   updateUi();
   sequenceLineWinSounds(outcome, BET_OPTIONS[state.betIndex]);
 }
@@ -1291,7 +1274,7 @@ async function buyAstralFeature(costMultiplier) {
   showReturnChip(outcome.totalWin, purchaseCost);
 
   const outcomeClass = outcomeClassFor(outcome.totalWin, purchaseCost);
-  if (outcomeClass === "net-win") showWinBanner(outcome.totalWin, purchaseCost);
+  if (outcome.totalWin > 0) await showWinBanner(outcome.totalWin, purchaseCost, { outcomeClass, total: true });
   await showCelebration(outcome.totalWin, purchaseCost);
 
   state.lastReceipt = {
@@ -1347,8 +1330,6 @@ async function spin({ fromAuto = false } = {}) {
   }
 
   state.isSpinning = true;
-  state.quickStopRequested = false;
-  state.canQuickStop = !fromAuto;
   state.balance -= wager;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
@@ -1391,12 +1372,10 @@ async function spin({ fromAuto = false } = {}) {
   const anticipation = outcome.bonusRounds.length > 0;
   if (anticipation && remainingDelay > 760) {
     await waitForSpinDelay(remainingDelay - 760);
-    if (!state.quickStopRequested) {
-      setAnticipationUi(true, game.anticipationCopy);
-      setStatus(game.anticipationCopy);
-      playAnticipationSound();
-      await waitForSpinDelay(760);
-    }
+    setAnticipationUi(true, game.anticipationCopy);
+    setStatus(game.anticipationCopy);
+    playAnticipationSound();
+    await waitForSpinDelay(760);
   } else {
     await waitForSpinDelay(remainingDelay);
   }
@@ -1425,8 +1404,11 @@ async function spin({ fromAuto = false } = {}) {
     setStatus(`No win this spin. ${game.featureName} keeps your progress.`);
   }
 
+  if (outcome.baseWin > 0) {
+    await showWinBanner(outcome.baseWin, wager, { outcomeClass: baseOutcomeClass });
+  }
+
   if (baseOutcomeClass === "net-win") {
-    showWinBanner(outcome.baseWin, wager);
     playWinChord();
     burstParticles(outcome.baseWin >= wager * 10 ? 42 : 18, outcome.baseWin >= wager * 10 ? 1.25 : .75);
     if (outcome.baseWin >= wager * 10) document.querySelector(".machine").classList.add("is-big-win");
@@ -1445,7 +1427,9 @@ async function spin({ fromAuto = false } = {}) {
   updateUi();
   showReturnChip(outcome.totalWin, wager);
   const totalOutcomeClass = outcomeClassFor(outcome.totalWin, wager);
-  if (outcome.bonusWin > 0 && totalOutcomeClass === "net-win") showWinBanner(outcome.totalWin, wager);
+  if (outcome.bonusWin > 0 && outcome.totalWin > 0) {
+    await showWinBanner(outcome.totalWin, wager, { outcomeClass: totalOutcomeClass, total: true });
+  }
   await showCelebration(outcome.totalWin, wager, { autoAdvance: fromAuto });
 
   state.lastReceipt = {
@@ -1467,9 +1451,6 @@ async function spin({ fromAuto = false } = {}) {
   await rotateServerSeed();
   ui.spinButton.classList.remove("is-spinning");
   state.isSpinning = false;
-  state.quickStopRequested = false;
-  state.canQuickStop = false;
-  ui.reelViewport.classList.remove("is-quick-stopping");
   updateUi();
 
   if (totalOutcomeClass === "net-win") setStatus(`${formatCredits(outcome.totalWin)} CR returned on ${formatCredits(wager)} CR bet · receipt ready`);
@@ -1560,8 +1541,10 @@ function bindEvents() {
   document.querySelectorAll("[data-buy-feature]").forEach((button) => {
     button.addEventListener("click", () => buyAstralFeature(Number(button.dataset.buyFeature)));
   });
-  ui.spinButton.addEventListener("click", () => state.isSpinning ? requestQuickStop() : spin());
-  ui.turboButton.addEventListener("click", cycleSpinSpeed);
+  ui.spinButton.addEventListener("click", () => spin());
+  ui.speedButtons.forEach((button) => {
+    button.addEventListener("click", () => selectSpinSpeed(button.dataset.spinSpeed));
+  });
   ui.autoButton.addEventListener("click", () => {
     if (state.autoActive) {
       stopAutoplay("Autoplay will stop after the current spin");
@@ -1641,11 +1624,6 @@ function bindEvents() {
     const activeTag = document.activeElement?.tagName;
     const dialogOpen = Boolean(document.querySelector("dialog[open]"));
     const overlayOpen = dialogOpen || !ui.featureMarketOverlay.hidden || !ui.bonusOverlay.hidden || !state.ageConfirmed || !ui.lobbyOverlay.hidden;
-    if (state.canQuickStop && !overlayOpen) {
-      event.preventDefault();
-      requestQuickStop();
-      return;
-    }
     if (["INPUT", "BUTTON", "TEXTAREA"].includes(activeTag) || overlayOpen) return;
     event.preventDefault();
     spin();

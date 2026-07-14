@@ -153,7 +153,10 @@
                   <span id="lastMultiplier">—</span>
                 </div>
                 <div class="spin-options" id="spinOptions">
-                  <button class="turbo-button" id="turboButton" type="button" aria-label="Spin speed Normal 1×. Activate for Turbo."><span aria-hidden="true">⚡</span><strong id="speedLabel">1×</strong></button>
+                  <div class="spin-speed-selector" role="group" aria-label="Spin speed">
+                    <button class="speed-choice is-selected" type="button" data-spin-speed="normal" aria-pressed="true"><strong>Normal</strong><small>1×</small></button>
+                    <button class="speed-choice" type="button" data-spin-speed="fast" aria-pressed="false"><strong><span aria-hidden="true">⚡</span> Fast</strong><small>3×</small></button>
+                  </div>
                   <button class="auto-button" id="autoButton" type="button" aria-label="Open autoplay options" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong></button>
                 </div>
               </div>
@@ -407,6 +410,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=2.16.1"></script>
+    <script type="module" src="./app.js?v=2.17.0"></script>
   </body>
 </html>

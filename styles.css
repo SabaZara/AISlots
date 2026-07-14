@@ -3823,58 +3823,52 @@ kbd {
   gap: 6px;
 }
 
-.turbo-button {
-  width: 48px;
+.spin-speed-selector {
+  width: 68px;
   min-height: 52px;
+  padding: 3px;
   display: grid;
-  place-content: center;
-  gap: 3px;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2px;
   border: 1px solid rgba(201,224,255,.22);
-  color: #dce8ff;
   background: rgba(255,255,255,.045);
-  font-size: 18px;
+}
+
+.speed-choice {
+  min-width: 0;
+  padding: 3px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
+  border: 1px solid transparent;
+  color: #aebbd3;
+  background: rgba(2,7,22,.42);
   cursor: pointer;
   transition: 180ms ease;
 }
 
-.turbo-button > span { font-size: 17px; line-height: 1; }
-.turbo-button > strong { font-size: 9px; line-height: 1; letter-spacing: .05em; }
+.speed-choice strong { font-size: 8px; line-height: 1; letter-spacing: .04em; text-transform: uppercase; }
+.speed-choice small { color: inherit; font-size: 7px; font-weight: 900; line-height: 1; }
 
-.turbo-button.is-active {
+.speed-choice.is-selected {
   border-color: #fff09c;
   color: #fff5b9;
   background: radial-gradient(circle, rgba(255,224,86,.28), rgba(107,74,183,.18));
   box-shadow: 0 0 18px rgba(255,220,91,.24), inset 0 0 12px rgba(255,255,255,.09);
 }
 
-.turbo-button.is-quick {
+.speed-choice[data-spin-speed="fast"].is-selected {
   border-color: #7ff7ff;
   color: #e6feff;
   background: radial-gradient(circle, rgba(65,236,255,.32), rgba(117,69,222,.25));
   box-shadow: 0 0 22px rgba(74,230,255,.34), inset 0 0 14px rgba(255,255,255,.12);
 }
 
-.spin-button.can-quick-stop {
-  border-color: rgba(255,239,145,.92);
-  filter: brightness(1.16);
-  animation: quickStopPulse .52s ease-in-out infinite alternate;
-}
+.game-stage[data-speed="fast"] .symbol-cell.is-settling .generated-symbol,
+.game-stage[data-speed="fast"] .symbol-cell.is-settling svg { animation-duration: 230ms !important; }
 
-@keyframes quickStopPulse {
-  to { transform: scale(.96); box-shadow: 0 0 30px rgba(255,224,93,.58), inset 0 0 22px rgba(255,255,255,.22); }
-}
-
-.game-stage[data-speed="turbo"] .symbol-cell.is-settling .generated-symbol,
-.game-stage[data-speed="turbo"] .symbol-cell.is-settling svg { animation-duration: 340ms !important; }
-.game-stage[data-speed="quick"] .symbol-cell.is-settling .generated-symbol,
-.game-stage[data-speed="quick"] .symbol-cell.is-settling svg { animation-duration: 165ms !important; }
-.reel-viewport.is-quick-stopping .symbol-cell.is-settling .generated-symbol,
-.reel-viewport.is-quick-stopping .symbol-cell.is-settling svg {
-  animation-duration: 90ms !important;
-  animation-delay: 0ms !important;
-}
-
-.turbo-button:disabled { opacity: .45; cursor: default; }
+.speed-choice:disabled { opacity: .45; cursor: default; }
 .auto-button { min-width: 106px; }
 .auto-button > span { font-size: 20px; line-height: 1; }
 .auto-button > strong { margin-top: 3px; letter-spacing: .04em; }
@@ -4149,7 +4143,7 @@ kbd {
   .game-stage[data-game="astral"] .spin-button { width: 92px; height: 92px; margin-top: -28px; }
   .game-stage[data-game="astral"] .spin-icon { font-size: 34px; }
   .spin-options { gap: 3px; }
-  .turbo-button { width: 38px; min-height: 48px; }
+  .spin-speed-selector { width: 60px; min-height: 48px; }
   .auto-button { min-width: 70px; padding: 5px; }
   .auto-button > strong { font-size: 7px; }
   .game-stage[data-game="astral"] .feature-card { grid-template-columns: 78px 1fr; min-height: 94px; }
@@ -4859,7 +4853,7 @@ kbd {
   .game-stage[data-game] .win-panel { width: 100%; justify-self: stretch; justify-content: center; }
   .game-stage[data-game] .win-panel .win-readout { display: none; }
   .game-stage[data-game] .spin-options { justify-content: center; gap: 4px; }
-  .game-stage[data-game] .turbo-button { width: 44px; min-height: 46px; }
+  .game-stage[data-game] .spin-speed-selector { width: 64px; min-height: 46px; }
   .game-stage[data-game] .auto-button { min-width: 82px; min-height: 46px; padding: 5px; }
   .game-stage[data-game] .autoplay-menu {
     right: 0;
@@ -5296,7 +5290,7 @@ body {
   animation: astralSpinRingBreath 1.8s ease-in-out infinite alternate;
 }
 
-.game-stage[data-game="astral"] .turbo-button,
+.game-stage[data-game="astral"] .spin-speed-selector,
 .game-stage[data-game="astral"] .auto-button {
   border-color: rgba(146,224,255,.36);
   border-radius: 9px 3px 9px 3px;

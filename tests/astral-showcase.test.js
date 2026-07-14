@@ -126,7 +126,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.16.1");
+  assert.equal(JSON.parse(packageJson).version, "2.17.0");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
@@ -194,19 +194,29 @@ test("licensed WOW Sound Astral layers include source attribution", async () => 
   assert.match(html, /Astral music and sound effects by[\s\S]*?WOW Sound/);
 });
 
-test("three remembered spin speeds and manual quick-stop are wired", async () => {
+test("explicit remembered Normal and Fast spin choices are wired", async () => {
   const [html, app, css, inventory] = await Promise.all([
     readFile(new URL("index.html", root), "utf8"),
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("styles.css", root), "utf8"),
     readFile(new URL("GAME_FUNCTIONS.md", root), "utf8")
   ]);
-  for (const speed of ["normal", "turbo", "quick"]) assert.match(app, new RegExp(`id: ["']${speed}["']`));
+  for (const speed of ["normal", "fast"]) assert.match(app, new RegExp(`id: ["']${speed}["']`));
   assert.match(app, /SPIN_SPEED_STORAGE_KEY/);
-  assert.match(app, /requestQuickStop/);
+  assert.match(app, /selectSpinSpeed/);
   assert.match(app, /waitForSpinDelay/);
-  assert.match(html, /id="speedLabel">1×/);
-  assert.match(css, /data-speed="quick"/);
-  assert.match(css, /can-quick-stop/);
-  assert.match(inventory, /Normal 1×, Turbo 2×, and Quick 4×/);
+  assert.match(html, /data-spin-speed="normal"/);
+  assert.match(html, /data-spin-speed="fast"/);
+  assert.match(css, /data-speed="fast"/);
+  assert.doesNotMatch(app, /requestQuickStop/);
+  assert.match(inventory, /Normal 1× and Fast 3×/);
+});
+
+test("every positive payout receives a visible animated amount", async () => {
+  const app = await readFile(new URL("app.js", root), "utf8");
+  assert.match(app, /if \(outcome\.baseWin > 0\)/);
+  assert.match(app, /await showWinBanner\(outcome\.baseWin/);
+  assert.match(app, /outcomeClass === "partial-return"/);
+  assert.match(app, /shortName} payout/);
+  assert.match(app, /if \(outcome\.bonusWin > 0 && outcome\.totalWin > 0\)/);
 });
