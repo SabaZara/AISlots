@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.11.0**
+Version reviewed: **2.11.1**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -57,7 +57,8 @@ All characters are transparent foreground cutouts placed independently over envi
 - Returned credits count upward with synchronized payout notes.
 - Nice, Big, Mega, and Epic tiers use different labels, timing, particles, scale, lighting, and full-screen celebration intensity.
 - Feature prizes are sealed before any bonus choice or reveal animation begins; selections are presentation only.
-- Astral includes a no-wager showcase preview for reviewing the cinematic free-spin sequence.
+- Astral includes a clearly labeled no-wager **Bonus demo** for reviewing the cinematic free-spin sequence. It does not spend credits, award credits, advance the meter, or replace the real triggered bonus.
+- Astral winning tiles remain stationary and transparent while only the isolated symbol artwork jumps. The other three games retain their existing winner treatment.
 
 ## Persistent meters and bonuses
 
@@ -115,7 +116,7 @@ All characters are transparent foreground cutouts placed independently over envi
 | Modern phone rotated | 844×390 | Landscape | None | Horizontal meter–reels–controls cabinet fits. |
 | iPad | 768×1024 | Portrait | None | Centered full cabinet, meter, controls, and footer fit. |
 | iPad rotated | 1024×768 | Landscape | None | Compact landscape cabinet, meter, controls, and footer fit. |
-| Desktop | 1440×900 and larger | Landscape | None | Header, cabinet, bonus HUD, controls, preview row, and footer remain inside the viewport. |
+| Desktop | 1440×900 and larger | Landscape | None | Header, cabinet, bonus HUD, controls, Bonus demo row, and footer remain inside the viewport. |
 
 The same rotation checks verify that the four-card lobby stays inside its shell: 2×2 in portrait and one row in landscape.
 

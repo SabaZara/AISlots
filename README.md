@@ -46,7 +46,7 @@ The interface includes:
 - four original opt-in ambient music motifs—celestial arpeggio, underwater pulse, forge ostinato, and arena rhythm—generated live by Web Audio rather than copied music;
 - a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
 - synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
-- an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a no-wager preview button for immediate review;
+- an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a clearly labeled no-wager **Bonus demo** button for reviewing the animation without changing credits or progress;
 - an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, turbo timing, and visibly dancing winning symbols;
 - opt-in licensed Astral audio samples for the reel wheel and “you win” voice, with source and license records in `assets/audio/LICENSES.md`;
 - bet controls and a maximum-bet shortcut;
@@ -113,7 +113,7 @@ The four original background plates remain available as optimized 1672×941 JPEG
 
 Each game also has a dedicated 1774×887 raster symbol sheet generated with the same built-in image tool:
 
-- `assets/symbols-astral-v4.png` — large high-contrast moonflower, orbit crystal, crown gem, comet lantern, dewdrop, leaf shield, and petal rosette icons.
+- `assets/symbols-astral-transparent-v5.png` — transparent-background high-contrast moonflower, orbit crystal, crown gem, comet lantern, dewdrop, leaf shield, and petal rosette icons; only the icon artwork moves on Astral wins.
 - `assets/symbols-neon-v2.png` — pearl, tide ring, starfish gem, coral spear, shell, and Pearl Key.
 - `assets/symbols-ember-v2.png` — sunsteel seal, forge ring, star anvil, ember spear, scale, and Crown Rune.
 - `assets/symbols-ufc-v2.png` — logo-free championship belt, octagon, event star, strike, clock, glove, and Fight Token.

@@ -23,6 +23,8 @@ test("Astral cinematic showcase markup and styles stay fully connected", async (
   assert.match(css, /@media \(max-width: 560px\)/);
   assert.match(app, /no wager/i);
   assert.match(app, /no credits or feature progress changed/i);
+  assert.match(html, /Bonus demo/i);
+  assert.match(html, /without spending credits or changing progress/i);
 });
 
 test("generated Astral guardian asset is a project-local PNG", async () => {
@@ -31,15 +33,16 @@ test("generated Astral guardian asset is a project-local PNG", async () => {
   assert.ok(image.length > 500_000);
 });
 
-test("Astral symbols and bonus chamber are project-local", async () => {
+test("transparent Astral symbols and bonus chamber are project-local", async () => {
   const paths = [
-    "assets/symbols-astral-v4.png",
+    "assets/symbols-astral-transparent-v5.png",
     "assets/astral-bonus-chamber-v1.png"
   ];
   for (const path of paths) {
     const image = await readFile(new URL(path, root));
     assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
     assert.ok(image.length > 500_000, `${path} should retain production detail`);
+    if (path.includes("transparent")) assert.equal(image[25], 6, `${path} must use RGBA PNG color type 6`);
   }
 });
 
@@ -91,7 +94,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.11.0");
+  assert.equal(JSON.parse(packageJson).version, "2.11.1");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
@@ -117,6 +120,8 @@ test("generated bonus HUDs and unclipped winner state are wired for every world"
   assert.match(app, /classList\.toggle\("has-winners"/);
   assert.match(css, /\.reels\.has-winners/);
   assert.match(css, /winningSymbolBreakout/);
+  assert.match(css, /symbol-cell\.is-winner \{[\s\S]*?animation: none !important/);
+  assert.match(css, /data-game="astral"\] \.control-deck/);
 });
 
 test("all audio profiles provide distinct synthesized music motifs", async () => {

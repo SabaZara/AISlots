@@ -35,7 +35,7 @@ export const GAMES = {
     secondary: "#a77cff",
     background: "./assets/astral-bloom-bg.jpg",
     characterLayer: "./assets/astral-characters-cutout-v1.png",
-    symbolSheet: "./assets/symbols-astral-v4.png",
+    symbolSheet: "./assets/symbols-astral-transparent-v5.png",
     bonusBarArt: "./assets/astral-bonusbar-frame-v1.png",
     actionLabel: "Bloom",
     lobbyTag: "Celestial collector",

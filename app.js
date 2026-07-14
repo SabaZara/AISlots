@@ -890,9 +890,9 @@ function cinematicDelay(milliseconds) {
 
 async function runAstralCinematicTransition({ preview = false } = {}) {
   ui.cinematicOverlay.dataset.phase = "sleeping";
-  ui.cinematicTitle.textContent = preview ? "Preview" : "Awaken";
+  ui.cinematicTitle.textContent = preview ? "Demo" : "Awaken";
   ui.cinematicCopy.textContent = preview ? "No wager" : "Moonwell opening";
-  ui.cinematicAward.textContent = preview ? "SHOWCASE" : "3 SPINS";
+  ui.cinematicAward.textContent = preview ? "BONUS DEMO" : "3 SPINS";
   ui.cinematicOverlay.hidden = false;
   ui.cinematicOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;
@@ -1002,10 +1002,10 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
   await runAstralCinematicTransition({ preview });
   return new Promise((resolve) => {
     ui.bonusOverlay.dataset.mode = "cinematic-free-spins";
-    ui.bonusEyebrow.textContent = preview ? "Preview" : "Bonus";
+    ui.bonusEyebrow.textContent = preview ? "Demo" : "Bonus";
     $("bonusTitle").textContent = "Moonwell";
     ui.bonusCopy.textContent = preview ? "No wager · no payout" : "3 sealed spins";
-    ui.bonusTotalLabel.textContent = preview ? "Preview" : "Win";
+    ui.bonusTotalLabel.textContent = preview ? "Demo" : "Win";
     ui.bonusTotal.textContent = "0.00 CR";
     ui.bonusMechanicName.textContent = "3 Spins";
     ui.bonusMechanicProgress.textContent = `0 / ${picks.length}`;
@@ -1164,10 +1164,10 @@ async function runAstralShowcasePreview() {
   state.isSpinning = true;
   ui.astralShowcaseButton.disabled = true;
   updateUi();
-  setStatus(state.soundEnabled ? "Astral cinematic preview · no wager · no payout" : "Astral cinematic preview · turn sound on afterward to hear the full mix");
+  setStatus(state.soundEnabled ? "Moonwell bonus demo · no wager · no payout" : "Moonwell bonus demo · turn sound on to hear the full mix");
   try {
     await showAstralBonus([[0.5, 1, 3]], 1, { autoAdvance: true, preview: true });
-    setStatus("Astral cinematic preview complete · no credits or feature progress changed");
+    setStatus("Moonwell bonus demo complete · no credits or feature progress changed");
   } finally {
     state.isSpinning = false;
     ui.astralShowcaseButton.disabled = false;

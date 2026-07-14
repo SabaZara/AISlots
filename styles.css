@@ -5245,3 +5245,134 @@ body {
     grid-row: 2;
   }
 }
+
+/* 2.11.1 Astral-only clarity pass: isolated symbols and transparent moonstone controls. */
+.game-stage[data-game="astral"] .symbol-cell {
+  border-color: color-mix(in srgb, var(--symbol-color) 34%, rgba(214,232,255,.12));
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--symbol-color) 9%, transparent), transparent 72%),
+    rgba(4,7,25,.18);
+  box-shadow: inset 0 0 0 1px rgba(208,230,255,.035);
+}
+
+.game-stage[data-game="astral"] .symbol-cell.is-winner {
+  transform: none !important;
+  animation: none !important;
+  filter: none !important;
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--symbol-color) 20%, transparent), transparent 74%),
+    rgba(4,7,25,.12);
+  box-shadow: inset 0 0 16px color-mix(in srgb, var(--symbol-color) 14%, transparent), 0 0 12px color-mix(in srgb, var(--symbol-color) 13%, transparent);
+}
+
+.game-stage[data-game="astral"] .symbol-cell.is-winner::after { display: none; }
+
+.game-stage[data-game="astral"] .control-deck {
+  border: 1px solid rgba(164,225,255,.34);
+  border-radius: 0 0 22px 22px;
+  background:
+    linear-gradient(180deg, rgba(25,35,82,.35), rgba(5,9,30,.16)),
+    radial-gradient(circle at 50% -20%, rgba(114,228,255,.18), transparent 58%);
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.18),
+    inset 0 -1px rgba(172,132,255,.13),
+    0 15px 34px rgba(0,0,0,.38),
+    0 0 26px rgba(105,221,255,.09);
+  backdrop-filter: blur(13px) saturate(1.22);
+}
+
+.game-stage[data-game="astral"] .bet-control,
+.game-stage[data-game="astral"] .win-panel {
+  position: relative;
+  padding: 7px 9px;
+  border: 1px solid rgba(143,224,255,.34);
+  border-radius: 14px 5px 14px 5px;
+  background:
+    linear-gradient(145deg, rgba(128,229,255,.1), transparent 42%),
+    rgba(7,12,39,.2);
+  box-shadow: inset 0 1px rgba(255,255,255,.13), 0 7px 20px rgba(0,0,0,.18), 0 0 14px rgba(98,214,255,.08);
+  backdrop-filter: blur(9px);
+}
+
+.game-stage[data-game="astral"] .bet-control::before,
+.game-stage[data-game="astral"] .win-panel::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(238,215,122,.14);
+  border-radius: 10px 3px 10px 3px;
+  pointer-events: none;
+}
+
+.game-stage[data-game="astral"] .bet-control .stepper button {
+  border: 1px solid rgba(154,232,255,.62);
+  border-radius: 50%;
+  color: #f7fbff;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255,255,255,.32), transparent 22%),
+    rgba(66,64,146,.28);
+  box-shadow: inset 0 0 10px rgba(102,219,255,.13), 0 0 12px rgba(102,219,255,.12);
+}
+
+.game-stage[data-game="astral"] .bet-control .stepper button:hover:not(:disabled) {
+  border-color: #ffe69a;
+  color: #fff1ab;
+  background: rgba(113,89,203,.38);
+  box-shadow: inset 0 0 12px rgba(255,230,154,.16), 0 0 18px rgba(110,222,255,.25);
+}
+
+.game-stage[data-game="astral"] .bet-control .mini-action {
+  border: 1px solid rgba(238,215,122,.38);
+  border-radius: 999px;
+  color: #fff0b0;
+  background: rgba(61,48,115,.22);
+}
+
+.game-stage[data-game="astral"] .spin-button {
+  border-color: rgba(245,233,181,.92);
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,.98), rgba(127,236,255,.9) 17%, rgba(123,91,232,.82) 46%, rgba(37,14,91,.78) 75%, rgba(8,4,28,.72) 100%);
+  box-shadow:
+    0 0 0 5px rgba(8,5,34,.76),
+    0 0 0 8px rgba(238,214,114,.62),
+    inset 0 0 22px rgba(255,255,255,.2),
+    0 13px 34px rgba(0,0,0,.48),
+    0 0 44px rgba(102,220,255,.54);
+  backdrop-filter: blur(9px);
+}
+
+.game-stage[data-game="astral"] .spin-rings {
+  inset: 7px;
+  border: 2px solid rgba(222,247,255,.35);
+  box-shadow: inset 0 0 13px rgba(114,226,255,.2), 0 0 10px rgba(238,214,114,.14);
+  animation: astralSpinRingBreath 1.8s ease-in-out infinite alternate;
+}
+
+.game-stage[data-game="astral"] .turbo-button,
+.game-stage[data-game="astral"] .auto-button {
+  border-color: rgba(146,224,255,.36);
+  border-radius: 9px 3px 9px 3px;
+  background: rgba(18,25,63,.23);
+  box-shadow: inset 0 1px rgba(255,255,255,.1), 0 0 12px rgba(101,220,255,.07);
+  backdrop-filter: blur(8px);
+}
+
+.game-stage[data-game="astral"] .showcase-button {
+  border-color: rgba(238,214,116,.5);
+  border-radius: 999px;
+  color: #fff6d2;
+  background: rgba(26,27,69,.28);
+  box-shadow: inset 0 1px rgba(255,255,255,.11), 0 0 17px rgba(106,220,255,.1);
+  backdrop-filter: blur(8px);
+}
+
+@keyframes astralSpinRingBreath {
+  to { transform: rotate(10deg) scale(.96); border-color: rgba(255,226,119,.54); }
+}
+
+@media (max-width: 560px) and (orientation: portrait) {
+  .game-stage[data-game="astral"] .bet-control,
+  .game-stage[data-game="astral"] .win-panel { padding: 4px; }
+  .game-stage[data-game="astral"] .bet-control::before,
+  .game-stage[data-game="astral"] .win-panel::before { inset: 2px; }
+}
