@@ -31,9 +31,8 @@ test("generated Astral guardian asset is a project-local PNG", async () => {
   assert.ok(image.length > 500_000);
 });
 
-test("Astral image-led cabinet, symbols, and bonus chamber are project-local", async () => {
+test("Astral symbols and bonus chamber are project-local", async () => {
   const paths = [
-    "assets/astral-cabinet-two-guardians-v1.png",
     "assets/symbols-astral-v4.png",
     "assets/astral-bonus-chamber-v1.png"
   ];
@@ -42,6 +41,41 @@ test("Astral image-led cabinet, symbols, and bonus chamber are project-local", a
     assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
     assert.ok(image.length > 500_000, `${path} should retain production detail`);
   }
+});
+
+test("every world has a transparent standalone character layer", async () => {
+  const paths = [
+    "assets/astral-characters-cutout-v1.png",
+    "assets/neon-characters-cutout-v1.png",
+    "assets/ember-characters-cutout-v1.png",
+    "assets/ufc-characters-cutout-v1.png"
+  ];
+  for (const path of paths) {
+    const image = await readFile(new URL(path, root));
+    assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.equal(image[25], 6, `${path} must use RGBA PNG color type 6`);
+    assert.ok(image.length > 500_000, `${path} should retain production detail`);
+  }
+});
+
+test("runtime uses character cutouts and contains no payline overlay", async () => {
+  const [html, app, model, css, inventory] = await Promise.all([
+    readFile(new URL("index.html", root), "utf8"),
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("game-model.js", root), "utf8"),
+    readFile(new URL("styles.css", root), "utf8"),
+    readFile(new URL("GAME_FUNCTIONS.md", root), "utf8")
+  ]);
+  assert.doesNotMatch(html, /paylineOverlay/);
+  assert.doesNotMatch(app, /renderPaylineOverlay|One symbol short|reel three breaks/i);
+  assert.doesNotMatch(css, /astral-cabinet-two-guardians-v1\.png|\.payline-overlay/);
+  assert.match(app, /lobby-game-image/);
+  assert.match(app, /--game-characters/);
+  assert.match(css, /background-image: var\(--game-characters\)/);
+  for (const game of ["astral", "neon", "ember", "ufc"]) {
+    assert.match(model, new RegExp(`${game}-characters-cutout-v1\\.png`));
+  }
+  assert.match(inventory, /Production gate/);
 });
 
 test("licensed Astral spin and win samples include source attribution", async () => {

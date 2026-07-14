@@ -1455,95 +1455,6 @@ a:focus-visible {
   background: radial-gradient(circle, rgba(176, 102, 255, .16), rgba(64, 36, 124, .06));
 }
 
-.symbol-cell.is-near-match {
-  z-index: 3;
-  border-color: #ffce62 !important;
-  box-shadow: inset 0 0 18px rgba(255,196,70,.22), 0 0 18px rgba(255,196,70,.34) !important;
-  animation: nearMatchPulse 720ms ease-in-out infinite alternate;
-}
-
-.symbol-cell.is-line-break {
-  border-color: rgba(255,91,84,.88) !important;
-  box-shadow: inset 0 0 18px rgba(255,65,58,.18) !important;
-  filter: saturate(.65) brightness(.82);
-}
-
-@keyframes nearMatchPulse { to { filter: brightness(1.22); transform: scale(1.025); } }
-
-.payline-overlay {
-  position: absolute;
-  z-index: 6;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-}
-
-.payline-overlay polyline,
-.payline-overlay path,
-.payline-overlay circle {
-  vector-effect: non-scaling-stroke;
-}
-
-.payline-shadow,
-.payline-win,
-.payline-near {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.payline-shadow {
-  stroke: rgba(0,0,0,.82);
-  stroke-width: 12;
-  opacity: 0;
-  animation: paylineShadowIn 220ms ease-out var(--line-delay, 0ms) forwards;
-}
-.payline-win {
-  stroke: var(--line-color, #6be4ff);
-  stroke-width: 6;
-  filter: drop-shadow(0 0 9px var(--line-color, #6be4ff));
-  stroke-dasharray: 700;
-  animation: drawPayline 680ms ease-out var(--line-delay, 0ms) both, paylinePulse 820ms ease-in-out calc(var(--line-delay, 0ms) + 700ms) infinite alternate;
-}
-.payline-win-node {
-  fill: #fff;
-  stroke: var(--line-color, #6be4ff);
-  stroke-width: 5;
-  opacity: 0;
-  filter: drop-shadow(0 0 8px var(--line-color, #6be4ff));
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: paylineNodePop 360ms cubic-bezier(.15,1.3,.3,1) calc(var(--line-delay, 0ms) + 430ms) forwards;
-}
-.payline-near {
-  stroke: #ffcb55;
-  stroke-width: 5;
-  stroke-dasharray: 15 10;
-  filter: drop-shadow(0 0 6px rgba(255,189,57,.65));
-  animation: drawPayline 760ms ease-out both;
-}
-.payline-node { fill: #fff3c5; stroke: #ffb838; stroke-width: 4; }
-.payline-break { fill: none; stroke: #ff4f49; stroke-width: 7; stroke-linecap: round; filter: drop-shadow(0 0 5px rgba(255,49,43,.7)); }
-.payline-label {
-  fill: #fff;
-  stroke: rgba(0,0,0,.94);
-  stroke-width: 4px;
-  paint-order: stroke;
-  font: 900 15px/1 var(--sans);
-  letter-spacing: .035em;
-  opacity: 0;
-  animation: paylineLabelIn 320ms ease-out calc(var(--line-delay, 0ms) + 510ms) forwards;
-}
-.payline-label.near-label { fill: #ffd979; font-size: 14px; }
-
-@keyframes drawPayline { from { stroke-dashoffset: 700; opacity: .2; } to { stroke-dashoffset: 0; opacity: 1; } }
-@keyframes paylineShadowIn { to { opacity: 1; } }
-@keyframes paylinePulse { to { stroke-width: 8; filter: drop-shadow(0 0 16px var(--line-color, #6be4ff)); } }
-@keyframes paylineNodePop { from { opacity: 0; transform: scale(.15); } to { opacity: 1; transform: scale(1); } }
-@keyframes paylineLabelIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
 @keyframes winnerPulse { to { filter: brightness(1.25); transform: translateY(-1px); } }
 
 .win-banner {
@@ -4016,53 +3927,6 @@ kbd {
   display: block;
 }
 
-.game-stage[data-game="astral"] .machine {
-  isolation: isolate;
-  width: 100%;
-  box-sizing: border-box;
-  padding: clamp(18px, 2.8vw, 38px) 24.5% clamp(22px, 3vw, 44px);
-  background: url("./assets/astral-cabinet-two-guardians-v1.png") center top / 100% auto no-repeat;
-  filter: drop-shadow(0 32px 62px rgba(0,0,0,.68));
-}
-
-.game-stage[data-game="astral"] .machine::before,
-.game-stage[data-game="astral"] .machine::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  pointer-events: none;
-  background: url("./assets/astral-cabinet-two-guardians-v1.png") center top / 100% auto no-repeat;
-  will-change: transform, filter;
-}
-
-.game-stage[data-game="astral"] .machine::before {
-  clip-path: polygon(0 0, 27% 0, 27% 100%, 0 100%);
-  transform-origin: 14% 92%;
-  animation: astralOracleBreathe 5.8s ease-in-out infinite alternate;
-}
-
-.game-stage[data-game="astral"] .machine::after {
-  clip-path: polygon(73% 0, 100% 0, 100% 100%, 73% 100%);
-  transform-origin: 86% 92%;
-  animation: astralSentinelBreathe 4.9s ease-in-out infinite alternate;
-}
-
-@keyframes astralOracleBreathe {
-  from { transform: translate(-2px, 2px) rotate(-.35deg) scale(1.002); filter: brightness(.94) saturate(.96); }
-  to { transform: translate(5px, -5px) rotate(.45deg) scale(1.012); filter: brightness(1.12) saturate(1.08) drop-shadow(0 0 15px rgba(172,147,255,.48)); }
-}
-
-@keyframes astralSentinelBreathe {
-  from { transform: translate(2px, 1px) rotate(.3deg) scale(1.002); filter: brightness(.95); }
-  to { transform: translate(-5px, -4px) rotate(-.4deg) scale(1.013); filter: brightness(1.13) drop-shadow(0 0 18px rgba(80,212,255,.5)); }
-}
-
-.game-stage[data-game="astral"] .machine > * {
-  position: relative;
-  z-index: 2;
-}
-
 .game-stage[data-game="astral"] .machine-title {
   min-height: 68px;
   border-radius: 24px 24px 0 0;
@@ -4298,11 +4162,7 @@ kbd {
   .game-stage[data-game="astral"] .machine {
     order: 1;
     padding: 0;
-    background-size: auto 330px;
-    background-position: center top;
   }
-  .game-stage[data-game="astral"] .machine::before,
-  .game-stage[data-game="astral"] .machine::after { display: none; }
   .game-stage[data-game="astral"] .machine-title { min-height: 116px; align-items: end; padding-bottom: 12px; }
   .game-stage[data-game="astral"] .machine-title h1 { font-size: 38px; }
   .game-stage[data-game="astral"] .feature-card {
@@ -4335,7 +4195,6 @@ kbd {
 }
 
 @media (max-width: 560px) {
-  .game-stage[data-game="astral"] .machine { background-size: auto 250px; }
   .game-stage[data-game="astral"] .machine-title { min-height: 86px; padding-bottom: 7px; }
   .game-stage[data-game="astral"] .machine-title h1 { font-size: 30px; }
   .game-stage[data-game="astral"] .reels { --reel-gap: 2px; padding: 3px; aspect-ratio: 5 / 4; }
@@ -4357,4 +4216,314 @@ kbd {
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene > p { display: none; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .astral-bonus-stage { margin-top: 8px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action { min-height: 46px; }
+}
+
+/* 2.9 character-led cabinet: every world uses independent foreground cutouts. */
+.lobby-game-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 500ms ease, filter 300ms ease;
+}
+
+.lobby-game:hover .lobby-game-image,
+.lobby-game:focus-visible .lobby-game-image {
+  transform: scale(1.055);
+  filter: saturate(1.14) brightness(1.05);
+}
+
+.game-stage[data-game] .game-layout {
+  position: relative;
+  width: min(1420px, 100%);
+  max-width: 1420px;
+  display: block;
+}
+
+.game-stage[data-game] .game-switcher { display: none; }
+
+.game-stage[data-game] .machine {
+  isolation: isolate;
+  width: 100%;
+  box-sizing: border-box;
+  padding: clamp(18px, 2.8vw, 38px) 24.5% clamp(22px, 3vw, 44px);
+  background: none;
+  filter: drop-shadow(0 32px 62px rgba(0,0,0,.68));
+}
+
+.game-stage[data-game] .machine::before,
+.game-stage[data-game] .machine::after {
+  display: block;
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--game-characters);
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  will-change: transform, filter;
+}
+
+.game-stage[data-game] .machine::before {
+  clip-path: polygon(0 0, 27% 0, 27% 100%, 0 100%);
+  transform-origin: 14% 90%;
+  animation: worldCharacterLeft 5.6s ease-in-out infinite alternate;
+}
+
+.game-stage[data-game] .machine::after {
+  clip-path: polygon(73% 0, 100% 0, 100% 100%, 73% 100%);
+  transform-origin: 86% 90%;
+  animation: worldCharacterRight 4.8s ease-in-out infinite alternate;
+}
+
+.game-stage[data-game] .machine > * {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes worldCharacterLeft {
+  from { transform: translate(-3px, 3px) rotate(-.45deg) scale(1.002); filter: brightness(.92) saturate(.96); }
+  to { transform: translate(6px, -7px) rotate(.55deg) scale(1.018); filter: brightness(1.14) saturate(1.1) drop-shadow(0 0 18px var(--game-accent)); }
+}
+
+@keyframes worldCharacterRight {
+  from { transform: translate(3px, 2px) rotate(.38deg) scale(1.002); filter: brightness(.94); }
+  to { transform: translate(-6px, -6px) rotate(-.5deg) scale(1.016); filter: brightness(1.14) drop-shadow(0 0 19px var(--game-secondary)); }
+}
+
+.game-stage[data-game="neon"] .machine::before,
+.game-stage[data-game="neon"] .machine::after { filter: drop-shadow(0 0 13px rgba(63,228,255,.34)); }
+.game-stage[data-game="ember"] .machine::before,
+.game-stage[data-game="ember"] .machine::after { filter: drop-shadow(0 0 15px rgba(255,91,34,.36)); }
+.game-stage[data-game="ufc"] .machine::before,
+.game-stage[data-game="ufc"] .machine::after { filter: drop-shadow(0 10px 16px rgba(0,0,0,.62)); }
+
+.game-stage[data-game] .machine-title {
+  min-height: 68px;
+  border-radius: 24px 24px 0 0;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--game-accent) 16%, rgba(7,10,30,.68)), transparent 72%);
+}
+
+.game-stage[data-game] .machine-title p,
+.game-stage[data-game] .title-flourish,
+.game-stage[data-game] .symbol-name-tag { display: none; }
+
+.game-stage[data-game] .reel-frame {
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--game-accent) 48%, rgba(226,233,255,.3));
+  box-shadow: inset 0 0 0 4px rgba(7,10,26,.76), 0 0 0 2px color-mix(in srgb, var(--game-secondary) 34%, transparent), 0 20px 54px rgba(0,0,0,.6), 0 0 32px color-mix(in srgb, var(--game-accent) 18%, transparent);
+}
+
+.game-stage[data-game] .reel-meta {
+  min-height: 27px;
+  justify-content: flex-end;
+  padding-inline: 8px;
+}
+
+.game-stage[data-game] .feature-card {
+  position: absolute;
+  z-index: 8;
+  left: 3.2%;
+  bottom: 6.5%;
+  width: min(15vw, 190px);
+  padding: 8px;
+  border-color: color-mix(in srgb, var(--game-accent) 38%, rgba(255,255,255,.12));
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(15,19,50,.88), rgba(4,8,25,.82));
+  box-shadow: 0 15px 35px rgba(0,0,0,.48), 0 0 28px color-mix(in srgb, var(--game-accent) 18%, transparent);
+  backdrop-filter: blur(7px);
+}
+
+.game-stage[data-game] .feature-card > .eyebrow,
+.game-stage[data-game] .feature-card > h2,
+.game-stage[data-game] .feature-card > .feature-copy,
+.game-stage[data-game] .feature-card > .meter-message,
+.game-stage[data-game] .feature-card > .feature-steps,
+.game-stage[data-game] .feature-card > .game-performance { display: none; }
+
+.game-stage[data-game] .feature-card .moonwell-visual {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  margin: 0;
+}
+
+.game-stage[data-game] .feature-card .petal-meter {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  bottom: 5%;
+  gap: 2px;
+}
+
+.game-stage[data-game] .feature-card .petal-pip {
+  min-width: 0;
+  height: 15px;
+  padding: 0;
+  font-size: 0;
+}
+
+.game-stage[data-game] .control-deck {
+  min-height: 90px;
+  border-radius: 0 0 22px 22px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--game-accent) 7%, rgba(16,18,50,.98)), rgba(4,7,22,.99));
+  box-shadow: 0 18px 42px rgba(0,0,0,.58), inset 0 1px rgba(255,255,255,.12);
+}
+
+.bet-control {
+  min-width: 176px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 34%, rgba(255,255,255,.1));
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+  box-shadow: inset 0 1px rgba(255,255,255,.08), 0 9px 20px rgba(0,0,0,.24);
+}
+
+.bet-control .control-label {
+  margin-bottom: 6px;
+  color: #d9e7ff;
+  text-align: center;
+}
+
+.bet-control .stepper {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bet-control .stepper button {
+  width: 46px;
+  height: 46px;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 60%, white 14%);
+  border-radius: 9px;
+  color: white;
+  background: radial-gradient(circle at 34% 25%, rgba(255,255,255,.22), color-mix(in srgb, var(--game-accent) 24%, rgba(15,17,49,.96)) 52%, rgba(4,7,21,.98));
+  box-shadow: inset 0 1px rgba(255,255,255,.18), 0 7px 16px rgba(0,0,0,.35), 0 0 13px color-mix(in srgb, var(--game-accent) 13%, transparent);
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.bet-control .stepper button:hover:not(:disabled) {
+  border-color: #fff0a0;
+  color: #fff5bf;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: inset 0 1px rgba(255,255,255,.25), 0 9px 18px rgba(0,0,0,.4), 0 0 20px color-mix(in srgb, var(--game-accent) 28%, transparent);
+}
+
+.bet-control .stepper strong {
+  min-width: 72px;
+  font-size: 22px;
+  text-align: center;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--game-accent) 48%, transparent);
+}
+
+.bet-control .mini-action {
+  width: 100%;
+  min-height: 30px;
+  margin-top: 7px;
+  border: 1px solid color-mix(in srgb, var(--game-secondary) 38%, rgba(255,255,255,.12));
+  border-radius: 7px;
+  color: #fff1b7;
+  background: color-mix(in srgb, var(--game-secondary) 12%, rgba(8,10,27,.92));
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+.bet-control .mini-action:hover:not(:disabled) {
+  border-color: #fff0a0;
+  color: white;
+  background: color-mix(in srgb, var(--game-secondary) 22%, rgba(8,10,27,.92));
+}
+
+@media (max-height: 800px) and (min-width: 821px) {
+  .game-stage[data-game] .game-layout { width: min(1080px, 100%); }
+  .game-stage[data-game] .machine { padding: 12px 24.5% 18px; }
+  .game-stage[data-game] .machine-title { min-height: 52px; }
+  .game-stage[data-game] .machine-title h1 { font-size: 40px; }
+  .game-stage[data-game] .reel-meta { min-height: 22px; }
+  .game-stage[data-game] .reel-footer { min-height: 30px; }
+  .game-stage[data-game] .control-deck { min-height: 74px; }
+  .game-stage[data-game] .spin-button { width: 96px; height: 96px; margin-top: -30px; }
+  .game-stage[data-game] .spin-icon { font-size: 35px; }
+  .game-stage[data-game] .feature-card { width: 145px; }
+  .bet-control { min-width: 150px; padding: 6px; }
+  .bet-control .stepper { gap: 4px; }
+  .bet-control .stepper button { width: 42px; height: 42px; }
+  .bet-control .stepper strong { min-width: 48px; font-size: 18px; }
+  .bet-control .mini-action { min-height: 28px; }
+}
+
+@media (max-width: 820px) {
+  .game-stage[data-game] .game-layout {
+    width: min(680px, 100%);
+    display: flex;
+    flex-direction: column;
+  }
+  .game-stage[data-game] .machine {
+    order: 1;
+    padding: 0;
+    background: none;
+  }
+  .game-stage[data-game] .machine::before,
+  .game-stage[data-game] .machine::after {
+    bottom: auto;
+    height: 150px;
+    background-size: auto 230px;
+    background-position: center top;
+  }
+  .game-stage[data-game] .machine-title { min-height: 116px; align-items: end; padding-bottom: 12px; }
+  .game-stage[data-game] .machine-title h1 { font-size: 38px; }
+  .game-stage[data-game] .feature-card {
+    position: relative;
+    order: 2;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    min-height: 118px;
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 102px 1fr;
+    border-radius: 16px;
+  }
+  .game-stage[data-game] .feature-card .moonwell-visual { width: 100px; grid-column: 1; grid-row: 1; }
+  .game-stage[data-game] .feature-card .petal-meter {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    gap: 4px;
+  }
+  .game-stage[data-game] .feature-card .petal-pip { height: 24px; }
+}
+
+@media (max-width: 560px) {
+  .game-stage[data-game] .machine::before,
+  .game-stage[data-game] .machine::after {
+    height: 105px;
+    background-size: auto 170px;
+  }
+  .game-stage[data-game] .machine-title { min-height: 86px; padding-bottom: 7px; }
+  .game-stage[data-game] .machine-title h1 { font-size: 29px; }
+  .game-stage[data-game] .reels { --reel-gap: 2px; padding: 3px; aspect-ratio: 5 / 4; }
+  .game-stage[data-game] .reel-meta { min-height: 24px; }
+  .game-stage[data-game] .reel-footer { min-height: 31px; }
+  .game-stage[data-game] .control-deck { grid-template-columns: 1fr 78px 1fr; padding-inline: 7px; }
+  .game-stage[data-game] .spin-button { width: 92px; height: 92px; margin-top: -28px; }
+  .game-stage[data-game] .spin-icon { font-size: 34px; }
+  .game-stage[data-game] .feature-card { grid-template-columns: 78px 1fr; min-height: 94px; }
+  .game-stage[data-game] .feature-card .moonwell-visual { width: 76px; }
+  .game-stage[data-game] .feature-card .petal-pip { height: 18px; }
+  .bet-control { min-width: 0; padding: 5px; }
+  .bet-control .control-label { margin-bottom: 4px; }
+  .bet-control .stepper { gap: 2px; }
+  .bet-control .stepper button { width: 40px; height: 44px; font-size: 23px; }
+  .bet-control .stepper strong { min-width: 38px; font-size: 15px; }
+  .bet-control .mini-action { min-height: 30px; margin-top: 5px; }
 }

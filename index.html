@@ -6,7 +6,8 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="The Lumen Collection — four free-play slot games with published 99.00% theoretical RTP, including UFC Octagon Gold." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="preload" href="./assets/astral-cabinet-two-guardians-v1.png" as="image" />
+    <link rel="preload" href="./assets/astral-bloom-bg.jpg" as="image" />
+    <link rel="preload" href="./assets/astral-characters-cutout-v1.png" as="image" />
     <link rel="preload" href="./assets/symbols-astral-v4.png" as="image" />
     <link rel="stylesheet" href="./styles.css" />
     <title>The Lumen Collection · Four free-play slots</title>
@@ -91,15 +92,11 @@
             </div>
 
             <div class="reel-frame">
-              <div class="reel-meta">
-                <span><i></i> 20</span>
-                <span id="reelCommitment">RTP 99%</span>
-              </div>
+              <div class="reel-meta"><span id="reelCommitment">RTP 99%</span></div>
               <div class="reel-viewport">
                 <div class="reels" id="reels" aria-label="Five reels and four rows" aria-live="off"></div>
                 <div class="reel-speed-layer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
                 <div class="reel-impact-layer" id="reelImpactLayer" aria-hidden="true"></div>
-                <svg class="payline-overlay" id="paylineOverlay" viewBox="0 0 500 400" preserveAspectRatio="none" aria-hidden="true"></svg>
                 <div class="anticipation-callout" id="anticipationCallout" hidden aria-hidden="true">
                   <span>Bonus</span>
                   <strong id="anticipationCopy">Final reel in motion</strong>
@@ -112,8 +109,8 @@
                 <small id="winBannerMultiplier">0.00× bet</small>
               </div>
               <div class="near-miss-banner" id="nearMissBanner" hidden aria-hidden="true">
-                <strong>One symbol short</strong>
-                <span id="nearMissCopy">Line connection stopped on reel 3.</span>
+                <strong>Almost</strong>
+                <span id="nearMissCopy">The reels nearly aligned.</span>
                 <small>Natural RNG</small>
               </div>
               <div class="reel-footer">

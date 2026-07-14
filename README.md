@@ -27,24 +27,24 @@ Open `http://localhost:4173`.
 The interface includes:
 
 - a first-entry four-game lobby that also performs the 18+ free-play confirmation;
-- a compact four-game switcher with progress retained per game;
+- a four-game lobby reachable from the top-left brand, with progress retained per game;
 - four distinct bonus-meter machines: Astral constellation orbit, Neon pearl-current tank, Ember forge-heat chamber, and UFC ten-step fight card;
 - four distinct reel-motion systems: celestial cascade, underwater wave, heavy forge slam, and left-to-right fight strike;
 - permanent per-game ledgers showing total credits won, spins played, and each title's biggest win;
 - reel-stop anticipation for strong collector results and feature triggers;
 - animated win count-ups, highlighted winning symbols, collection bursts, and themed bonus reveals;
 - tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
-- themed reel-start, reel-stop, anticipation, collection, line-win, bonus, and celebration sound cues;
+- themed reel-start, reel-stop, anticipation, collection, payout, bonus, and celebration sound cues;
 - four sealed bonus presentations: Moonwell Free Spins, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
 - a visible session timer, configurable net-loss limit, 15-minute reality checks, and wagered/returned/net summaries;
 - honest partial-return messaging: a payout below the bet is shown as a net loss and never receives a win celebration;
-- high-contrast neutral reel tiles with always-visible symbol names and per-symbol color coding;
-- animated SVG payline traces that connect every winning symbol directly across the reels;
-- truthful natural near-miss traces for unmodified RNG results where two leftmost symbols connect and reel three breaks the line;
+- high-contrast generated reel symbols with distinct silhouettes and per-symbol color coding;
+- winning-symbol animation without drawn payline overlays;
+- a generic, non-quantified “Almost” cue on naturally occurring unmodified RNG results, without revealing a line, reel, symbol count, or how close the result was;
 - larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
 - four distinct continuous spin-tick patterns plus themed reel-stop cues instead of one shared generic tick;
-- a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, line-win cues, payout-count notes, and bonus reveal hits;
-- synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, sequential win-line nodes, staged bonus reveals, and multi-phase big-win scenes;
+- a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
+- synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
 - an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a no-wager preview button for immediate review;
 - an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, turbo timing, and visibly dancing winning symbols;
 - opt-in licensed Astral audio samples for the reel wheel and “you win” voice, with source and license records in `assets/audio/LICENSES.md`;
@@ -80,15 +80,21 @@ Before each spin, the game commits to `SHA-256(serverSeed)`. The deterministic o
 SHA-256(serverSeed:clientSeed:nonce:counter)
 ```
 
-The player can change the client seed. After a spin, the secret is revealed and the verifier recreates the selected game, all 20 symbols, line wins, persistent progress, and feature prizes. Four-byte values use rejection sampling before weighted mapping to avoid modulo bias.
+The player can change the client seed. After a spin, the secret is revealed and the verifier recreates the selected game, all 20 symbols, base-game wins, persistent progress, and feature prizes. Four-byte values use rejection sampling before weighted mapping to avoid modulo bias.
 
 This static demo holds the unrevealed seed in browser memory. A real-money implementation must move seeds, nonce control, account state, balance updates, and signed receipts to audited server infrastructure.
 
 ## Original artwork
 
-The project-bound world art was generated with the built-in OpenAI image-generation tool. Astral also includes three production PNG plates created for the new visual-first cabinet:
+The project-bound world art was generated with the built-in OpenAI image-generation tool. Each world now uses a transparent character plate independently layered over its environment:
 
-- `assets/astral-cabinet-two-guardians-v1.png` — a wide reel cabinet flanked by an original moon-garden oracle and crystal-antler sentinel.
+- `assets/astral-characters-cutout-v1.png` — an original moon-garden oracle and crystal-antler sentinel.
+- `assets/neon-characters-cutout-v1.png` — an original pearl-current navigator and deep-sea guardian.
+- `assets/ember-characters-cutout-v1.png` — an original forge queen and obsidian furnace warden.
+- `assets/ufc-characters-cutout-v1.png` — two original fictional MMA champions with no real-fighter likenesses or sponsor marks.
+
+Astral also includes two feature presentation plates:
+
 - `assets/astral-bonus-chamber-v1.png` — a three-portal Moonwell bonus chamber.
 - `assets/astral-guardian-cinematic-v1.png` — the full-screen Moonwell awakening guardian.
 
@@ -107,6 +113,8 @@ Each game also has a dedicated 1774×887 raster symbol sheet generated with the 
 - `assets/symbols-ufc-v2.png` — logo-free championship belt, octagon, event star, strike, clock, glove, and Fight Token.
 
 The background prompts required environment-only compositions, a low-detail center for readable reels, no text or logos, and no recognizable characters or copied game imagery. The symbol prompts required seven isolated glossy 3D game icons on a removable chroma background. Any final UFC trademarks, logos, approved typography, fighter likenesses, event names, or sponsor material should come from the license holder's approved brand pack and legal review.
+
+See `GAME_FUNCTIONS.md` for the team-review inventory of controls, math, bonuses, presentation, audio, fairness, accessibility, and remaining production gates.
 
 ## Render deployment
 

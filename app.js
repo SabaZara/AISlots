@@ -36,7 +36,6 @@ const ui = {
   reelImpactLayer: $("reelImpactLayer"),
   anticipationCallout: $("anticipationCallout"),
   anticipationCopy: $("anticipationCopy"),
-  paylineOverlay: $("paylineOverlay"),
   nearMissBanner: $("nearMissBanner"),
   nearMissCopy: $("nearMissCopy"),
   resultStatus: $("resultStatus"),
@@ -273,9 +272,8 @@ function symbolGraphic(id) {
   return symbolSvg(id);
 }
 
-function renderGrid(grid, { shuffling = false, settling = false, winnerCells = new Set(), nearMiss = null } = {}) {
+function renderGrid(grid, { shuffling = false, settling = false, winnerCells = new Set() } = {}) {
   const fragment = document.createDocumentFragment();
-  const nearMatchCells = new Set(nearMiss?.matchCells ?? []);
   for (let row = 0; row < ROWS; row += 1) {
     for (let col = 0; col < COLS; col += 1) {
       const index = cellIndex(col, row);
@@ -285,8 +283,6 @@ function renderGrid(grid, { shuffling = false, settling = false, winnerCells = n
       if (shuffling) cell.classList.add("is-shuffling");
       if (settling) cell.classList.add("is-settling");
       if (winnerCells.has(index)) cell.classList.add("is-winner");
-      if (nearMatchCells.has(index)) cell.classList.add("is-near-match");
-      if (nearMiss?.breakCell === index) cell.classList.add("is-line-break");
       if (id === "petal") cell.classList.add("is-scatter");
       cell.dataset.symbol = id;
       cell.dataset.col = String(col);
@@ -454,11 +450,9 @@ function buildLobby() {
     button.className = `lobby-game lobby-game-${game.id}`;
     button.type = "button";
     button.dataset.lobbyGameId = game.id;
-    const lobbyBackground = game.id === "astral" ? "./assets/astral-cabinet-two-guardians-v1.png" : game.background;
-    button.style.setProperty("--lobby-bg", `url("${lobbyBackground}")`);
     button.style.setProperty("--lobby-accent", game.accent);
     button.innerHTML = `
-      <span class="lobby-game-art" aria-hidden="true"></span>
+      <span class="lobby-game-art" aria-hidden="true"><img class="lobby-game-image" src="${game.background}" alt="" ${game.id === "astral" ? "fetchpriority=\"high\"" : "loading=\"lazy\""}></span>
       <span class="lobby-game-shade" aria-hidden="true"></span>
       <span class="lobby-game-content">
         <span class="lobby-game-kicker">${game.lobbyTag}</span>
@@ -503,6 +497,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.featureVisual.dataset.meter = game.meterMode;
   ui.reels.dataset.motion = game.reelMotion;
   gameStage.style.setProperty("--game-bg", `url("${game.background}")`);
+  gameStage.style.setProperty("--game-characters", `url("${game.characterLayer}")`);
   gameStage.style.setProperty("--game-accent", game.accent);
   gameStage.style.setProperty("--game-secondary", game.secondary);
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
@@ -553,7 +548,6 @@ function switchGame(gameId) {
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-spinning", "is-stopping");
   ui.reelImpactLayer.replaceChildren();
-  renderPaylineOverlay();
   ui.nearMissBanner.hidden = true;
   ui.nearMissBanner.classList.remove("is-visible");
   applyGameTheme({ resetGrid: true });
@@ -573,44 +567,12 @@ function winningCells(outcome) {
 
 function findNaturalNearMiss(outcome) {
   if (outcome.wins.length > 0) return null;
-  const nearMiss = naturalNearMissFor(outcome.grid, PAYLINES, cellIndex);
-  if (!nearMiss) return null;
-  return {
-    ...nearMiss,
-    symbolName: currentSymbols().find((symbol) => symbol.id === nearMiss.symbolId)?.name ?? nearMiss.symbolId,
-    breakName: currentSymbols().find((symbol) => symbol.id === nearMiss.breakSymbolId)?.name ?? nearMiss.breakSymbolId
-  };
-}
-
-function paylinePoints(rows, count = COLS) {
-  return rows.slice(0, count).map((row, col) => `${col * 100 + 50},${row * 100 + 50}`).join(" ");
-}
-
-function renderPaylineOverlay(outcome = null, nearMiss = null) {
-  if (!outcome) {
-    ui.paylineOverlay.replaceChildren();
-    return;
-  }
-  const palette = ["#6be4ff", "#f5d899", "#ff8fda", "#89f3c1", "#ff755f"];
-  const winLines = outcome.wins.slice(0, 6).map((win, index) => {
-    const rows = PAYLINES[win.line - 1];
-    const color = palette[index % palette.length];
-    const lineDelay = index * 240;
-    const nodes = rows.slice(0, win.count).map((row, col) => `<circle class="payline-win-node" style="--line-color:${color};--line-delay:${lineDelay}ms" cx="${col * 100 + 50}" cy="${row * 100 + 50}" r="8"></circle>`).join("");
-    return `<polyline class="payline-shadow" style="--line-delay:${lineDelay}ms" points="${paylinePoints(rows, win.count)}"></polyline><polyline class="payline-win" style="--line-color:${color};--line-delay:${lineDelay}ms" points="${paylinePoints(rows, win.count)}"></polyline>${nodes}<text class="payline-label" style="--line-delay:${lineDelay}ms" x="${Math.min(win.count * 100 - 42, 440)}" y="${rows[Math.min(win.count - 1, rows.length - 1)] * 100 + 42}">L${win.line} · ${formatCredits(win.amount)} CR</text>`;
-  }).join("");
-  let nearLine = "";
-  if (nearMiss) {
-    const breakX = 250;
-    const breakY = nearMiss.rows[2] * 100 + 50;
-    nearLine = `<polyline class="payline-near" points="${paylinePoints(nearMiss.rows, 3)}"></polyline><circle class="payline-node" cx="50" cy="${nearMiss.rows[0] * 100 + 50}" r="10"></circle><circle class="payline-node" cx="150" cy="${nearMiss.rows[1] * 100 + 50}" r="10"></circle><path class="payline-break" d="M${breakX - 10} ${breakY - 10}L${breakX + 10} ${breakY + 10}M${breakX + 10} ${breakY - 10}L${breakX - 10} ${breakY + 10}"></path><text class="payline-label near-label" x="270" y="${Math.max(24, breakY - 15)}">LINE ${nearMiss.line} · NO PAYOUT</text>`;
-  }
-  ui.paylineOverlay.innerHTML = winLines || nearLine;
+  return naturalNearMissFor(outcome.grid, PAYLINES, cellIndex);
 }
 
 function showNaturalNearMiss(nearMiss) {
   if (!nearMiss) return;
-  ui.nearMissCopy.textContent = `Line ${nearMiss.line}: two ${nearMiss.symbolName} symbols connected, then ${nearMiss.breakName} broke the line on reel 3.`;
+  ui.nearMissCopy.textContent = "The reels nearly aligned.";
   ui.nearMissBanner.hidden = false;
   ui.nearMissBanner.setAttribute("aria-hidden", "false");
   ui.nearMissBanner.classList.add("is-visible");
@@ -805,7 +767,7 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
   });
 }
 
-async function settleOutcome(outcome, nearMiss = null) {
+async function settleOutcome(outcome) {
   const game = currentGame();
   setAnticipationUi(false);
   audio.stopSpinLoop();
@@ -815,10 +777,9 @@ async function settleOutcome(outcome, nearMiss = null) {
     ui.reels.classList.add("is-board-clearing");
     await cinematicDelay(280);
   }
-  renderGrid(outcome.grid, { settling: true, winnerCells: winningCells(outcome), nearMiss });
+  renderGrid(outcome.grid, { settling: true, winnerCells: winningCells(outcome) });
   ui.reels.classList.remove("is-board-clearing");
   if (state.gameId === "astral") ui.reels.classList.add("is-cinematic-drop");
-  renderPaylineOverlay();
   for (let reel = 0; reel < COLS; reel += 1) {
     const collector = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).includes("petal");
     window.setTimeout(() => {
@@ -829,7 +790,6 @@ async function settleOutcome(outcome, nearMiss = null) {
   await delay(game.reelStopGap * (COLS - 1) + 620);
   ui.reels.classList.remove("is-cinematic-drop");
   ui.reelViewport.classList.remove("is-stopping");
-  renderPaylineOverlay(outcome, nearMiss);
   sequenceLineWinSounds(outcome, BET_OPTIONS[state.betIndex]);
 }
 
@@ -889,7 +849,7 @@ async function verifyLastSpin() {
   const valid = hashMatches && outcomeMatches;
   ui.verifyResult.className = `verify-result ${valid ? "is-valid" : "is-invalid"}`;
   ui.verifyResult.textContent = valid
-    ? `✓ Verified. The pre-spin hash matches, and all 20 symbols, line wins, feature progress, and bonus prizes replay exactly.`
+    ? `✓ Verified. The pre-spin hash matches, and all 20 symbols, base-game wins, feature progress, and bonus prizes replay exactly.`
     : `Verification failed. ${hashMatches ? "The commitment matches, but the outcome differs." : "The revealed seed does not match the pre-spin commitment."}`;
   ui.receiptStatus.textContent = valid ? "Cryptographically verified" : "Verification failed";
   ui.receiptStatus.classList.toggle("is-valid", valid);
@@ -913,13 +873,13 @@ function renderWinDetails() {
   const outcome = state.lastOutcome;
   if (!outcome) return;
   const game = getGame(outcome.gameId);
-  const lines = outcome.wins.length
-    ? outcome.wins.map((win) => `<div class="win-line-item"><span>Line ${win.line} · <b>${win.count}× ${win.symbolName}</b></span><strong>${formatCredits(win.amount)} CR</strong></div>`).join("")
-    : `<div class="win-line-item"><span>No line wins on this result</span><strong>0.00 CR</strong></div>`;
+  const wins = outcome.wins.length
+    ? outcome.wins.map((win, index) => `<div class="win-line-item"><span>Payout ${index + 1} · <b>${win.count}× ${win.symbolName}</b></span><strong>${formatCredits(win.amount)} CR</strong></div>`).join("")
+    : `<div class="win-line-item"><span>No base-game payout</span><strong>0.00 CR</strong></div>`;
   const bonus = outcome.bonusWin > 0
     ? `<div class="win-line-item"><span>${game.featureName} · <b>${outcome.bonusMultiplier}× total bet</b></span><strong>${formatCredits(outcome.bonusWin)} CR</strong></div>`
     : "";
-  ui.winDetailsContent.innerHTML = `<div class="win-summary"><div><span>${game.name} total</span><strong>${formatCredits(outcome.totalWin)} CR</strong></div><div><span>${game.collectionPlural} landed</span><strong>${outcome.collectorCount}</strong></div></div><div class="win-line-list">${lines}${bonus}</div>`;
+  ui.winDetailsContent.innerHTML = `<div class="win-summary"><div><span>${game.name} total</span><strong>${formatCredits(outcome.totalWin)} CR</strong></div><div><span>${game.collectionPlural} landed</span><strong>${outcome.collectorCount}</strong></div></div><div class="win-line-list">${wins}${bonus}</div>`;
 }
 
 function cinematicDelay(milliseconds) {
@@ -1242,7 +1202,6 @@ async function spin({ fromAuto = false } = {}) {
   ui.reelViewport.classList.remove("is-stopping");
   ui.reelViewport.classList.add("is-spinning");
   ui.winBanner.classList.remove("is-visible");
-  renderPaylineOverlay();
   ui.nearMissBanner.hidden = true;
   ui.nearMissBanner.classList.remove("is-visible");
   ui.lastWinButton.disabled = true;
@@ -1288,7 +1247,7 @@ async function spin({ fromAuto = false } = {}) {
   }
   window.clearInterval(shuffleTimer);
 
-  await settleOutcome(outcome, nearMiss);
+  await settleOutcome(outcome);
   if (nearMiss) showNaturalNearMiss(nearMiss);
   state.progress[state.gameId] = outcome.progressAfter;
   state.lastOutcome = outcome;
@@ -1303,7 +1262,7 @@ async function spin({ fromAuto = false } = {}) {
     playCollectSound(outcome.collectorCount);
     burstParticles(8 + outcome.collectorCount * 3, .55);
   } else if (baseOutcomeClass === "net-win") {
-    setStatus(`${outcome.wins.length} line win${outcome.wins.length === 1 ? "" : "s"} illuminated`);
+    setStatus(`${outcome.wins.length} payout${outcome.wins.length === 1 ? "" : "s"} illuminated`);
   } else if (baseOutcomeClass === "break-even") {
     setStatus(`Bet returned exactly · ${formatCredits(outcome.baseWin)} CR returned on ${formatCredits(bet)} CR bet`);
   } else if (baseOutcomeClass === "partial-return") {
@@ -1357,8 +1316,8 @@ async function spin({ fromAuto = false } = {}) {
 
   if (totalOutcomeClass === "net-win") setStatus(`Net win +${formatCredits(outcome.totalWin - bet)} CR · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
   else if (totalOutcomeClass === "break-even") setStatus(`Break-even result · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
-  else if (nearMiss && totalOutcomeClass === "partial-return") setStatus(`Line ${nearMiss.line}: two ${nearMiss.symbolName} connected, reel 3 broke the line · partial return ${formatCredits(outcome.totalWin)} CR`);
-  else if (nearMiss) setStatus(`Line ${nearMiss.line}: two ${nearMiss.symbolName} connected, reel 3 broke the line · no payout`);
+  else if (nearMiss && totalOutcomeClass === "partial-return") setStatus(`Almost · partial return ${formatCredits(outcome.totalWin)} CR · receipt ready`);
+  else if (nearMiss) setStatus("Almost · no return · receipt ready");
   else if (totalOutcomeClass === "partial-return") setStatus(`Partial return ${formatCredits(outcome.totalWin)} CR · net −${formatCredits(bet - outcome.totalWin)} CR · receipt ready`);
   else setStatus(`No return · net −${formatCredits(bet)} CR · receipt ready`);
   if (sessionLoss() >= state.lossLimit) {
@@ -1525,7 +1484,6 @@ function bindEvents() {
     setAnticipationUi(false);
     ui.reelViewport.classList.remove("is-spinning", "is-stopping");
     ui.reelImpactLayer.replaceChildren();
-    renderPaylineOverlay();
     ui.nearMissBanner.hidden = true;
     setStatus("Demo balance reset. All four feature meters start anew.");
     updateUi();
