@@ -1,6 +1,6 @@
 {
   "name": "aislots",
-  "version": "2.12.0",
+  "version": "2.12.1",
   "private": true,
   "type": "module",
   "description": "AISlots — four visually distinct free-play slot games with generated artwork and exact published RTP.",

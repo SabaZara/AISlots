@@ -83,8 +83,11 @@ test("runtime uses character cutouts and contains no payline overlay", async () 
   ]);
   assert.doesNotMatch(html, /paylineOverlay/);
   assert.doesNotMatch(html, /near-miss-banner|>Almost</i);
+  assert.doesNotMatch(html, /realityCheckDialog|lossLimitSelect|Open session reality check/i);
   assert.doesNotMatch(app, /renderPaylineOverlay|One symbol short|reel three breaks|\bAlmost\b/i);
+  assert.doesNotMatch(app, /renderRealityCheck|lossLimit|REALITY_CHECK_INTERVAL/i);
   assert.doesNotMatch(css, /astral-cabinet-two-guardians-v1\.png|\.payline-overlay/);
+  assert.doesNotMatch(css, /\.reality-check-modal|\.reality-stats|\.loss-limit-control/);
   assert.match(app, /lobby-game-image/);
   assert.match(app, /--game-characters/);
   assert.match(css, /background-image: var\(--game-characters\)/);
@@ -107,7 +110,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.12.0");
+  assert.equal(JSON.parse(packageJson).version, "2.12.1");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {

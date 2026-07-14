@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.12.0**
+Version reviewed: **2.12.1**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -16,7 +16,7 @@ This is the team-review checklist for the current build. “Implemented” means
 | Bet decrease / increase | Implemented | Large `−` and `+` buttons select 1, 2, 5, 10, or 20 CR. Controls lock while a result is resolving. |
 | Maximum bet | Implemented | `MAX` selects 20 CR. There is no real-money purchase or deposit path. |
 | Turbo | Implemented | Shortens the presentation wait while preserving the exact same outcome generation and RTP. |
-| Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits, a feature presentation, or the configured loss limit. |
+| Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits or a feature presentation. |
 | Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. Exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
 | Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet buys a deterministic Moonwell Multiplier Gate using demo credits only. Purchase prizes are scaled to 99.00% theoretical RTP and receive a fairness receipt. |
 | Sound | Implemented | Sound is opt-in and can be turned on or off from the top bar. |
@@ -103,8 +103,7 @@ All characters are transparent foreground cutouts placed independently over envi
 
 - Clearly marked 18+ free-play prototype with no deposits, real-money purchases, or cash value. Astral feature buys spend demo credits only.
 - Visible balance, current bet, last return, session net, elapsed session time, total wagered, total returned, per-world wins, spin count, and biggest win.
-- Configurable 25, 50, 100, or 250 CR session net-loss limit.
-- Reality check every 15 minutes, plus a manually available session summary.
+- Passive session time and session-net displays remain visible without timed reality-check dialogs or loss-limit interruptions.
 - Reduced-motion media query support.
 - Keyboard operation, focus states, ARIA labels, live result status, and dialog close controls.
 - Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, turbo, autoplay, sound, lobby, and verification controls.

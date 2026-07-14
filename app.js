@@ -17,7 +17,6 @@ import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from ".
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
 const INITIAL_BALANCE = 1000;
-const REALITY_CHECK_INTERVAL_MINUTES = 15;
 const SYMBOL_SHEET_INDEX = { luma: 0, orbit: 1, nova: 2, comet: 3, dew: 4, leaf: 5, petal: 6 };
 
 const $ = (id) => document.getElementById(id);
@@ -25,7 +24,6 @@ const ui = {
   balance: $("balance"),
   sessionNet: $("sessionNet"),
   sessionTime: $("sessionTime"),
-  sessionClockButton: $("sessionClockButton"),
   betAmount: $("betAmount"),
   betDown: $("betDown"),
   betUp: $("betUp"),
@@ -109,18 +107,7 @@ const ui = {
   astralFreeSpinLabel: $("astralFreeSpinLabel"),
   astralCascadeLabel: $("astralCascadeLabel"),
   astralRoundAward: $("astralRoundAward"),
-  astralTotalMultiplier: $("astralTotalMultiplier"),
-  lossLimitSelect: $("lossLimitSelect"),
-  lossLimitStatus: $("lossLimitStatus"),
-  realityCheckDialog: $("realityCheckDialog"),
-  realityTime: $("realityTime"),
-  realitySpins: $("realitySpins"),
-  realityWagered: $("realityWagered"),
-  realityWon: $("realityWon"),
-  realityNet: $("realityNet"),
-  realityLimit: $("realityLimit"),
-  continueSession: $("continueSession"),
-  realityChooseGame: $("realityChooseGame")
+  astralTotalMultiplier: $("astralTotalMultiplier")
 };
 
 const state = {
@@ -131,11 +118,6 @@ const state = {
   progress: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0])),
   gameStats: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()])),
   sessionStartedAt: Date.now(),
-  sessionSpins: 0,
-  sessionWagered: 0,
-  sessionWon: 0,
-  lossLimit: 100,
-  lastRealityCheckMinute: 0,
   nonce: 0,
   serverSeed: "",
   serverHash: "",
@@ -227,39 +209,8 @@ function formatElapsed(milliseconds) {
     : `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-function sessionLoss() {
-  return Math.max(0, -state.sessionNet);
-}
-
-function updateSessionSafetyUi() {
-  const elapsed = Date.now() - state.sessionStartedAt;
-  ui.sessionTime.textContent = formatElapsed(elapsed);
-  ui.lossLimitStatus.textContent = `${formatCredits(sessionLoss())} of ${formatCredits(state.lossLimit)} CR net loss`;
-  ui.lossLimitStatus.classList.toggle("is-close", sessionLoss() >= state.lossLimit * .75);
-}
-
-function renderRealityCheck() {
-  ui.realityTime.textContent = formatElapsed(Date.now() - state.sessionStartedAt);
-  ui.realitySpins.textContent = String(state.sessionSpins);
-  ui.realityWagered.textContent = `${formatCredits(state.sessionWagered)} CR`;
-  ui.realityWon.textContent = `${formatCredits(state.sessionWon)} CR`;
-  const sign = state.sessionNet > 0 ? "+" : "";
-  ui.realityNet.textContent = `${sign}${formatCredits(state.sessionNet)} CR`;
-  ui.realityNet.className = state.sessionNet > 0 ? "positive" : state.sessionNet < 0 ? "negative" : "neutral";
-  ui.realityLimit.textContent = `${formatCredits(state.lossLimit)} CR`;
-  if (!ui.realityCheckDialog.open) ui.realityCheckDialog.showModal();
-}
-
 function tickSessionClock() {
-  updateSessionSafetyUi();
-  const elapsedMinutes = Math.floor((Date.now() - state.sessionStartedAt) / 60000);
-  const scheduledMinute = state.lastRealityCheckMinute + REALITY_CHECK_INTERVAL_MINUTES;
-  const overlayOpen = !ui.lobbyOverlay.hidden || !ui.bonusOverlay.hidden || !ui.celebrationOverlay.hidden;
-  const otherDialogOpen = Boolean(document.querySelector("dialog[open]:not(#realityCheckDialog)"));
-  if (elapsedMinutes >= scheduledMinute && !state.isSpinning && !overlayOpen && !otherDialogOpen && !ui.realityCheckDialog.open) {
-    state.lastRealityCheckMinute = elapsedMinutes;
-    renderRealityCheck();
-  }
+  ui.sessionTime.textContent = formatElapsed(Date.now() - state.sessionStartedAt);
 }
 
 function symbolSvg(id) {
@@ -425,7 +376,7 @@ function updateUi() {
   ui.sessionNet.className = state.sessionNet > 0 ? "positive" : state.sessionNet < 0 ? "negative" : "neutral";
   renderPetalMeter();
   renderGameStats();
-  updateSessionSafetyUi();
+  tickSessionClock();
 }
 
 function updateCommitmentUi() {
@@ -1186,11 +1137,6 @@ async function buyAstralFeature(costMultiplier) {
   if (state.gameId !== "astral" || state.isSpinning || state.autoActive) return;
   const bet = currentBaseBet();
   const purchaseCost = bet * costMultiplier;
-  if (sessionLoss() >= state.lossLimit) {
-    closeFeatureMarket({ returnFocus: false });
-    renderRealityCheck();
-    return;
-  }
   if (state.balance < purchaseCost) return;
 
   const serverSeed = state.serverSeed;
@@ -1202,8 +1148,6 @@ async function buyAstralFeature(costMultiplier) {
   state.isSpinning = true;
   state.balance -= purchaseCost;
   state.sessionNet -= purchaseCost;
-  state.sessionSpins += 1;
-  state.sessionWagered += purchaseCost;
   updateUi();
 
   const outcome = await simulateBonusPurchase({
@@ -1219,7 +1163,6 @@ async function buyAstralFeature(costMultiplier) {
   await showAstralBonus(outcome.bonusRounds, bet, { purchased: true });
   state.balance += outcome.totalWin;
   state.sessionNet += outcome.totalWin;
-  state.sessionWon += outcome.totalWin;
   state.gameStats.astral = recordGameResult(state.gameStats.astral, outcome.totalWin, purchaseCost);
   updateUi();
 
@@ -1247,7 +1190,6 @@ async function buyAstralFeature(costMultiplier) {
   state.isSpinning = false;
   updateUi();
   setStatus(`${costMultiplier}× feature · ${formatMultiplier(outcome.bonusMultiplier)} · ${formatCredits(outcome.totalWin)} CR returned`);
-  if (sessionLoss() >= state.lossLimit) renderRealityCheck();
   ui.buyFeatureButton.focus();
 }
 
@@ -1273,12 +1215,6 @@ async function spin({ fromAuto = false } = {}) {
   const game = currentGame();
   const bet = currentBaseBet();
   const wager = currentSpinWager();
-  if (sessionLoss() >= state.lossLimit) {
-    setStatus(`Session loss limit reached at ${formatCredits(state.lossLimit)} CR. Review the session before continuing.`);
-    state.autoStopRequested = true;
-    renderRealityCheck();
-    return false;
-  }
   if (state.balance < wager) {
     setStatus("Not enough demo credits. Reset the free-play balance below.");
     playTone(170, .2, "square");
@@ -1289,8 +1225,6 @@ async function spin({ fromAuto = false } = {}) {
   state.isSpinning = true;
   state.balance -= wager;
   state.sessionNet -= wager;
-  state.sessionSpins += 1;
-  state.sessionWagered += wager;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
   setAnticipationUi(false);
@@ -1381,7 +1315,6 @@ async function spin({ fromAuto = false } = {}) {
     updateUi();
   }
 
-  state.sessionWon += outcome.totalWin;
   state.gameStats[state.gameId] = recordGameResult(state.gameStats[state.gameId], outcome.totalWin, wager);
   updateUi();
   const totalOutcomeClass = outcomeClassFor(outcome.totalWin, wager);
@@ -1413,10 +1346,6 @@ async function spin({ fromAuto = false } = {}) {
   else if (totalOutcomeClass === "break-even") setStatus(`Break-even result · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
   else if (totalOutcomeClass === "partial-return") setStatus(`Partial return ${formatCredits(outcome.totalWin)} CR · net −${formatCredits(wager - outcome.totalWin)} CR · receipt ready`);
   else setStatus(`No return · net −${formatCredits(wager)} CR · receipt ready`);
-  if (sessionLoss() >= state.lossLimit) {
-    state.autoStopRequested = true;
-    renderRealityCheck();
-  }
   if (!fromAuto) ui.spinButton.focus();
   return true;
 }
@@ -1463,17 +1392,6 @@ function openDialog(id) {
 }
 
 function bindEvents() {
-  ui.sessionClockButton.addEventListener("click", renderRealityCheck);
-  ui.lossLimitSelect.addEventListener("change", () => {
-    state.lossLimit = Number(ui.lossLimitSelect.value);
-    updateSessionSafetyUi();
-    setStatus(`Session loss limit set to ${formatCredits(state.lossLimit)} CR`);
-  });
-  ui.continueSession.addEventListener("click", () => ui.realityCheckDialog.close());
-  ui.realityChooseGame.addEventListener("click", () => {
-    ui.realityCheckDialog.close();
-    openLobby();
-  });
   $("brandLink").addEventListener("click", (event) => {
     event.preventDefault();
     openLobby();
@@ -1584,10 +1502,6 @@ function bindEvents() {
     state.progress = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0]));
     state.gameStats = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()]));
     state.sessionStartedAt = Date.now();
-    state.sessionSpins = 0;
-    state.sessionWagered = 0;
-    state.sessionWon = 0;
-    state.lastRealityCheckMinute = 0;
     state.specialBetBoost = 0;
     state.lastOutcome = null;
     ui.lastWinButton.disabled = true;

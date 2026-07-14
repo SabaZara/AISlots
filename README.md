@@ -36,7 +36,7 @@ The interface includes:
 - tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
 - themed reel-start, reel-stop, anticipation, collection, payout, bonus, and celebration sound cues;
 - four sealed bonus presentations: Moonwell Multiplier Gate, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
-- a visible session timer, configurable net-loss limit, 15-minute reality checks, and wagered/returned/net summaries;
+- a passive session timer and visible session-net summary without interruption dialogs;
 - honest partial-return messaging: a payout below the bet is shown as a net loss and never receives a win celebration;
 - high-contrast generated reel symbols with distinct silhouettes and per-symbol color coding;
 - winning-symbol animation without drawn payline overlays;

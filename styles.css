@@ -142,12 +142,6 @@ a:focus-visible {
   color: var(--ink);
   background: transparent;
   text-align: left;
-  cursor: pointer;
-}
-
-.session-clock:hover {
-  color: var(--cyan);
-  background: rgba(107,228,255,.045);
 }
 
 .session-stat > span,
@@ -1780,40 +1774,6 @@ a:focus-visible {
 .auto-options strong { color: var(--game-accent); font: 400 19px/1 var(--serif); }
 .auto-options span { margin-top: 4px; color: var(--muted); font-size: 7px; text-transform: uppercase; }
 
-.loss-limit-control {
-  margin-top: 12px;
-  padding-top: 11px;
-  border-top: 1px solid var(--line);
-}
-
-.loss-limit-control label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 8px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.loss-limit-control select {
-  min-height: 32px;
-  padding: 0 8px;
-  border: 1px solid var(--line);
-  border-radius: 0;
-  color: var(--ink);
-  background: #0d1530;
-}
-
-.loss-limit-control small {
-  margin-top: 7px;
-  color: var(--positive);
-  font-size: 8px;
-}
-
-.loss-limit-control small.is-close { color: var(--negative); }
-
 .fx-layer {
   position: absolute;
   z-index: 14;
@@ -2514,40 +2474,6 @@ kbd {
 
 .win-line-item b {
   color: var(--ink);
-}
-
-.reality-copy {
-  margin: 0 0 16px;
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.6;
-}
-
-.reality-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
-}
-
-.reality-stats div {
-  min-width: 0;
-  padding: 14px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.reality-stats span,
-.reality-stats strong { display: block; }
-.reality-stats span { color: var(--muted); font-size: 8px; text-transform: uppercase; }
-.reality-stats strong { margin-top: 6px; font: 400 18px/1 var(--serif); }
-.reality-stats strong.positive { color: var(--positive); }
-.reality-stats strong.negative { color: var(--negative); }
-
-.reality-actions {
-  margin-top: 16px;
-  display: flex;
-  gap: 9px;
 }
 
 .cinematic-overlay {
@@ -3780,8 +3706,6 @@ kbd {
   .rules-hero span { font-size: 20px; }
   .paytable { grid-template-columns: 1fr; }
   .bonus-prize-table { grid-template-columns: repeat(4, 1fr); }
-  .reality-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .reality-actions { flex-direction: column; }
   .receipt-grid { grid-template-columns: 1fr; }
   .verifier-actions { flex-direction: column; }
   .rtp-breakdown span { padding: 8px; }
