@@ -78,6 +78,22 @@ test("runtime uses character cutouts and contains no payline overlay", async () 
   assert.match(inventory, /Production gate/);
 });
 
+test("phone rotation and iPad viewport-fit rules remain documented", async () => {
+  const [css, readme, inventory, packageJson] = await Promise.all([
+    readFile(new URL("styles.css", root), "utf8"),
+    readFile(new URL("README.md", root), "utf8"),
+    readFile(new URL("GAME_FUNCTIONS.md", root), "utf8"),
+    readFile(new URL("package.json", root), "utf8")
+  ]);
+  assert.match(css, /height: 100dvh/);
+  assert.match(css, /env\(safe-area-inset-top\)/);
+  assert.match(css, /orientation: landscape/);
+  assert.match(css, /grid-template-columns: clamp\(56px, 9vw, 70px\) minmax\(0, 1fr\)/);
+  assert.match(readme, /viewport-locked phone and iPad gameplay/i);
+  assert.match(inventory, /no document scrolling/i);
+  assert.equal(JSON.parse(packageJson).version, "2.10.0");
+});
+
 test("licensed Astral spin and win samples include source attribution", async () => {
   const [spin, voice, licenses, audioEngine] = await Promise.all([
     readFile(new URL("assets/audio/mixkit-slot-machine-random-wheel-1930.mp3", root)),

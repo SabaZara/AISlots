@@ -53,7 +53,11 @@ The interface includes:
 - balance, last win, session net, recent result details, and feature progression;
 - themed synthesized sound effects, win chords, collection tones, particles, bonus reveals, and big-win motion;
 - reduced-motion support and keyboard spinning;
+- viewport-locked phone and iPad gameplay with no page scrolling, dynamic-viewport sizing, safe-area padding, compact portrait controls, and a dedicated horizontal cabinet after rotation;
+- a no-scroll responsive lobby that uses a 2×2 chooser in portrait and a four-card row in landscape;
 - a single compact fairness button in the top toolbar.
+
+Responsive QA covers 320×568, 360×740, and 390×844 phone portraits; 667×375 and 844×390 phone landscapes; 768×1024 iPad portrait; and 1024×768 iPad landscape. The document remains exactly viewport-sized at each breakpoint.
 
 Autoplay is present only for this no-value free-play prototype. Real-money rules differ by jurisdiction, and some markets prohibit online-slot autoplay entirely.
 

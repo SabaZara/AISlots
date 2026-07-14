@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.9.0**
+Version reviewed: **2.10.0**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -97,6 +97,22 @@ All characters are transparent foreground cutouts placed independently over envi
 - Reduced-motion media query support.
 - Keyboard operation, focus states, ARIA labels, live result status, and dialog close controls.
 - Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, turbo, autoplay, sound, lobby, and verification controls.
+- Phone and iPad gameplay is locked to the dynamic viewport with no document scrolling. Portrait keeps the cabinet centered with the bonus meter floating inside it; short landscape rotation switches to a horizontal meter–reels–controls layout.
+- Safe-area insets protect controls around notches and home indicators. The lobby fits as a 2×2 portrait chooser or a four-card landscape row without page scrolling.
+
+### Responsive verification matrix
+
+| Device class | Viewport | Orientation | Page scrolling | Cabinet containment |
+| --- | ---: | --- | --- | --- |
+| Small phone | 320×568 | Portrait | None | Header, meter, reels, bet controls, spin, and autoplay stay inside the viewport. |
+| Phone | 360×740 | Portrait | None | Full portrait cabinet and compact responsible-play footer fit. |
+| Modern phone | 390×844 | Portrait | None | Full portrait cabinet, floating feature meter, and footer fit. |
+| Small phone rotated | 667×375 | Landscape | None | Horizontal meter–reels–controls cabinet fits. |
+| Modern phone rotated | 844×390 | Landscape | None | Horizontal meter–reels–controls cabinet fits. |
+| iPad | 768×1024 | Portrait | None | Centered full cabinet, meter, controls, and footer fit. |
+| iPad rotated | 1024×768 | Landscape | None | Compact landscape cabinet, meter, controls, and footer fit. |
+
+The same rotation checks verify that the four-card lobby stays inside its shell: 2×2 in portrait and one row in landscape.
 
 ## Data and persistence
 
