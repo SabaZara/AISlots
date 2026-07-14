@@ -4,14 +4,15 @@ import {
   COLS,
   DEFAULT_GAME_ID,
   GAMES,
-  PAYLINES,
   ROWS,
   cellIndex,
   getGame,
+  simulateBonusPurchase,
   theoreticalRtp,
+  specialBetCostMultiplier,
   simulateSpin
 } from "./game-model.js";
-import { emptyGameStats, naturalNearMissFor, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
+import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -36,8 +37,6 @@ const ui = {
   reelImpactLayer: $("reelImpactLayer"),
   anticipationCallout: $("anticipationCallout"),
   anticipationCopy: $("anticipationCopy"),
-  nearMissBanner: $("nearMissBanner"),
-  nearMissCopy: $("nearMissCopy"),
   resultStatus: $("resultStatus"),
   winBanner: $("winBanner"),
   winBannerAmount: $("winBannerAmount"),
@@ -99,11 +98,18 @@ const ui = {
   cinematicCopy: $("cinematicCopy"),
   cinematicAward: $("cinematicAward"),
   astralShowcaseButton: $("astralShowcaseButton"),
+  specialBetButton: $("specialBetButton"),
+  specialBetState: $("specialBetState"),
+  buyFeatureButton: $("buyFeatureButton"),
+  featureMarketOverlay: $("featureMarketOverlay"),
+  closeFeatureMarket: $("closeFeatureMarket"),
   astralBonusStage: $("astralBonusStage"),
-  astralBonusGrid: $("astralBonusGrid"),
+  astralLockedMultipliers: $("astralLockedMultipliers"),
+  astralMultiplierDial: $("astralMultiplierDial"),
   astralFreeSpinLabel: $("astralFreeSpinLabel"),
   astralCascadeLabel: $("astralCascadeLabel"),
   astralRoundAward: $("astralRoundAward"),
+  astralTotalMultiplier: $("astralTotalMultiplier"),
   lossLimitSelect: $("lossLimitSelect"),
   lossLimitStatus: $("lossLimitStatus"),
   realityCheckDialog: $("realityCheckDialog"),
@@ -141,6 +147,7 @@ const state = {
   ageConfirmed: false,
   soundEnabled: false,
   turboMode: false,
+  specialBetBoost: 0,
   lastOutcome: null,
   lastReceipt: null
 };
@@ -159,6 +166,43 @@ function formatCredits(value) {
   return Number(value).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
+  });
+}
+
+function currentBaseBet() {
+  return BET_OPTIONS[state.betIndex];
+}
+
+function currentSpecialBetMultiplier() {
+  return state.gameId === "astral" ? specialBetCostMultiplier("astral", state.specialBetBoost) : 1;
+}
+
+function currentSpinWager() {
+  return currentBaseBet() * currentSpecialBetMultiplier();
+}
+
+function updateAstralFeatureUi(controlsLocked = false) {
+  const multiplier = specialBetCostMultiplier("astral", state.specialBetBoost);
+  const boostLabel = state.specialBetBoost > 0 ? `+${state.specialBetBoost} Bloom${state.specialBetBoost === 1 ? "" : "s"}` : "Standard";
+  ui.specialBetState.textContent = `${boostLabel} · ${multiplier.toFixed(2)}×`;
+  ui.specialBetButton.classList.toggle("is-active", state.specialBetBoost > 0);
+  ui.specialBetButton.setAttribute("aria-pressed", String(state.specialBetBoost > 0));
+  ui.specialBetButton.disabled = controlsLocked || state.gameId !== "astral";
+  ui.buyFeatureButton.disabled = controlsLocked || state.gameId !== "astral";
+
+  document.querySelectorAll("[data-progress-boost]").forEach((button) => {
+    const selected = Number(button.dataset.progressBoost) === state.specialBetBoost;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+
+  document.querySelectorAll("[data-buy-feature]").forEach((button) => {
+    const costMultiplier = Number(button.dataset.buyFeature);
+    const cost = currentBaseBet() * costMultiplier;
+    const price = button.querySelector(`[data-buy-price="${costMultiplier}"]`);
+    if (price) price.textContent = `${formatCredits(cost)} CR`;
+    button.disabled = controlsLocked || state.balance < cost;
+    button.setAttribute("aria-label", `Buy ${costMultiplier} times bet Moonwell bonus for ${formatCredits(cost)} demo credits`);
   });
 }
 
@@ -350,16 +394,18 @@ function setStatus(message) {
 }
 
 function updateUi() {
-  const bet = BET_OPTIONS[state.betIndex];
+  const bet = currentBaseBet();
+  const spinWager = currentSpinWager();
   ui.balance.textContent = formatCredits(state.balance);
   ui.betAmount.textContent = formatCredits(bet);
-  ui.spinButton.setAttribute("aria-label", `${currentGame().actionLabel} spin for ${formatCredits(bet)} credits`);
+  ui.spinButton.setAttribute("aria-label", `${currentGame().actionLabel} spin for ${formatCredits(spinWager)} credits${state.gameId === "astral" && state.specialBetBoost ? ` with ${state.specialBetBoost} bonus meter boost` : ""}`);
   const controlsLocked = state.isSpinning || state.autoActive;
   ui.betDown.disabled = controlsLocked || state.betIndex === 0;
   ui.betUp.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.maxBetButton.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.spinButton.disabled = controlsLocked;
   ui.astralShowcaseButton.disabled = controlsLocked || state.gameId !== "astral";
+  updateAstralFeatureUi(controlsLocked);
   ui.saveClientSeed.disabled = controlsLocked;
   ui.clientSeedInput.disabled = controlsLocked;
   ui.autoButton.disabled = state.isSpinning && !state.autoActive;
@@ -557,8 +603,6 @@ function switchGame(gameId) {
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-spinning", "is-stopping");
   ui.reelImpactLayer.replaceChildren();
-  ui.nearMissBanner.hidden = true;
-  ui.nearMissBanner.classList.remove("is-visible");
   applyGameTheme({ resetGrid: true });
   updateUi();
   setStatus(`${currentGame().name} ready · collect ${currentGame().collectionPlural} to unlock the feature`);
@@ -572,25 +616,6 @@ function cosmeticGrid(tick) {
 
 function winningCells(outcome) {
   return new Set(outcome.wins.flatMap((win) => win.cells));
-}
-
-function findNaturalNearMiss(outcome) {
-  if (outcome.wins.length > 0) return null;
-  return naturalNearMissFor(outcome.grid, PAYLINES, cellIndex);
-}
-
-function showNaturalNearMiss(nearMiss) {
-  if (!nearMiss) return;
-  ui.nearMissCopy.textContent = "The reels nearly aligned.";
-  ui.nearMissBanner.hidden = false;
-  ui.nearMissBanner.setAttribute("aria-hidden", "false");
-  ui.nearMissBanner.classList.add("is-visible");
-  playNearMissCue();
-  window.setTimeout(() => {
-    ui.nearMissBanner.classList.remove("is-visible");
-    ui.nearMissBanner.hidden = true;
-    ui.nearMissBanner.setAttribute("aria-hidden", "true");
-  }, 3200);
 }
 
 function playTone(frequency, duration = 0.12, type = "sine", delaySeconds = 0) {
@@ -612,10 +637,6 @@ function playSpinSound() {
 
 function playSpinTick(tick) {
   audio.spinTick(tick);
-}
-
-function playNearMissCue() {
-  audio.nearMiss();
 }
 
 function playCollectSound(count = 1) {
@@ -803,7 +824,7 @@ async function settleOutcome(outcome) {
 }
 
 function receiptOutcomeLabel(outcome) {
-  const resultHash = outcome.grid.map((id) => id[0].toUpperCase()).join("");
+  const resultHash = outcome.grid.length ? outcome.grid.map((id) => id[0].toUpperCase()).join("") : "FEATURE BUY";
   return `${resultHash} · ${formatCredits(outcome.totalWin)} CR`;
 }
 
@@ -831,6 +852,7 @@ function stableOutcome(outcome) {
     wins: outcome.wins,
     collectorCount: outcome.collectorCount,
     scatterCount: outcome.scatterCount,
+    progressBoost: outcome.progressBoost,
     progressBefore: outcome.progressBefore,
     progressAfter: outcome.progressAfter,
     petalsBefore: outcome.petalsBefore,
@@ -839,7 +861,11 @@ function stableOutcome(outcome) {
     baseWin: outcome.baseWin,
     bonusMultiplier: outcome.bonusMultiplier,
     bonusWin: outcome.bonusWin,
-    totalWin: outcome.totalWin
+    totalWin: outcome.totalWin,
+    mode: outcome.mode ?? "spin",
+    costMultiplier: outcome.costMultiplier ?? null,
+    payoutScale: outcome.payoutScale ?? null,
+    purchaseCost: outcome.purchaseCost ?? null
   });
 }
 
@@ -849,16 +875,19 @@ async function verifyLastSpin() {
   ui.verifyResult.className = "verify-result";
   ui.verifyResult.textContent = "Replaying SHA-256 stream and game mapping…";
   const receipt = state.lastReceipt;
+  const replay = receipt.mode === "feature-buy" ? simulateBonusPurchase(receipt) : simulateSpin(receipt);
   const [hash, replayed] = await Promise.all([
     sha256Hex(receipt.serverSeed),
-    simulateSpin(receipt)
+    replay
   ]);
   const hashMatches = hash === receipt.serverHash;
   const outcomeMatches = stableOutcome(replayed) === stableOutcome(receipt.outcome);
   const valid = hashMatches && outcomeMatches;
   ui.verifyResult.className = `verify-result ${valid ? "is-valid" : "is-invalid"}`;
   ui.verifyResult.textContent = valid
-    ? `✓ Verified. The pre-spin hash matches, and all 20 symbols, base-game wins, feature progress, and bonus prizes replay exactly.`
+    ? receipt.mode === "feature-buy"
+      ? `✓ Verified. The pre-purchase hash matches and all three sealed multiplier prizes replay exactly.`
+      : `✓ Verified. The pre-spin hash matches, and all 20 symbols, base-game wins, feature progress, and bonus prizes replay exactly.`
     : `Verification failed. ${hashMatches ? "The commitment matches, but the outcome differs." : "The revealed seed does not match the pre-spin commitment."}`;
   ui.receiptStatus.textContent = valid ? "Cryptographically verified" : "Verification failed";
   ui.receiptStatus.classList.toggle("is-valid", valid);
@@ -895,11 +924,11 @@ function cinematicDelay(milliseconds) {
   return delay(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? Math.min(80, milliseconds) : milliseconds);
 }
 
-async function runAstralCinematicTransition({ preview = false } = {}) {
+async function runAstralCinematicTransition({ preview = false, multiplierCount = 3 } = {}) {
   ui.cinematicOverlay.dataset.phase = "sleeping";
   ui.cinematicTitle.textContent = preview ? "Demo" : "Awaken";
   ui.cinematicCopy.textContent = preview ? "No wager" : "Moonwell opening";
-  ui.cinematicAward.textContent = preview ? "BONUS DEMO" : "3 SPINS";
+  ui.cinematicAward.textContent = preview ? "BONUS DEMO" : `${multiplierCount} MULTIPLIERS`;
   ui.cinematicOverlay.hidden = false;
   ui.cinematicOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;
@@ -909,8 +938,8 @@ async function runAstralCinematicTransition({ preview = false } = {}) {
   await cinematicDelay(1050);
   ui.cinematicOverlay.dataset.phase = "awakened";
   ui.cinematicTitle.textContent = "Moonwell";
-  ui.cinematicCopy.textContent = preview ? "No payout" : "Sealed prizes";
-  ui.cinematicAward.textContent = "3 SPINS";
+  ui.cinematicCopy.textContent = preview ? "No payout" : "Sealed multipliers";
+  ui.cinematicAward.textContent = `${multiplierCount} MULTIPLIERS`;
   jumpText(ui.cinematicTitle);
   jumpText(ui.cinematicAward);
   burstParticles(70, 1.65);
@@ -923,101 +952,64 @@ async function runAstralCinematicTransition({ preview = false } = {}) {
   $("appShell").inert = false;
 }
 
-function astralBonusLayout(roundIndex, variant = 0) {
-  const ids = ["luma", "orbit", "nova", "comet", "dew", "leaf"];
-  return Array.from({ length: COLS * ROWS }, (_, index) => {
-    const col = Math.floor(index / ROWS);
-    const row = index % ROWS;
-    return ids[(index * 3 + col + roundIndex * 2 + variant * 5 + row) % ids.length];
-  });
+function formatMultiplier(value) {
+  return `${Number(value).toFixed(2)}×`;
 }
 
-function astralCascadeCells(roundIndex) {
-  const patterns = [
-    [0, 5, 10, 15],
-    [3, 6, 9, 12, 15],
-    [1, 4, 7, 10, 13, 16]
-  ];
-  return patterns[roundIndex % patterns.length];
-}
-
-function renderAstralBonusGrid(roundIndex, variant = 0) {
-  const fragment = document.createDocumentFragment();
-  const layout = astralBonusLayout(roundIndex, variant);
-  layout.forEach((symbolId, index) => {
-    const col = Math.floor(index / ROWS);
-    const row = index % ROWS;
-    const cell = document.createElement("div");
-    const symbolName = currentSymbols().find((symbol) => symbol.id === symbolId)?.name ?? symbolId;
-    cell.className = "astral-bonus-cell is-dropping";
-    cell.dataset.symbol = symbolId;
-    cell.dataset.index = String(index);
-    cell.style.setProperty("--drop-delay", `${col * 85 + row * 42}ms`);
-    cell.style.gridColumn = String(col + 1);
-    cell.style.gridRow = String(row + 1);
-    cell.setAttribute("aria-label", symbolName);
-    cell.innerHTML = symbolGraphic(symbolId);
-    fragment.append(cell);
-  });
-  ui.astralBonusGrid.replaceChildren(fragment);
-}
-
-async function playAstralFreeSpin(roundIndex, multiplier, bet, multiplierTotal) {
-  ui.astralFreeSpinLabel.textContent = `${roundIndex + 1} / 3`;
-  ui.astralCascadeLabel.textContent = "↓";
+async function playAstralMultiplierRound(roundIndex, multiplier, bet, multiplierTotal, totalRounds) {
+  ui.astralFreeSpinLabel.textContent = `${roundIndex + 1} / ${totalRounds}`;
+  ui.astralCascadeLabel.textContent = "Charging";
   ui.astralRoundAward.textContent = "0.00×";
-  ui.astralBonusGrid.classList.remove("is-cascade-impact", "is-refilling");
-  ui.astralBonusGrid.classList.add("is-clearing-board");
-  await cinematicDelay(roundIndex === 0 ? 120 : 360);
-  renderAstralBonusGrid(roundIndex, 0);
-  ui.astralBonusGrid.classList.remove("is-clearing-board");
-  await cinematicDelay(920);
-
-  const winningIndexes = astralCascadeCells(roundIndex);
-  ui.astralCascadeLabel.textContent = `${multiplier.toFixed(2)}×`;
-  jumpText(ui.astralCascadeLabel);
-  winningIndexes.forEach((index) => ui.astralBonusGrid.querySelector(`[data-index="${index}"]`)?.classList.add("is-cascade-win"));
-  ui.astralBonusGrid.classList.add("is-cascade-impact");
-  audio.bonusReveal(roundIndex, multiplier);
-  burstParticles(22, .78);
-  await cinematicDelay(620);
-
-  winningIndexes.forEach((index) => ui.astralBonusGrid.querySelector(`[data-index="${index}"]`)?.classList.add("is-clearing"));
-  await cinematicDelay(430);
-  ui.astralBonusGrid.classList.remove("is-cascade-impact");
-  ui.astralBonusGrid.classList.add("is-refilling");
-  const refill = astralBonusLayout(roundIndex, 1);
-  winningIndexes.forEach((index, refillIndex) => {
-    const cell = ui.astralBonusGrid.querySelector(`[data-index="${index}"]`);
-    if (!cell) return;
-    const symbolId = refill[(index + refillIndex) % refill.length];
-    cell.className = "astral-bonus-cell is-refill";
-    cell.dataset.symbol = symbolId;
-    cell.innerHTML = symbolGraphic(symbolId);
-  });
-  await cinematicDelay(650);
-  ui.astralRoundAward.textContent = `${multiplier.toFixed(2)}×`;
+  ui.astralMultiplierDial.classList.remove("is-locked");
+  ui.astralMultiplierDial.classList.add("is-spinning");
+  const reelValues = [.25, .5, 1, 2, 3, 5, 10];
+  for (let tick = 0; tick < 10; tick += 1) {
+    ui.astralRoundAward.textContent = formatMultiplier(reelValues[(tick + roundIndex * 2) % reelValues.length]);
+    await cinematicDelay(72 + tick * 5);
+  }
+  ui.astralMultiplierDial.classList.remove("is-spinning");
+  ui.astralMultiplierDial.classList.add("is-locked");
+  ui.astralRoundAward.textContent = formatMultiplier(multiplier);
+  ui.astralCascadeLabel.textContent = "Locked";
+  const lock = ui.astralLockedMultipliers.children[roundIndex];
+  if (lock) {
+    lock.textContent = formatMultiplier(multiplier);
+    lock.classList.add("is-locked");
+  }
+  ui.astralTotalMultiplier.textContent = formatMultiplier(multiplierTotal);
   jumpText(ui.astralRoundAward);
-  ui.bonusMechanicProgress.textContent = `${roundIndex + 1} / 3`;
-  ui.bonusMechanicBar.style.width = `${(roundIndex + 1) / 3 * 100}%`;
+  jumpText(ui.astralTotalMultiplier);
+  audio.bonusReveal(roundIndex, multiplier);
+  burstParticles(multiplier >= 20 ? 54 : 28, multiplier >= 20 ? 1.35 : .88);
+  ui.bonusMechanicProgress.textContent = `${roundIndex + 1} / ${totalRounds}`;
+  ui.bonusMechanicBar.style.width = `${(roundIndex + 1) / totalRounds * 100}%`;
   void animateCreditValue(ui.bonusTotal, multiplierTotal * bet, 520, { sound: true, tierId: multiplier >= 5 ? "big" : "nice" });
-  await cinematicDelay(620);
+  await cinematicDelay(820);
+  ui.astralMultiplierDial.classList.remove("is-locked");
 }
 
-async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview = false } = {}) {
-  const picks = bonusRounds.flat().slice(0, 3);
-  await runAstralCinematicTransition({ preview });
+async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview = false, purchased = false } = {}) {
+  const picks = bonusRounds.flat();
+  await runAstralCinematicTransition({ preview, multiplierCount: picks.length });
   return new Promise((resolve) => {
     ui.bonusOverlay.dataset.mode = "cinematic-free-spins";
-    ui.bonusEyebrow.textContent = preview ? "Demo" : "Bonus";
+    ui.bonusEyebrow.textContent = preview ? "Demo" : purchased ? "Feature buy" : "Bonus";
     $("bonusTitle").textContent = "Moonwell";
-    ui.bonusCopy.textContent = preview ? "No wager · no payout" : "3 sealed spins";
+    ui.bonusCopy.textContent = preview ? "No wager · no payout" : `${picks.length} sealed multipliers`;
     ui.bonusTotalLabel.textContent = preview ? "Demo" : "Win";
     ui.bonusTotal.textContent = "0.00 CR";
-    ui.bonusMechanicName.textContent = "3 Spins";
+    ui.bonusMechanicName.textContent = "Multiplier gate";
     ui.bonusMechanicProgress.textContent = `0 / ${picks.length}`;
     ui.bonusMechanicBar.style.width = "0%";
     ui.astralBonusStage.hidden = false;
+    ui.astralLockedMultipliers.replaceChildren(...picks.map(() => {
+      const lock = document.createElement("span");
+      lock.textContent = "—";
+      return lock;
+    }));
+    ui.astralRoundAward.textContent = "0.00×";
+    ui.astralTotalMultiplier.textContent = "0.00×";
+    ui.astralCascadeLabel.textContent = "Sealed";
     ui.constellationPicks.hidden = true;
     ui.constellationPicks.replaceChildren();
     ui.bonusAction.textContent = preview ? "Start" : `Start ${picks.length}`;
@@ -1052,7 +1044,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       let multiplierTotal = 0;
       for (let index = 0; index < picks.length; index += 1) {
         multiplierTotal += picks[index];
-        await playAstralFreeSpin(index, picks[index], bet, multiplierTotal);
+        await playAstralMultiplierRound(index, picks[index], bet, multiplierTotal, picks.length);
       }
       ui.bonusOverlay.classList.remove("is-playing");
       ui.bonusOverlay.classList.add("is-resolved");
@@ -1166,6 +1158,99 @@ function showBonus(bonusRounds, bet, options = {}) {
     : showCardBonus(bonusRounds, bet, options);
 }
 
+function openFeatureMarket(panel = "special") {
+  if (state.gameId !== "astral" || state.isSpinning || state.autoActive || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
+  updateAstralFeatureUi(false);
+  ui.featureMarketOverlay.dataset.panel = panel;
+  ui.featureMarketOverlay.hidden = false;
+  ui.featureMarketOverlay.setAttribute("aria-hidden", "false");
+  $("appShell").inert = true;
+  document.body.classList.add("is-feature-market-open");
+  playTone(panel === "buy" ? 392 : 523.25, .18, "triangle");
+  const focusTarget = panel === "buy"
+    ? ui.featureMarketOverlay.querySelector("[data-buy-feature]")
+    : ui.featureMarketOverlay.querySelector(`[data-progress-boost="${state.specialBetBoost}"]`);
+  window.requestAnimationFrame(() => focusTarget?.focus());
+}
+
+function closeFeatureMarket({ returnFocus = true } = {}) {
+  const returnTarget = ui.featureMarketOverlay.dataset.panel === "buy" ? ui.buyFeatureButton : ui.specialBetButton;
+  ui.featureMarketOverlay.hidden = true;
+  ui.featureMarketOverlay.setAttribute("aria-hidden", "true");
+  $("appShell").inert = false;
+  document.body.classList.remove("is-feature-market-open");
+  if (returnFocus) returnTarget.focus();
+}
+
+async function buyAstralFeature(costMultiplier) {
+  if (state.gameId !== "astral" || state.isSpinning || state.autoActive) return;
+  const bet = currentBaseBet();
+  const purchaseCost = bet * costMultiplier;
+  if (sessionLoss() >= state.lossLimit) {
+    closeFeatureMarket({ returnFocus: false });
+    renderRealityCheck();
+    return;
+  }
+  if (state.balance < purchaseCost) return;
+
+  const serverSeed = state.serverSeed;
+  const serverHash = state.serverHash;
+  const clientSeed = state.clientSeed;
+  const nonce = state.nonce;
+  const progressBefore = state.progress.astral;
+  closeFeatureMarket({ returnFocus: false });
+  state.isSpinning = true;
+  state.balance -= purchaseCost;
+  state.sessionNet -= purchaseCost;
+  state.sessionSpins += 1;
+  state.sessionWagered += purchaseCost;
+  updateUi();
+
+  const outcome = await simulateBonusPurchase({
+    serverSeed,
+    clientSeed,
+    nonce,
+    bet,
+    costMultiplier,
+    progressBefore,
+    gameId: "astral"
+  });
+  state.lastOutcome = outcome;
+  await showAstralBonus(outcome.bonusRounds, bet, { purchased: true });
+  state.balance += outcome.totalWin;
+  state.sessionNet += outcome.totalWin;
+  state.sessionWon += outcome.totalWin;
+  state.gameStats.astral = recordGameResult(state.gameStats.astral, outcome.totalWin, purchaseCost);
+  updateUi();
+
+  const outcomeClass = outcomeClassFor(outcome.totalWin, purchaseCost);
+  if (outcomeClass === "net-win") showWinBanner(outcome.totalWin, purchaseCost);
+  await showCelebration(outcome.totalWin, purchaseCost);
+
+  state.lastReceipt = {
+    mode: "feature-buy",
+    serverSeed,
+    serverHash,
+    clientSeed,
+    nonce,
+    bet,
+    wager: purchaseCost,
+    costMultiplier,
+    gameId: "astral",
+    progressBefore,
+    outcome
+  };
+  state.nonce += 1;
+  ui.lastWinButton.disabled = false;
+  renderReceipt();
+  await rotateServerSeed();
+  state.isSpinning = false;
+  updateUi();
+  setStatus(`${costMultiplier}× feature · ${formatMultiplier(outcome.bonusMultiplier)} · ${formatCredits(outcome.totalWin)} CR returned`);
+  if (sessionLoss() >= state.lossLimit) renderRealityCheck();
+  ui.buyFeatureButton.focus();
+}
+
 async function runAstralShowcasePreview() {
   if (state.gameId !== "astral" || state.isSpinning || state.autoActive || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
   state.isSpinning = true;
@@ -1186,14 +1271,15 @@ async function runAstralShowcasePreview() {
 async function spin({ fromAuto = false } = {}) {
   if (state.isSpinning || (state.autoActive && !fromAuto)) return false;
   const game = currentGame();
-  const bet = BET_OPTIONS[state.betIndex];
+  const bet = currentBaseBet();
+  const wager = currentSpinWager();
   if (sessionLoss() >= state.lossLimit) {
     setStatus(`Session loss limit reached at ${formatCredits(state.lossLimit)} CR. Review the session before continuing.`);
     state.autoStopRequested = true;
     renderRealityCheck();
     return false;
   }
-  if (state.balance < bet) {
+  if (state.balance < wager) {
     setStatus("Not enough demo credits. Reset the free-play balance below.");
     playTone(170, .2, "square");
     state.autoStopRequested = true;
@@ -1201,18 +1287,16 @@ async function spin({ fromAuto = false } = {}) {
   }
 
   state.isSpinning = true;
-  state.balance -= bet;
-  state.sessionNet -= bet;
+  state.balance -= wager;
+  state.sessionNet -= wager;
   state.sessionSpins += 1;
-  state.sessionWagered += bet;
+  state.sessionWagered += wager;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-stopping");
   ui.reelViewport.classList.add("is-spinning");
   ui.winBanner.classList.remove("is-visible");
-  ui.nearMissBanner.hidden = true;
-  ui.nearMissBanner.classList.remove("is-visible");
   ui.lastWinButton.disabled = true;
   setStatus(`${game.name} is aligning…`);
   playSpinSound();
@@ -1229,6 +1313,7 @@ async function spin({ fromAuto = false } = {}) {
     nonce: spinNonce,
     bet,
     progressBefore,
+    progressBoost: state.gameId === "astral" ? state.specialBetBoost : 0,
     gameId: state.gameId
   });
 
@@ -1241,7 +1326,6 @@ async function spin({ fromAuto = false } = {}) {
   }, game.spinInterval);
 
   const outcome = await outcomePromise;
-  const nearMiss = outcome.bonusRounds.length === 0 ? findNaturalNearMiss(outcome) : null;
   const resultDisplayMs = state.turboMode ? 900 : MIN_RESULT_DISPLAY_MS;
   const remainingDelay = Math.max(0, resultDisplayMs - (performance.now() - startedAt));
   const anticipation = outcome.bonusRounds.length > 0;
@@ -1257,34 +1341,34 @@ async function spin({ fromAuto = false } = {}) {
   window.clearInterval(shuffleTimer);
 
   await settleOutcome(outcome);
-  if (nearMiss) showNaturalNearMiss(nearMiss);
   state.progress[state.gameId] = outcome.progressAfter;
   state.lastOutcome = outcome;
   state.balance += outcome.baseWin;
   state.sessionNet += outcome.baseWin;
   updateUi();
-  const baseOutcomeClass = outcomeClassFor(outcome.baseWin, bet);
+  const baseOutcomeClass = outcomeClassFor(outcome.baseWin, wager);
 
-  if (outcome.collectorCount > 0) {
+  if (outcome.collectorCount > 0 || outcome.progressBoost > 0) {
     const collectorLabel = outcome.collectorCount === 1 ? game.collectionName : game.collectionPlural;
-    setStatus(`${outcome.collectorCount} ${collectorLabel} collected · ${state.progress[state.gameId]}/${game.threshold} charged`);
-    playCollectSound(outcome.collectorCount);
-    burstParticles(8 + outcome.collectorCount * 3, .55);
+    const boostCopy = outcome.progressBoost > 0 ? ` + ${outcome.progressBoost} special` : "";
+    setStatus(`${outcome.collectorCount} ${collectorLabel}${boostCopy} · ${state.progress[state.gameId]}/${game.threshold} charged`);
+    playCollectSound(Math.max(1, outcome.collectorCount + outcome.progressBoost));
+    burstParticles(8 + (outcome.collectorCount + outcome.progressBoost) * 3, .55);
   } else if (baseOutcomeClass === "net-win") {
     setStatus(`${outcome.wins.length} payout${outcome.wins.length === 1 ? "" : "s"} illuminated`);
   } else if (baseOutcomeClass === "break-even") {
-    setStatus(`Bet returned exactly · ${formatCredits(outcome.baseWin)} CR returned on ${formatCredits(bet)} CR bet`);
+    setStatus(`Bet returned exactly · ${formatCredits(outcome.baseWin)} CR returned on ${formatCredits(wager)} CR bet`);
   } else if (baseOutcomeClass === "partial-return") {
-    setStatus(`Partial return ${formatCredits(outcome.baseWin)} CR · net result −${formatCredits(bet - outcome.baseWin)} CR`);
+    setStatus(`Partial return ${formatCredits(outcome.baseWin)} CR · net result −${formatCredits(wager - outcome.baseWin)} CR`);
   } else {
     setStatus(`No win this spin. ${game.featureName} keeps your progress.`);
   }
 
   if (baseOutcomeClass === "net-win") {
-    showWinBanner(outcome.baseWin, bet);
+    showWinBanner(outcome.baseWin, wager);
     playWinChord();
-    burstParticles(outcome.baseWin >= bet * 10 ? 42 : 18, outcome.baseWin >= bet * 10 ? 1.25 : .75);
-    if (outcome.baseWin >= bet * 10) document.querySelector(".machine").classList.add("is-big-win");
+    burstParticles(outcome.baseWin >= wager * 10 ? 42 : 18, outcome.baseWin >= wager * 10 ? 1.25 : .75);
+    if (outcome.baseWin >= wager * 10) document.querySelector(".machine").classList.add("is-big-win");
     window.setTimeout(() => document.querySelector(".machine")?.classList.remove("is-big-win"), 900);
   }
 
@@ -1298,11 +1382,11 @@ async function spin({ fromAuto = false } = {}) {
   }
 
   state.sessionWon += outcome.totalWin;
-  state.gameStats[state.gameId] = recordGameResult(state.gameStats[state.gameId], outcome.totalWin, bet);
+  state.gameStats[state.gameId] = recordGameResult(state.gameStats[state.gameId], outcome.totalWin, wager);
   updateUi();
-  const totalOutcomeClass = outcomeClassFor(outcome.totalWin, bet);
-  if (outcome.bonusWin > 0 && totalOutcomeClass === "net-win") showWinBanner(outcome.totalWin, bet);
-  await showCelebration(outcome.totalWin, bet, { autoAdvance: fromAuto });
+  const totalOutcomeClass = outcomeClassFor(outcome.totalWin, wager);
+  if (outcome.bonusWin > 0 && totalOutcomeClass === "net-win") showWinBanner(outcome.totalWin, wager);
+  await showCelebration(outcome.totalWin, wager, { autoAdvance: fromAuto });
 
   state.lastReceipt = {
     serverSeed: spinServerSeed,
@@ -1310,8 +1394,10 @@ async function spin({ fromAuto = false } = {}) {
     clientSeed: spinClientSeed,
     nonce: spinNonce,
     bet,
+    wager,
     gameId: state.gameId,
     progressBefore,
+    progressBoost: outcome.progressBoost,
     petalsBefore: progressBefore,
     outcome
   };
@@ -1323,12 +1409,10 @@ async function spin({ fromAuto = false } = {}) {
   state.isSpinning = false;
   updateUi();
 
-  if (totalOutcomeClass === "net-win") setStatus(`Net win +${formatCredits(outcome.totalWin - bet)} CR · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
+  if (totalOutcomeClass === "net-win") setStatus(`Net win +${formatCredits(outcome.totalWin - wager)} CR · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
   else if (totalOutcomeClass === "break-even") setStatus(`Break-even result · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
-  else if (nearMiss && totalOutcomeClass === "partial-return") setStatus(`Almost · partial return ${formatCredits(outcome.totalWin)} CR · receipt ready`);
-  else if (nearMiss) setStatus("Almost · no return · receipt ready");
-  else if (totalOutcomeClass === "partial-return") setStatus(`Partial return ${formatCredits(outcome.totalWin)} CR · net −${formatCredits(bet - outcome.totalWin)} CR · receipt ready`);
-  else setStatus(`No return · net −${formatCredits(bet)} CR · receipt ready`);
+  else if (totalOutcomeClass === "partial-return") setStatus(`Partial return ${formatCredits(outcome.totalWin)} CR · net −${formatCredits(wager - outcome.totalWin)} CR · receipt ready`);
+  else setStatus(`No return · net −${formatCredits(wager)} CR · receipt ready`);
   if (sessionLoss() >= state.lossLimit) {
     state.autoStopRequested = true;
     renderRealityCheck();
@@ -1411,6 +1495,23 @@ function bindEvents() {
     playTone(520, .14, "triangle");
   });
   ui.astralShowcaseButton.addEventListener("click", runAstralShowcasePreview);
+  ui.specialBetButton.addEventListener("click", () => openFeatureMarket("special"));
+  ui.buyFeatureButton.addEventListener("click", () => openFeatureMarket("buy"));
+  ui.closeFeatureMarket.addEventListener("click", () => closeFeatureMarket());
+  ui.featureMarketOverlay.addEventListener("click", (event) => {
+    if (event.target === ui.featureMarketOverlay) closeFeatureMarket();
+  });
+  document.querySelectorAll("[data-progress-boost]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.specialBetBoost = Number(button.dataset.progressBoost);
+      updateUi();
+      setStatus(state.specialBetBoost ? `Special bet active · +${state.specialBetBoost} guaranteed Bloom${state.specialBetBoost === 1 ? "" : "s"}` : "Standard bet active");
+      playTone(state.specialBetBoost ? 880 + state.specialBetBoost * 160 : 520, .18, "triangle");
+    });
+  });
+  document.querySelectorAll("[data-buy-feature]").forEach((button) => {
+    button.addEventListener("click", () => buyAstralFeature(Number(button.dataset.buyFeature)));
+  });
   ui.spinButton.addEventListener("click", () => spin());
   ui.turboButton.addEventListener("click", () => {
     if (state.isSpinning || state.autoActive) return;
@@ -1487,13 +1588,13 @@ function bindEvents() {
     state.sessionWagered = 0;
     state.sessionWon = 0;
     state.lastRealityCheckMinute = 0;
+    state.specialBetBoost = 0;
     state.lastOutcome = null;
     ui.lastWinButton.disabled = true;
     audio.stopSpinLoop({ immediate: true });
     setAnticipationUi(false);
     ui.reelViewport.classList.remove("is-spinning", "is-stopping");
     ui.reelImpactLayer.replaceChildren();
-    ui.nearMissBanner.hidden = true;
     setStatus("Demo balance reset. All four feature meters start anew.");
     updateUi();
   });
@@ -1502,7 +1603,7 @@ function bindEvents() {
     if (event.code !== "Space" || event.repeat) return;
     const activeTag = document.activeElement?.tagName;
     const dialogOpen = Boolean(document.querySelector("dialog[open]"));
-    if (["INPUT", "BUTTON", "TEXTAREA"].includes(activeTag) || dialogOpen || !ui.bonusOverlay.hidden || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
+    if (["INPUT", "BUTTON", "TEXTAREA"].includes(activeTag) || dialogOpen || !ui.featureMarketOverlay.hidden || !ui.bonusOverlay.hidden || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
     event.preventDefault();
     spin();
   });

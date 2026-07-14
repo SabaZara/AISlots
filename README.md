@@ -35,18 +35,20 @@ The interface includes:
 - animated win count-ups, highlighted winning symbols, collection bursts, and themed bonus reveals;
 - tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
 - themed reel-start, reel-stop, anticipation, collection, payout, bonus, and celebration sound cues;
-- four sealed bonus presentations: Moonwell Free Spins, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
+- four sealed bonus presentations: Moonwell Multiplier Gate, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
 - a visible session timer, configurable net-loss limit, 15-minute reality checks, and wagered/returned/net summaries;
 - honest partial-return messaging: a payout below the bet is shown as a net loss and never receives a win celebration;
 - high-contrast generated reel symbols with distinct silhouettes and per-symbol color coding;
 - winning-symbol animation without drawn payline overlays;
-- a generic, non-quantified “Almost” cue on naturally occurring unmodified RNG results, without revealing a line, reel, symbol count, or how close the result was;
 - larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
 - four distinct continuous spin-tick patterns plus themed reel-stop cues instead of one shared generic tick;
-- four original opt-in ambient music motifs—celestial arpeggio, underwater pulse, forge ostinato, and arena rhythm—generated live by Web Audio rather than copied music;
+- four original opt-in ambient music motifs—Astral lunar pulse, underwater pulse, forge ostinato, and arena rhythm—generated live by Web Audio rather than copied music;
 - a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
 - synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
-- an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a clearly labeled no-wager **Bonus demo** button at the top of the game for reviewing the animation without changing credits or progress;
+- an Astral Bloom cinematic showcase with an original generated Moonwell guardian and multiplier apparatus, a full-screen awakening transition, individually locking X prizes, a persistent total-X readout, staged award counting, and a clearly labeled no-wager **Bonus demo** button at the top of the game;
+- Astral-only **Special bet** modes that guarantee +1 or +2 meter Blooms per spin at mathematically calibrated wager multipliers while preserving 99.00% theoretical RTP;
+- Astral-only 25×, 50×, and 100× **Buy bonus** options using demo credits only; each deterministic purchase preserves 99.00% theoretical RTP and produces a commit/reveal receipt;
+- a graphic Moonwell feature market and generated multiplier-gate scene with no below-board result narration or near-miss banner on Astral;
 - an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, turbo timing, and visibly dancing winning symbols;
 - opt-in licensed Astral audio samples for the reel wheel and “you win” voice, with source and license records in `assets/audio/LICENSES.md`;
 - bet controls and a maximum-bet shortcut;
@@ -64,7 +66,7 @@ Responsive QA covers 320×568, 360×740, and 390×844 phone portraits; 667×375 
 
 Autoplay is present only for this no-value free-play prototype. Real-money rules differ by jurisdiction, and some markets prohibit online-slot autoplay entirely.
 
-The game does not engineer near-misses, amplify losses disguised as wins, fabricate winner feeds, sell bonus access, send re-engagement notifications, or change demo odds. Bonus choices are presentation controls only: every result and prize is sealed in the fairness receipt before the reveal animation starts.
+The game does not engineer near-misses, amplify losses disguised as wins, fabricate winner feeds, accept money, send re-engagement notifications, or change demo odds. Special bets and feature buys use free-play credits only, keep 99.00% theoretical RTP, and seal every result in a fairness receipt before animation starts.
 
 ## Published 99% return
 
@@ -100,10 +102,11 @@ The project-bound world art was generated with the built-in OpenAI image-generat
 - `assets/ember-characters-cutout-v1.png` — an original forge queen and obsidian furnace warden.
 - `assets/ufc-characters-cutout-v1.png` — two original fictional MMA champions with no real-fighter likenesses or sponsor marks.
 
-Astral also includes two feature presentation plates:
+Astral also includes three feature presentation plates:
 
 - `assets/astral-bonus-chamber-v1.png` — a three-portal Moonwell bonus chamber.
 - `assets/astral-guardian-cinematic-v1.png` — the full-screen Moonwell awakening guardian.
+- `assets/astral-multiplier-gate-v1.png` — the original lunar multiplier apparatus used by the feature market and bonus round.
 
 The four original background plates remain available as optimized 1672×941 JPEG assets:
 

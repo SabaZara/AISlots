@@ -10,6 +10,7 @@
     <link rel="preload" href="./assets/astral-characters-cutout-v1.png" as="image" />
     <link rel="preload" href="./assets/symbols-astral-transparent-v5.png" as="image" />
     <link rel="preload" href="./assets/astral-bonusbar-frame-v1.png" as="image" />
+    <link rel="preload" href="./assets/astral-multiplier-gate-v1.png" as="image" />
     <link rel="stylesheet" href="./styles.css" />
     <title>The Lumen Collection · Four free-play slots</title>
   </head>
@@ -86,6 +87,14 @@
             <div class="machine-top-actions" id="machineTopActions">
               <button class="showcase-button" id="astralShowcaseButton" type="button" aria-label="Play the no-wager Moonwell bonus demo" title="Shows the Moonwell bonus animation without spending credits or changing progress."><span>✦</span> Bonus demo</button>
             </div>
+            <div class="astral-feature-dock" id="astralFeatureDock" aria-label="Astral feature controls">
+              <button class="astral-feature-button is-special" id="specialBetButton" type="button" aria-label="Open special bet options">
+                <span class="feature-button-orb" aria-hidden="true">✦</span><strong>Special bet</strong><small id="specialBetState">Standard · 1.00×</small>
+              </button>
+              <button class="astral-feature-button is-buy" id="buyFeatureButton" type="button" aria-label="Open buy bonus options">
+                <span class="feature-button-orb" aria-hidden="true">☾</span><strong>Buy bonus</strong><small>25× · 50× · 100×</small>
+              </button>
+            </div>
             <div class="machine-title">
               <div class="title-flourish" aria-hidden="true"></div>
               <div>
@@ -111,11 +120,6 @@
                 <span id="winBannerLabel">Celestial win</span>
                 <strong id="winBannerAmount">0.00 CR</strong>
                 <small id="winBannerMultiplier">0.00× bet</small>
-              </div>
-              <div class="near-miss-banner" id="nearMissBanner" hidden aria-hidden="true">
-                <strong>Almost</strong>
-                <span id="nearMissCopy">The reels nearly aligned.</span>
-                <small>Natural RNG</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">
@@ -198,7 +202,7 @@
 
       <footer class="responsibility-bar">
         <span class="age-mark">18+</span>
-        <p><strong>Free-play prototype.</strong> No deposits, purchases, or cash prizes. Play for entertainment.</p>
+          <p><strong>Free-play prototype.</strong> No deposits, payments, or cash prizes. Play for entertainment.</p>
         <button id="resetSession" type="button">Reset demo balance</button>
       </footer>
     </div>
@@ -329,7 +333,7 @@
         <span>Bonus</span>
         <h2 id="cinematicTitle">The guardian awakens</h2>
         <p id="cinematicCopy">Moonwell opening</p>
-        <strong id="cinematicAward">3 FREE SPINS</strong>
+        <strong id="cinematicAward">3 MULTIPLIERS</strong>
         <small>Sealed result</small>
       </section>
     </div>
@@ -341,21 +345,56 @@
         <h2 id="bonusTitle">The garden remembers.</h2>
         <p id="bonusCopy">Three constellations are already sealed into your spin receipt. Reveal their light.</p>
         <div class="bonus-mechanic">
-          <span id="bonusMechanicName">Moonwell Free Spins</span>
+          <span id="bonusMechanicName">Moonwell Multiplier Gate</span>
           <strong id="bonusMechanicProgress">0 / 3</strong>
           <i><b id="bonusMechanicBar"></b></i>
           <small>Sealed result</small>
         </div>
         <div class="astral-bonus-stage" id="astralBonusStage" hidden>
-          <div class="astral-free-spin-head"><span id="astralFreeSpinLabel">1 / 3</span><strong id="astralCascadeLabel">Ready</strong></div>
-          <div class="astral-bonus-grid" id="astralBonusGrid" aria-label="Astral free-spin presentation"></div>
-          <div class="astral-round-award"><span>Win</span><strong id="astralRoundAward">0.00×</strong></div>
-          <small class="astral-presentation-note">Sealed result</small>
+          <div class="astral-locked-multipliers" id="astralLockedMultipliers" aria-label="Locked bonus multipliers">
+            <span>—</span><span>—</span><span>—</span>
+          </div>
+          <div class="astral-multiplier-dial" id="astralMultiplierDial">
+            <span id="astralFreeSpinLabel">1 / 3</span>
+            <strong id="astralRoundAward">0.00×</strong>
+            <small id="astralCascadeLabel">Sealed</small>
+          </div>
+          <div class="astral-total-multiplier"><span>Total multiplier</span><strong id="astralTotalMultiplier">0.00×</strong></div>
         </div>
         <div class="constellation-picks" id="constellationPicks"></div>
         <div class="bonus-total"><span id="bonusTotalLabel">Bonus win</span><strong id="bonusTotal">0.00 CR</strong></div>
         <button class="primary-button bonus-action" id="bonusAction" type="button">Reveal constellations</button>
       </div>
+    </div>
+
+    <div class="feature-market-overlay" id="featureMarketOverlay" hidden aria-hidden="true">
+      <section class="feature-market-scene" role="dialog" aria-modal="true" aria-labelledby="featureMarketTitle">
+        <button class="feature-market-close" id="closeFeatureMarket" type="button" aria-label="Close feature options">×</button>
+        <div class="feature-market-heading">
+          <span>✦</span><h2 id="featureMarketTitle">Moonwell features</h2><small>99% RTP · Free play</small>
+        </div>
+        <div class="feature-market-grid">
+          <article class="feature-market-card is-special-card" id="specialBetPanel">
+            <div class="market-card-emblem" aria-hidden="true">✦</div>
+            <h3>Special bets</h3>
+            <div class="special-bet-options" role="group" aria-label="Choose Astral special bet">
+              <button type="button" data-progress-boost="0" aria-pressed="true"><span>Standard</span><strong>1.00×</strong><small>Normal meter</small></button>
+              <button type="button" data-progress-boost="1" aria-pressed="false"><span>Moon charge</span><strong>1.30×</strong><small>+1 Bloom every spin</small></button>
+              <button type="button" data-progress-boost="2" aria-pressed="false"><span>Star charge</span><strong>1.60×</strong><small>+2 Blooms every spin</small></button>
+            </div>
+          </article>
+          <article class="feature-market-card is-buy-card" id="buyFeaturePanel">
+            <div class="market-card-emblem" aria-hidden="true">☾</div>
+            <h3>Buy bonus</h3>
+            <div class="buy-feature-options" role="group" aria-label="Buy a sealed Moonwell bonus with free-play credits">
+              <button type="button" data-buy-feature="25"><span>Moonwell</span><strong>25×</strong><small data-buy-price="25">50.00 CR</small></button>
+              <button type="button" data-buy-feature="50"><span>Super</span><strong>50×</strong><small data-buy-price="50">100.00 CR</small></button>
+              <button type="button" data-buy-feature="100"><span>Grand</span><strong>100×</strong><small data-buy-price="100">200.00 CR</small></button>
+            </div>
+          </article>
+        </div>
+        <p class="feature-market-note">Feature prizes are sealed before animation. Purchases use demo credits only.</p>
+      </section>
     </div>
 
     <div class="lobby-overlay" id="lobbyOverlay" aria-hidden="false">

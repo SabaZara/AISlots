@@ -9,15 +9,15 @@ export const AUDIO_PROFILES = Object.freeze({
     winBase: 392,
     wet: 0.28,
     music: Object.freeze({
-      bpm: 76,
-      wave: "sine",
-      root: 196,
-      lead: [0, 7, 12, 16, 12, 7, 4, 11],
-      bass: [-12, null, -7, null, -9, null, -5, null],
-      filter: 1900,
-      wet: 0.42,
-      level: 0.021,
-      percussion: "shimmer"
+      bpm: 94,
+      wave: "triangle",
+      root: 146.83,
+      lead: [0, 7, 12, 15, 12, 10, 7, 3, 0, 5, 10, 14, 10, 7, 5, 2],
+      bass: [-12, null, -5, null, -9, null, -2, null, -12, null, -7, null, -5, null, -2, null],
+      filter: 2450,
+      wet: 0.36,
+      level: 0.018,
+      percussion: "moonpulse"
     })
   }),
   neon: Object.freeze({
@@ -356,8 +356,10 @@ export class SlotAudioEngine {
       this.noise(0.09, { volume: 0.009, wet: 0.03, filterType: "bandpass", frequency: 680, frequencyEnd: 210, music: true });
     } else if (music.percussion === "bubble" && (step === 2 || step === 6)) {
       this.tone(this.musicFrequency(music.root, lead + 19), 0.16, { type: "sine", volume: 0.009, frequencyEnd: this.musicFrequency(music.root, lead + 24), wet: 0.55, music: true });
-    } else if (music.percussion === "shimmer" && step === 7) {
-      this.noise(0.22, { volume: 0.006, wet: 0.54, filterType: "highpass", frequency: 2600, frequencyEnd: 5200, music: true });
+    } else if (music.percussion === "moonpulse" && step % 4 === 0) {
+      this.noise(0.14, { volume: 0.012, wet: 0.18, filterType: "lowpass", frequency: 340, frequencyEnd: 82, music: true });
+    } else if (music.percussion === "moonpulse" && step % 4 === 2) {
+      this.tone(this.musicFrequency(music.root, lead + 24), 0.18, { type: "sine", volume: 0.008, frequencyEnd: this.musicFrequency(music.root, lead + 19), wet: 0.48, music: true });
     }
     this.musicStep += 1;
   }

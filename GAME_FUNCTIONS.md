@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.11.2**
+Version reviewed: **2.12.0**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -17,6 +17,8 @@ This is the team-review checklist for the current build. “Implemented” means
 | Maximum bet | Implemented | `MAX` selects 20 CR. There is no real-money purchase or deposit path. |
 | Turbo | Implemented | Shortens the presentation wait while preserving the exact same outcome generation and RTP. |
 | Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits, a feature presentation, or the configured loss limit. |
+| Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. Exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
+| Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet buys a deterministic Moonwell Multiplier Gate using demo credits only. Purchase prizes are scaled to 99.00% theoretical RTP and receive a fairness receipt. |
 | Sound | Implemented | Sound is opt-in and can be turned on or off from the top bar. |
 | Last result | Implemented | Info button shows total returned, collector count, individual base-game payouts, and bonus payout. No paylines are drawn over the reels. |
 | Reset demo | Implemented | Resets demo credits, progress, statistics, receipt state, and session totals. |
@@ -31,7 +33,6 @@ This is the team-review checklist for the current build. “Implemented” means
 | Published RTP | Implemented and tested | Every world has an exact theoretical combined RTP of 99.00%. RTP is a long-run average, never a promise for one spin or session. |
 | Weighted symbol mapping | Implemented | Each game uses the same audited mapping structure with game-specific display names and calibrated low-symbol payout. |
 | Collection symbol | Implemented | The special collector does not pay as a base symbol. Each occurrence advances that world’s persistent meter. |
-| Natural “Almost” cue | Implemented | Can appear only after an unmodified natural RNG result. It says only “Almost” and does not expose a route, reel, symbol count, or how much was missing. It does not alter the outcome. |
 | Loss presentation | Implemented | A return smaller than the bet remains a partial return/net loss and does not receive a win celebration. |
 | Outcome classes | Implemented | No return, partial return, break-even, net win, and tiered large-win presentation are separated. |
 
@@ -39,7 +40,7 @@ This is the team-review checklist for the current build. “Implemented” means
 
 | World | Character layer | Reel motion | Meter | Trigger | Bonus presentation |
 | --- | --- | --- | --- | ---: | --- |
-| Astral Bloom | Moon-garden oracle + crystal-antler sentinel | Celestial cascade | 12-star constellation Moonwell | 12 Blooms | Three Moonwell Free Spins with independently sealed weighted multipliers and a dedicated cascade board. |
+| Astral Bloom | Moon-garden oracle + crystal-antler sentinel | Celestial cascade | 12-star constellation Moonwell | 12 Blooms | Three or more individually locked Moonwell multipliers with a dominant live X dial and running total X. |
 | Neon Tides | Pearl-current navigator + deep-sea guardian | Underwater wave | 10-step pearl current | 10 Pearl Keys | Four Pearl Cluster Cascade reveals added into one bonus total. |
 | Ember Crown | Forge queen + obsidian furnace warden | Heavy forge slam | 15-rune forge heat | 15 Crown Runes | Two higher-volatility Multiplier Forge strikes added into one bonus total. |
 | UFC Octagon Gold | Two original fictional MMA champions | Fast left-to-right strike | 10-step fight card | 10 Fight Tokens | Three Championship Hold & Win cards combined into the final purse. |
@@ -57,9 +58,11 @@ All characters are transparent foreground cutouts placed independently over envi
 - Returned credits count upward with synchronized payout notes.
 - Nice, Big, Mega, and Epic tiers use different labels, timing, particles, scale, lighting, and full-screen celebration intensity.
 - Feature prizes are sealed before any bonus choice or reveal animation begins; selections are presentation only.
-- Astral includes a clearly labeled no-wager **Bonus demo** for reviewing the cinematic free-spin sequence. It does not spend credits, award credits, advance the meter, or replace the real triggered bonus.
+- Astral includes a clearly labeled no-wager **Bonus demo** for reviewing the cinematic multiplier sequence. It does not spend credits, award credits, advance the meter, or replace the real triggered bonus.
 - Astral places **Bonus demo** in the upper-right game area and gives **Autoplay** its own centered utility dock below the main controls; short landscape layouts keep the Autoplay dock visible as a compact floating control.
 - Astral winning tiles remain stationary and transparent while only the isolated symbol artwork jumps. The other three games retain their existing winner treatment.
+- Astral removes the near-miss callout and the visible narration row below the reels. Result details remain available from the compact info control and fairness receipt.
+- Astral’s graphic **Special bet** and **Buy bonus** controls are isolated to the first game; Neon, Ember, and UFC retain their existing cabinets.
 
 ## Persistent meters and bonuses
 
@@ -71,11 +74,14 @@ All characters are transparent foreground cutouts placed independently over envi
 - Each bonus uses its own draw count, prize weights, presentation name, sound sequence, and visual meter.
 - Each world uses a transparent generated HUD frame with a live count and one deterministic progress light per required collector.
 - Bonus payout equals the sum of the pre-sealed prize multipliers multiplied by the spin’s total bet.
+- The Astral Multiplier Gate animates every sealed multiplier individually, locks each X into its own socket, and keeps the cumulative total X visible. Rare multi-trigger spins create enough sockets for every multiplier rather than truncating the presentation.
+- Special-bet progress boosts participate in the same meter rollover logic as natural Blooms. The higher wager is derived from the feature’s exact expected value so all three Astral wager modes remain at 99.00% theoretical RTP.
+- Feature purchases draw the same three sealed Astral prize values, scale them for the selected 25×, 50×, or 100× demo-credit cost, and preserve 99.00% theoretical RTP at each tier.
 
 ## Audio and effects
 
 - Web Audio engine with separate profiles for Astral, Neon, Ember, and UFC.
-- Four original low-volume music loops are synthesized in the browser: celestial arpeggio, underwater pulse, forge ostinato, and arena rhythm. Switching worlds restarts the matching motif; disabling sound stops it.
+- Four original low-volume music loops are synthesized in the browser: the revised 94-BPM Astral lunar pulse, underwater pulse, forge ostinato, and arena rhythm. Switching worlds restarts the matching motif; disabling sound stops it.
 - Per-world spin-start, spin-bed, tick rhythm, reel-stop, anticipation, collection, win, payout-count, bonus-start, bonus-reveal, and celebration cues.
 - Stereo movement, dynamics compression, synthesized room/reverb treatment, impact noise, musical win chords, particles, reel flashes, cabinet shake, and screen-level big-win scenes.
 - Astral can use the locally stored licensed wheel and “you win” samples. Sources and license notes are recorded in `assets/audio/LICENSES.md`.
@@ -89,13 +95,13 @@ All characters are transparent foreground cutouts placed independently over envi
 | Deterministic stream | Implemented | Outcome bytes come from `SHA-256(serverSeed:clientSeed:nonce:counter)`. |
 | Client seed | Implemented | Player can replace the client seed before a spin. |
 | Seed reveal | Implemented | The secret server seed is revealed in the completed receipt. |
-| Receipt verification | Implemented | Verifier replays the game, all 20 symbols, base payouts, meter change, and feature prizes. |
+| Receipt verification | Implemented | Verifier replays ordinary spins plus Astral special-bet meter boosts and feature purchases, including all symbols, payouts, meter changes, cost tier, and sealed multiplier prizes. |
 | Unbiased mapping | Implemented | Four-byte values use rejection sampling before weighted selection to avoid modulo bias. |
 | Server authority | Production gate | The static prototype keeps the pending seed in browser memory. A cash product must move seeds, nonce, balance, and signed receipts to audited server services. |
 
 ## Session safety and accessibility
 
-- Clearly marked 18+ free-play prototype with no deposits, purchases, or cash value.
+- Clearly marked 18+ free-play prototype with no deposits, real-money purchases, or cash value. Astral feature buys spend demo credits only.
 - Visible balance, current bet, last return, session net, elapsed session time, total wagered, total returned, per-world wins, spin count, and biggest win.
 - Configurable 25, 50, 100, or 250 CR session net-loss limit.
 - Reality check every 15 minutes, plus a manually available session summary.
@@ -133,7 +139,7 @@ The same rotation checks verify that the four-card lobby stays inside its shell:
 - No engineered or forced near misses.
 - No loss disguised as a win celebration.
 - No fabricated winner feed or fake online activity.
-- No feature purchase or bonus buy.
+- No real-money feature purchase, deposit, or payment path; the Astral bonus-buy prototype uses replenishable demo credits only.
 - No re-engagement notifications.
 - No deposits, withdrawals, cash prizes, or token purchase.
 - No claim that 99% RTP predicts a short session.
@@ -156,7 +162,7 @@ The visual prototype is deployable as a static free-play site. A real-money vers
 | --- | --- |
 | `game-model.js` | Game definitions, symbols, paylines, bonus tables, deterministic spin mapping, and theoretical RTP. |
 | `fairness.js` | Random seeds, SHA-256, deterministic counter stream, and rejection sampling. |
-| `presentation.js` | Win tiers, outcome classes, per-world statistics, and natural non-quantified “Almost” detection. |
+| `presentation.js` | Win tiers, outcome classes, per-world statistics, and shared presentation helpers. |
 | `experience-engine.js` | Per-world audio profiles and layered Web Audio effects. |
 | `app.js` | State, controls, spin lifecycle, autoplay, meters, receipts, dialogs, and presentations. |
 | `styles.css` | Responsive cabinets, character layers, world meters, symbols, reel motion, and celebrations. |

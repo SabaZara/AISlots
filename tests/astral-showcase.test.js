@@ -12,14 +12,18 @@ test("Astral cinematic showcase markup and styles stay fully connected", async (
   ]);
   const requiredIds = [
     "astralShowcaseButton", "cinematicOverlay", "cinematicTitle", "cinematicAward",
-    "astralBonusStage", "astralBonusGrid", "astralFreeSpinLabel", "astralRoundAward"
+    "astralBonusStage", "astralLockedMultipliers", "astralMultiplierDial", "astralFreeSpinLabel",
+    "astralRoundAward", "astralTotalMultiplier", "specialBetButton", "buyFeatureButton",
+    "featureMarketOverlay"
   ];
   requiredIds.forEach((id) => {
     assert.match(html, new RegExp(`id=["']${id}["']`));
     assert.match(app, new RegExp(`\\$\\(["']${id}["']\\)`));
   });
   assert.match(css, /astral-guardian-cinematic-v1\.png/);
-  assert.match(css, /\.astral-bonus-cell\.is-cascade-win/);
+  assert.match(css, /astral-multiplier-gate-v1\.png/);
+  assert.match(css, /\.astral-multiplier-dial/);
+  assert.match(css, /\.feature-market-overlay/);
   assert.match(css, /@media \(max-width: 560px\)/);
   assert.match(app, /no wager/i);
   assert.match(app, /no credits or feature progress changed/i);
@@ -31,6 +35,12 @@ test("Astral cinematic showcase markup and styles stay fully connected", async (
 
 test("generated Astral guardian asset is a project-local PNG", async () => {
   const image = await readFile(new URL("assets/astral-guardian-cinematic-v1.png", root));
+  assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+  assert.ok(image.length > 500_000);
+});
+
+test("generated Astral multiplier gate is a project-local production PNG", async () => {
+  const image = await readFile(new URL("assets/astral-multiplier-gate-v1.png", root));
   assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
   assert.ok(image.length > 500_000);
 });
@@ -72,7 +82,8 @@ test("runtime uses character cutouts and contains no payline overlay", async () 
     readFile(new URL("GAME_FUNCTIONS.md", root), "utf8")
   ]);
   assert.doesNotMatch(html, /paylineOverlay/);
-  assert.doesNotMatch(app, /renderPaylineOverlay|One symbol short|reel three breaks/i);
+  assert.doesNotMatch(html, /near-miss-banner|>Almost</i);
+  assert.doesNotMatch(app, /renderPaylineOverlay|One symbol short|reel three breaks|\bAlmost\b/i);
   assert.doesNotMatch(css, /astral-cabinet-two-guardians-v1\.png|\.payline-overlay/);
   assert.match(app, /lobby-game-image/);
   assert.match(app, /--game-characters/);
@@ -96,7 +107,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.11.2");
+  assert.equal(JSON.parse(packageJson).version, "2.12.0");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
@@ -131,7 +142,7 @@ test("all audio profiles provide distinct synthesized music motifs", async () =>
   assert.match(audioEngine, /playMusicStep\(\)/);
   assert.match(audioEngine, /startMusic\(\)/);
   assert.match(audioEngine, /restartMusic\(\)/);
-  for (const percussion of ["shimmer", "bubble", "forge", "arena"]) {
+  for (const percussion of ["moonpulse", "bubble", "forge", "arena"]) {
     assert.match(audioEngine, new RegExp(`percussion: ["']${percussion}["']`));
   }
 });

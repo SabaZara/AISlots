@@ -1505,33 +1505,6 @@ a:focus-visible {
   letter-spacing: .08em;
 }
 
-.near-miss-banner {
-  position: absolute;
-  z-index: 8;
-  left: 50%;
-  top: 48%;
-  width: min(430px, 84%);
-  padding: 15px 18px;
-  border: 2px solid rgba(255,198,78,.76);
-  color: #fff;
-  background: linear-gradient(135deg, rgba(63,39,13,.96), rgba(16,19,28,.97));
-  box-shadow: 0 14px 42px rgba(0,0,0,.58), 0 0 30px rgba(255,181,47,.18);
-  text-align: center;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, -50%) scale(.88);
-  transition: 280ms cubic-bezier(.2,.85,.2,1);
-}
-
-.near-miss-banner[hidden] { display: none; }
-.near-miss-banner.is-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-.near-miss-banner strong,
-.near-miss-banner span,
-.near-miss-banner small { display: block; }
-.near-miss-banner strong { color: #ffd978; font-size: 17px; letter-spacing: .08em; text-transform: uppercase; }
-.near-miss-banner span { margin-top: 7px; font-size: 11px; line-height: 1.4; }
-.near-miss-banner small { margin-top: 6px; color: #bfc8d8; font-size: 8px; }
-
 .win-banner[data-tier="nice"] {
   border-color: var(--gold);
   background: linear-gradient(90deg, rgba(85,48,116,.96), rgba(168,104,42,.95), rgba(85,48,116,.96));
@@ -4077,21 +4050,6 @@ kbd {
 .game-stage[data-game="astral"] .keyboard-hint { display: none; }
 .game-stage[data-game="astral"] .showcase-button { min-height: 35px; padding: 0 18px; font-size: 8px; }
 
-.game-stage[data-game="astral"] .near-miss-banner {
-  width: min(480px, 90%);
-  padding: 20px 22px;
-  border-width: 3px;
-  transform: translate(-50%, -50%) scale(.72) rotate(-2deg);
-}
-
-.game-stage[data-game="astral"] .near-miss-banner.is-visible {
-  transform: translate(-50%, -50%) scale(1.08) rotate(0);
-}
-
-.game-stage[data-game="astral"] .near-miss-banner strong { font-size: clamp(22px, 4vw, 36px); }
-.game-stage[data-game="astral"] .near-miss-banner span { margin-top: 6px; font-size: 12px; }
-.game-stage[data-game="astral"] .near-miss-banner small { font-size: 8px; }
-
 .bonus-overlay[data-mode="cinematic-free-spins"] {
   background: rgba(1,3,14,.92);
 }
@@ -4457,7 +4415,7 @@ kbd {
   .bet-control .mini-action { min-height: 28px; }
 }
 
-@media (max-width: 820px) {
+@media (max-width: 820px) and (orientation: portrait) {
   .game-stage[data-game] .game-layout {
     width: min(680px, 100%);
     display: flex;
@@ -5246,6 +5204,10 @@ body {
   }
 }
 
+@media (orientation: landscape) and (min-height: 521px) and (max-height: 800px) and (max-width: 1100px) {
+  .game-stage[data-game="astral"] .machine-title h1 { visibility: hidden; }
+}
+
 /* 2.11.1 Astral-only clarity pass: isolated symbols and transparent moonstone controls. */
 .game-stage[data-game="astral"] .symbol-cell {
   border-color: color-mix(in srgb, var(--symbol-color) 34%, rgba(214,232,255,.12));
@@ -5486,6 +5448,581 @@ body {
     top: 42px;
     bottom: auto;
   }
+}
+
+/* 2.12 Astral feature market and Moonwell multiplier gate. */
+.astral-feature-dock { display: none; }
+
+.game-stage[data-game="astral"] .astral-feature-dock {
+  position: absolute;
+  z-index: 43;
+  top: clamp(118px, 15vh, 154px);
+  left: calc(24.5% - 145px);
+  width: 132px;
+  display: grid;
+  gap: 10px;
+}
+
+.astral-feature-button {
+  position: relative;
+  min-height: 92px;
+  padding: 11px 8px 10px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(210,232,255,.48);
+  border-radius: 15px 4px 15px 4px;
+  color: #f5fbff;
+  background:
+    radial-gradient(circle at 50% 7%, rgba(111,225,255,.25), transparent 48%),
+    linear-gradient(145deg, rgba(28,38,92,.94), rgba(8,11,35,.97));
+  box-shadow: inset 0 1px rgba(255,255,255,.18), inset 0 0 24px rgba(102,203,255,.08), 0 12px 30px rgba(0,0,0,.45), 0 0 20px rgba(102,213,255,.12);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, filter 180ms ease, box-shadow 180ms ease;
+}
+
+.astral-feature-button::before,
+.feature-market-card::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  inset: 4px;
+  border: 1px solid rgba(239,218,127,.25);
+  border-radius: inherit;
+}
+
+.astral-feature-button.is-buy {
+  border-color: rgba(244,216,112,.56);
+  background:
+    radial-gradient(circle at 50% 7%, rgba(255,220,102,.25), transparent 48%),
+    linear-gradient(145deg, rgba(72,45,112,.95), rgba(12,10,36,.98));
+}
+
+.astral-feature-button:hover:not(:disabled),
+.astral-feature-button:focus-visible {
+  transform: translateY(-2px) scale(1.025);
+  border-color: #eafcff;
+  filter: brightness(1.13);
+  box-shadow: inset 0 1px rgba(255,255,255,.2), 0 14px 34px rgba(0,0,0,.5), 0 0 30px rgba(104,222,255,.28);
+}
+
+.astral-feature-button.is-active {
+  border-color: #fff0a4;
+  box-shadow: inset 0 0 25px rgba(161,110,255,.2), 0 0 32px rgba(105,224,255,.28);
+}
+
+.astral-feature-button:disabled { opacity: .48; cursor: default; }
+.feature-button-orb {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247,231,169,.58);
+  border-radius: 50%;
+  color: #fff2ac;
+  background: radial-gradient(circle at 34% 28%, white, #77e4ff 16%, #7658d9 54%, #14082f 100%);
+  box-shadow: 0 0 17px rgba(106,222,255,.42);
+  font-size: 15px;
+}
+.astral-feature-button strong {
+  font: 700 12px/1 var(--serif);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.astral-feature-button small { color: #b9cae2; font-size: 7px; line-height: 1.25; }
+
+.game-stage[data-game="astral"] .result-status { display: none; }
+.game-stage[data-game="astral"] .reel-footer { min-height: 21px; justify-content: flex-end; }
+
+.feature-market-overlay {
+  position: fixed;
+  z-index: 103;
+  inset: 0;
+  padding: 10px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgba(1,3,14,.9);
+  backdrop-filter: blur(14px);
+}
+
+.feature-market-overlay[hidden] { display: none; }
+
+.feature-market-scene {
+  position: relative;
+  isolation: isolate;
+  width: min(1120px, calc(100vw - 20px));
+  height: min(630px, calc(100dvh - 20px));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 2px solid rgba(211,229,255,.52);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(2,5,19,.06), rgba(2,4,16,.06) 42%, rgba(3,4,20,.84) 76%),
+    url("./assets/astral-multiplier-gate-v1.png") center / cover no-repeat;
+  box-shadow: 0 34px 120px rgba(0,0,0,.82), inset 0 0 65px rgba(44,19,111,.3), 0 0 68px rgba(91,211,255,.2);
+  animation: featureMarketEnter 460ms cubic-bezier(.14,.9,.2,1) both;
+}
+
+.feature-market-scene::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 49%, transparent 0 26%, rgba(2,5,20,.1) 46%, rgba(2,4,15,.4) 100%);
+}
+
+.feature-market-heading {
+  position: absolute;
+  z-index: 5;
+  top: 3.5%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  color: white;
+  text-align: center;
+  transform: translateX(-50%);
+  text-shadow: 0 4px 18px #000, 0 0 22px rgba(106,221,255,.62);
+}
+.feature-market-heading > span { color: #fff0a5; font-size: 18px; }
+.feature-market-heading h2 { margin: 2px 0; font: 500 clamp(24px, 4vw, 42px)/.9 var(--serif); white-space: nowrap; }
+.feature-market-heading small { color: #c6d8ef; font-size: 8px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+
+.feature-market-close {
+  position: absolute;
+  z-index: 8;
+  top: 13px;
+  right: 13px;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(234,224,181,.52);
+  border-radius: 50%;
+  color: white;
+  background: rgba(5,8,28,.72);
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 0 18px rgba(104,220,255,.16);
+  font: 300 24px/1 var(--sans);
+  cursor: pointer;
+}
+.feature-market-close:hover { background: rgba(67,47,127,.78); transform: rotate(5deg) scale(1.04); }
+
+.feature-market-grid {
+  position: absolute;
+  z-index: 4;
+  left: 2.5%;
+  right: 2.5%;
+  bottom: 7.5%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+
+.feature-market-card {
+  position: relative;
+  min-width: 0;
+  padding: 12px 13px 13px 75px;
+  border: 1px solid rgba(178,217,255,.45);
+  border-radius: 18px 6px 18px 6px;
+  background: linear-gradient(145deg, rgba(15,28,71,.91), rgba(5,8,28,.94));
+  box-shadow: inset 0 1px rgba(255,255,255,.14), 0 18px 38px rgba(0,0,0,.48), 0 0 24px rgba(104,218,255,.1);
+  backdrop-filter: blur(12px);
+}
+.feature-market-card.is-buy-card {
+  border-color: rgba(245,215,105,.48);
+  background: linear-gradient(145deg, rgba(66,38,103,.92), rgba(8,7,29,.95));
+}
+.market-card-emblem {
+  position: absolute;
+  left: 17px;
+  top: 17px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255,239,170,.65);
+  border-radius: 50%;
+  color: #fff1a7;
+  background: radial-gradient(circle at 35% 26%, white 0 5%, #7de9ff 15%, #7258d1 53%, #120729 100%);
+  box-shadow: 0 0 22px rgba(103,223,255,.38), inset 0 0 12px rgba(255,255,255,.2);
+  font-size: 22px;
+}
+.is-buy-card .market-card-emblem { background: radial-gradient(circle at 35% 26%, white 0 5%, #ffe986 18%, #9c5fe4 55%, #19072c 100%); }
+.feature-market-card h3 { margin: 0 0 8px; color: white; font: 600 17px/1 var(--serif); letter-spacing: .03em; text-transform: uppercase; }
+.special-bet-options,
+.buy-feature-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.special-bet-options button,
+.buy-feature-options button {
+  min-width: 0;
+  min-height: 78px;
+  padding: 8px 5px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+  border: 1px solid rgba(176,212,255,.27);
+  border-radius: 10px 3px 10px 3px;
+  color: white;
+  background: radial-gradient(circle at 50% 0, rgba(110,218,255,.13), transparent 55%), rgba(7,11,35,.72);
+  box-shadow: inset 0 1px rgba(255,255,255,.08);
+  cursor: pointer;
+  transition: 170ms ease;
+}
+.special-bet-options button:hover:not(:disabled),
+.buy-feature-options button:hover:not(:disabled),
+.special-bet-options button:focus-visible,
+.buy-feature-options button:focus-visible {
+  border-color: #f4f9ff;
+  background-color: rgba(52,49,116,.84);
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(102,221,255,.24), inset 0 1px rgba(255,255,255,.15);
+}
+.special-bet-options button.is-selected {
+  border-color: #fff0a0;
+  background: radial-gradient(circle at 50% 0, rgba(255,230,112,.24), transparent 56%), rgba(37,28,83,.86);
+  box-shadow: 0 0 22px rgba(108,222,255,.24), inset 0 0 18px rgba(255,229,114,.1);
+}
+.special-bet-options button:disabled,
+.buy-feature-options button:disabled { opacity: .43; cursor: default; }
+.special-bet-options span,
+.buy-feature-options span { color: #dbeaff; font-size: 7px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.special-bet-options strong,
+.buy-feature-options strong { color: #fff0a6; font: 500 clamp(18px, 2.5vw, 26px)/1 var(--serif); text-shadow: 0 0 14px rgba(255,225,107,.28); }
+.special-bet-options small,
+.buy-feature-options small { color: #9fb7d4; font-size: 7px; line-height: 1.25; }
+.feature-market-note {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 2.1%;
+  margin: 0;
+  color: rgba(219,235,255,.72);
+  font-size: 7px;
+  letter-spacing: .04em;
+  text-align: center;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.bonus-overlay[data-mode="cinematic-free-spins"] { padding: 8px; overflow: hidden; }
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene {
+  width: min(1180px, calc(100vw - 16px));
+  height: min(664px, calc(100dvh - 16px));
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 2px solid rgba(211,229,255,.5);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(2,5,20,.04), rgba(2,4,17,.06) 66%, rgba(2,3,13,.26)),
+    url("./assets/astral-multiplier-gate-v1.png") center / cover no-repeat;
+  box-shadow: 0 32px 120px rgba(0,0,0,.84), inset 0 0 70px rgba(34,13,98,.2), 0 0 70px rgba(91,211,255,.22);
+}
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene::before,
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene::after,
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-rays,
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene > .eyebrow,
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene > h2,
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene > p { display: none; }
+
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-mechanic {
+  position: absolute;
+  z-index: 8;
+  top: 3.2%;
+  left: 2.2%;
+  width: 178px;
+  margin: 0;
+  padding: 8px 10px;
+  border-color: rgba(202,229,255,.33);
+  border-radius: 10px 3px 10px 3px;
+  background: rgba(4,8,28,.66);
+  box-shadow: inset 0 1px rgba(255,255,255,.1), 0 8px 22px rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+}
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-mechanic > span { font-size: 7px; }
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-mechanic > strong { font-size: 8px; }
+
+.bonus-overlay[data-mode="cinematic-free-spins"] .astral-bonus-stage {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  pointer-events: none;
+}
+.astral-locked-multipliers {
+  position: absolute;
+  z-index: 6;
+  top: 11.3%;
+  left: 50%;
+  width: 34.2%;
+  display: flex;
+  justify-content: center;
+  gap: 4.5%;
+  transform: translateX(-50%);
+}
+.astral-locked-multipliers span {
+  width: 28.5%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(216,235,255,.5);
+  border-radius: 50%;
+  color: rgba(210,226,247,.55);
+  background: rgba(3,7,26,.55);
+  box-shadow: inset 0 0 18px rgba(96,205,255,.12);
+  font: 600 clamp(12px, 1.7vw, 22px)/1 var(--serif);
+  text-shadow: 0 2px 8px #000;
+}
+.astral-locked-multipliers span.is-locked {
+  color: #fff1a4;
+  background: radial-gradient(circle, rgba(92,213,255,.38), rgba(41,25,91,.72) 64%, rgba(3,6,24,.76));
+  border-color: #fff0a4;
+  box-shadow: inset 0 0 23px rgba(126,224,255,.24), 0 0 27px rgba(103,221,255,.5);
+  animation: multiplierSocketLock 640ms cubic-bezier(.16,1.2,.28,1) both;
+}
+.astral-multiplier-dial {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 50.5%;
+  width: 29%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  border-radius: 50%;
+  color: white;
+  background: radial-gradient(circle, rgba(38,43,111,.24), rgba(3,6,25,.08) 67%, transparent 70%);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.astral-multiplier-dial::before {
+  content: "";
+  position: absolute;
+  inset: 3%;
+  border: 1px solid rgba(136,229,255,.24);
+  border-radius: 50%;
+  box-shadow: inset 0 0 30px rgba(104,216,255,.12), 0 0 18px rgba(104,217,255,.1);
+}
+.astral-multiplier-dial span,
+.astral-multiplier-dial small,
+.astral-multiplier-dial strong { position: relative; z-index: 2; display: block; }
+.astral-multiplier-dial span { color: #b8d2ec; font-size: clamp(8px, 1vw, 13px); font-weight: 900; letter-spacing: .12em; }
+.astral-multiplier-dial strong {
+  color: #fff0a0;
+  font: 600 clamp(40px, 7vw, 92px)/.86 var(--serif);
+  letter-spacing: -.05em;
+  text-shadow: 0 5px 24px #000, 0 0 28px rgba(255,227,103,.4), 0 0 48px rgba(92,214,255,.32);
+}
+.astral-multiplier-dial small { color: #cbeeff; font-size: clamp(8px, 1.1vw, 14px); font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
+.astral-multiplier-dial.is-spinning { animation: multiplierDialCharge 420ms ease-in-out infinite alternate; }
+.astral-multiplier-dial.is-locked { animation: multiplierDialLock 620ms cubic-bezier(.16,1.2,.28,1) both; }
+.astral-total-multiplier {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: 70.5%;
+  min-width: 180px;
+  padding: 7px 18px;
+  border: 1px solid rgba(213,234,255,.27);
+  border-radius: 999px;
+  color: white;
+  background: rgba(4,7,27,.72);
+  box-shadow: 0 10px 30px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.1), 0 0 22px rgba(103,220,255,.13);
+  text-align: center;
+  transform: translateX(-50%);
+  backdrop-filter: blur(7px);
+}
+.astral-total-multiplier span { display: block; color: #b7cce5; font-size: 7px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.astral-total-multiplier strong { display: block; margin-top: 1px; color: #fff0a0; font: 600 clamp(23px, 3vw, 38px)/1 var(--serif); text-shadow: 0 0 18px rgba(255,228,106,.32); }
+
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total {
+  position: absolute;
+  z-index: 9;
+  right: 3%;
+  bottom: 5%;
+  min-width: 126px;
+  padding: 8px 12px;
+  border: 1px solid rgba(203,228,255,.3);
+  border-radius: 10px 3px 10px 3px;
+  background: rgba(3,7,26,.7);
+  box-shadow: 0 10px 28px rgba(0,0,0,.42);
+  backdrop-filter: blur(8px);
+}
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total strong { margin: 2px 0 0; font-size: clamp(17px, 2.1vw, 28px); }
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  bottom: 2.8%;
+  width: 24%;
+  min-width: 180px;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 2px solid rgba(255,237,159,.74);
+  border-radius: 9px 3px 9px 3px;
+  color: white;
+  background: linear-gradient(180deg, rgba(125,81,220,.95), rgba(47,21,101,.98));
+  box-shadow: inset 0 1px rgba(255,255,255,.3), 0 10px 30px rgba(0,0,0,.48), 0 0 24px rgba(102,220,255,.2);
+  font-size: 11px;
+  transform: translateX(-50%);
+}
+.bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action:hover:not(:disabled) { filter: brightness(1.18); box-shadow: inset 0 1px rgba(255,255,255,.32), 0 10px 34px rgba(0,0,0,.5), 0 0 34px rgba(103,221,255,.38); }
+
+@keyframes featureMarketEnter { from { opacity: 0; transform: scale(.82) translateY(28px); filter: brightness(1.7); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes multiplierDialCharge { to { filter: brightness(1.28); transform: translate(-50%, -50%) scale(1.025); } }
+@keyframes multiplierDialLock { 0% { filter: brightness(2.2); transform: translate(-50%, -50%) scale(.82); } 62% { transform: translate(-50%, -50%) scale(1.08); } 100% { filter: none; transform: translate(-50%, -50%); } }
+@keyframes multiplierSocketLock { 0% { opacity: .2; transform: scale(.35) rotate(-16deg); filter: brightness(2.4); } 70% { transform: scale(1.13) rotate(2deg); } 100% { opacity: 1; transform: none; filter: none; } }
+
+@media (max-height: 760px) and (min-width: 821px) {
+  .game-stage[data-game="astral"] .astral-feature-dock { top: 80px; }
+  .astral-feature-button { min-height: 76px; }
+  .feature-market-card { padding-top: 9px; padding-bottom: 9px; }
+  .special-bet-options button,
+  .buy-feature-options button { min-height: 66px; }
+}
+
+@media (max-width: 820px) {
+  .game-stage[data-game="astral"] .astral-feature-dock {
+    position: fixed;
+    z-index: 46;
+    top: auto;
+    left: max(7px, env(safe-area-inset-left));
+    right: max(7px, env(safe-area-inset-right));
+    bottom: calc(38px + env(safe-area-inset-bottom));
+    width: auto;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+  }
+  .astral-feature-button {
+    min-height: 47px;
+    padding: 5px 8px 5px 47px;
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: start;
+    align-content: center;
+    text-align: left;
+    border-radius: 12px 3px 12px 3px;
+  }
+  .feature-button-orb { position: absolute; left: 9px; top: 8px; width: 29px; height: 29px; }
+  .astral-feature-button strong { font-size: 9px; }
+  .astral-feature-button small { font-size: 6px; }
+
+  .feature-market-overlay { padding: 4px; }
+  .feature-market-scene {
+    width: calc(100vw - 8px);
+    height: calc(100dvh - 8px);
+    aspect-ratio: auto;
+    border-radius: 16px;
+    background-size: auto 100%;
+  }
+  .feature-market-heading { top: 3%; }
+  .feature-market-heading h2 { font-size: clamp(23px, 8vw, 34px); }
+  .feature-market-close { top: 8px; right: 8px; width: 38px; height: 38px; }
+  .feature-market-grid {
+    left: 7px;
+    right: 7px;
+    top: auto;
+    bottom: 34px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    align-content: end;
+    gap: 7px;
+  }
+  .feature-market-card { padding: 8px 7px 8px 49px; border-radius: 13px 4px 13px 4px; }
+  .market-card-emblem { left: 9px; top: 10px; width: 32px; height: 32px; font-size: 15px; }
+  .feature-market-card h3 { margin-bottom: 5px; font-size: 12px; }
+  .special-bet-options,
+  .buy-feature-options { gap: 4px; }
+  .special-bet-options button,
+  .buy-feature-options button { min-height: 59px; padding: 4px 2px; }
+  .special-bet-options strong,
+  .buy-feature-options strong { font-size: clamp(17px, 5vw, 23px); }
+  .special-bet-options small,
+  .buy-feature-options small { font-size: 6px; }
+  .feature-market-note { bottom: 10px; max-width: 86%; overflow: hidden; text-overflow: ellipsis; }
+
+  .bonus-overlay[data-mode="cinematic-free-spins"] { padding: 4px; }
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene {
+    width: calc(100vw - 8px);
+    height: calc(100dvh - 8px);
+    aspect-ratio: auto;
+    border-radius: 15px;
+    background-size: auto 100%;
+  }
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-mechanic { top: 1.5%; left: 2%; width: 145px; padding: 6px 8px; }
+  .astral-locked-multipliers { top: 13.3%; width: 72%; gap: 4%; }
+  .astral-locked-multipliers span { font-size: clamp(11px, 4.3vw, 18px); }
+  .astral-multiplier-dial { top: 49%; width: min(68vw, 290px); }
+  .astral-multiplier-dial strong { font-size: clamp(46px, 17vw, 76px); }
+  .astral-total-multiplier { top: 70%; min-width: 150px; padding: 5px 14px; }
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total { right: 3%; bottom: 12%; min-width: 104px; padding: 6px 8px; }
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action { bottom: 3%; width: 58%; min-width: 168px; min-height: 45px; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .game-stage[data-game="astral"] .astral-feature-dock {
+    position: fixed;
+    z-index: 46;
+    top: auto;
+    left: calc(max(6px, env(safe-area-inset-left)) + 74px);
+    bottom: max(4px, env(safe-area-inset-bottom));
+    width: 228px;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }
+  .astral-feature-button {
+    min-height: 32px;
+    padding: 3px 5px 3px 32px;
+    place-items: start;
+    align-content: center;
+    text-align: left;
+  }
+  .feature-button-orb { position: absolute; left: 6px; top: 5px; width: 21px; height: 21px; font-size: 11px; }
+  .astral-feature-button strong { font-size: 7px; }
+  .astral-feature-button small { font-size: 5px; }
+
+  .feature-market-overlay { padding: 4px; }
+  .feature-market-scene { width: calc(100vw - 8px); height: calc(100dvh - 8px); border-radius: 13px; }
+  .feature-market-heading { top: 2%; }
+  .feature-market-heading h2 { font-size: 25px; }
+  .feature-market-close { top: 6px; right: 6px; width: 34px; height: 34px; }
+  .feature-market-grid { left: 1.5%; right: 1.5%; bottom: 7%; gap: 7px; }
+  .feature-market-card { padding: 7px 7px 7px 48px; }
+  .market-card-emblem { left: 8px; top: 9px; width: 31px; height: 31px; font-size: 14px; }
+  .feature-market-card h3 { margin-bottom: 4px; font-size: 11px; }
+  .special-bet-options button,
+  .buy-feature-options button { min-height: 53px; padding: 3px 2px; }
+  .special-bet-options strong,
+  .buy-feature-options strong { font-size: 17px; }
+  .special-bet-options small,
+  .buy-feature-options small { display: none; }
+  .feature-market-note { bottom: 1.2%; }
+
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene { width: calc(100vw - 8px); height: calc(100dvh - 8px); border-radius: 13px; }
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-mechanic { top: 2%; left: 1.5%; width: 145px; padding: 5px 7px; }
+  .astral-locked-multipliers { top: 10.5%; width: 34%; }
+  .astral-multiplier-dial { top: 50%; width: 29%; }
+  .astral-multiplier-dial strong { font-size: clamp(38px, 9vw, 67px); }
+  .astral-total-multiplier { top: 70%; min-width: 140px; padding: 4px 12px; }
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total { bottom: 4%; padding: 5px 8px; }
+  .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action { bottom: 2%; min-height: 39px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-market-scene,
+  .astral-multiplier-dial,
+  .astral-locked-multipliers span { animation-duration: 1ms !important; }
 }
 
 @media (orientation: landscape) and (max-height: 520px) {

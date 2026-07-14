@@ -22,6 +22,35 @@ test("all four published game models return exactly 99.00%", () => {
   }
 });
 
+test("Astral special bets and feature purchases preserve 99.00% theoretical return", async () => {
+  for (const progressBoost of [0, 1, 2]) {
+    assert.ok(Math.abs(model.theoreticalSpecialBetRtp("astral", progressBoost) - 0.99) < 1e-12);
+  }
+
+  for (const costMultiplier of [25, 50, 100]) {
+    const game = model.GAMES.astral;
+    const purchasePrizes = model.bonusPurchasePrizeTable("astral", costMultiplier);
+    const totalWeight = purchasePrizes.reduce((total, prize) => total + prize.weight, 0);
+    const expectedRound = game.bonusDraws * purchasePrizes.reduce(
+      (total, prize) => total + prize.weight / totalWeight * prize.multiplier,
+      0
+    );
+    assert.ok(Math.abs(expectedRound / costMultiplier - 0.99) < 1e-12);
+    assert.equal(purchasePrizes.every((prize) => Math.abs(prize.multiplier * 100 - Math.round(prize.multiplier * 100)) < 1e-9), true);
+
+    const input = {
+      serverSeed: "19".repeat(32),
+      clientSeed: "feature-purchase-test",
+      nonce: costMultiplier,
+      bet: 2,
+      costMultiplier,
+      progressBefore: 5,
+      gameId: "astral"
+    };
+    assert.deepEqual(await model.simulateBonusPurchase(input), await model.simulateBonusPurchase(input));
+  }
+});
+
 test("every game recreates the same complete outcome from the same receipt", async () => {
   for (const gameId of Object.keys(model.GAMES)) {
     const input = {

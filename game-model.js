@@ -3,6 +3,7 @@ import { createFairRng } from "./fairness.js";
 export const COLS = 5;
 export const ROWS = 4;
 export const DEFAULT_GAME_ID = "astral";
+export const TARGET_RTP = 0.99;
 
 const BASE_SYMBOLS = [
   { id: "luma", weight: 1200, payouts: { 3: 36, 4: 108, 5: 360 } },
@@ -61,11 +62,11 @@ export const GAMES = {
     bonusTitle: "The garden remembers.",
     bonusCopy: "Three constellations are sealed into your spin receipt. Reveal their light.",
     bonusMode: "free-spins",
-    bonusMechanicName: "Moonwell Free Spins",
-    bonusCardLabel: "Free spin",
-    bonusStartLabel: "Start 3 free spins",
-    bonusProgressLabel: "Free spins resolved",
-    bonusMechanicCopy: "The meter awards three sealed free spins. Each spin resolves one independently weighted prize multiplier and all three prizes are added together.",
+    bonusMechanicName: "Moonwell Multiplier Gate",
+    bonusCardLabel: "Multiplier",
+    bonusStartLabel: "Open 3 multipliers",
+    bonusProgressLabel: "Multipliers locked",
+    bonusMechanicCopy: "The meter awards three sealed multiplier orbs. Each orb resolves one independently weighted multiplier and every revealed X is added to the total.",
     bonusDraws: 3,
     bonusPrizes: [
       { multiplier: 0.25, weight: 3000 },
@@ -314,6 +315,7 @@ export async function simulateSpin({
   bet,
   progressBefore,
   petalsBefore,
+  progressBoost = 0,
   gameId = DEFAULT_GAME_ID
 }) {
   const game = getGame(gameId);
@@ -330,7 +332,7 @@ export async function simulateSpin({
 
   const wins = evaluateLines(grid, bet, gameId);
   const collectorCount = grid.filter((symbol) => symbol === "petal").length;
-  const collectedTotal = startingProgress + collectorCount;
+  const collectedTotal = startingProgress + collectorCount + progressBoost;
   const bonusRoundCount = Math.floor(collectedTotal / game.threshold);
   const progressAfter = collectedTotal % game.threshold;
   const bonusRounds = [];
@@ -354,6 +356,7 @@ export async function simulateSpin({
     wins,
     collectorCount,
     scatterCount: collectorCount,
+    progressBoost,
     progressBefore: startingProgress,
     progressAfter,
     petalsBefore: startingProgress,
@@ -363,6 +366,103 @@ export async function simulateSpin({
     bonusMultiplier,
     bonusWin,
     totalWin: baseWin + bonusWin
+  };
+}
+
+function expectedBonusRoundMultiplier(game) {
+  const totalPrizeWeight = game.bonusPrizes.reduce((total, prize) => total + prize.weight, 0);
+  const expectedPrize = game.bonusPrizes.reduce(
+    (total, prize) => total + (prize.weight / totalPrizeWeight) * prize.multiplier,
+    0
+  );
+  return expectedPrize * game.bonusDraws;
+}
+
+export function specialBetCostMultiplier(gameId = DEFAULT_GAME_ID, progressBoost = 0) {
+  const game = getGame(gameId);
+  const boostValue = expectedBonusRoundMultiplier(game) / game.threshold * Math.max(0, progressBoost);
+  return 1 + boostValue / TARGET_RTP;
+}
+
+export function theoreticalSpecialBetRtp(gameId = DEFAULT_GAME_ID, progressBoost = 0) {
+  const game = getGame(gameId);
+  const standardReturn = theoreticalRtp(gameId).totalRtp;
+  const boostValue = expectedBonusRoundMultiplier(game) / game.threshold * Math.max(0, progressBoost);
+  const wagerMultiplier = specialBetCostMultiplier(gameId, progressBoost);
+  return (standardReturn + boostValue) / wagerMultiplier;
+}
+
+export function bonusPurchasePayoutScale(gameId = DEFAULT_GAME_ID, costMultiplier = 50) {
+  const game = getGame(gameId);
+  return costMultiplier * TARGET_RTP / expectedBonusRoundMultiplier(game);
+}
+
+export function bonusPurchasePrizeTable(gameId = DEFAULT_GAME_ID, costMultiplier = 50) {
+  const game = getGame(gameId);
+  const totalWeight = game.bonusPrizes.reduce((total, prize) => total + prize.weight, 0);
+  const payoutScale = bonusPurchasePayoutScale(gameId, costMultiplier);
+  const table = game.bonusPrizes.map((prize) => ({
+    weight: prize.weight,
+    multiplierCents: Math.round(prize.multiplier * payoutScale * 100)
+  }));
+  const targetWeightedCents = Math.round(costMultiplier * TARGET_RTP / game.bonusDraws * 100 * totalWeight);
+  const currentWeightedCents = table.reduce(
+    (total, prize) => total + prize.multiplierCents * prize.weight,
+    0
+  );
+  const correctionIndex = table.length - 1;
+  const correctionWeight = table[correctionIndex].weight;
+  const correctionCents = (targetWeightedCents - currentWeightedCents) / correctionWeight;
+  if (!Number.isInteger(correctionCents)) throw new Error("Feature purchase table cannot be calibrated to two decimal places");
+  table[correctionIndex].multiplierCents += correctionCents;
+  return table.map((prize) => ({ weight: prize.weight, multiplier: prize.multiplierCents / 100 }));
+}
+
+export async function simulateBonusPurchase({
+  serverSeed,
+  clientSeed,
+  nonce,
+  bet,
+  costMultiplier = 50,
+  progressBefore = 0,
+  gameId = DEFAULT_GAME_ID
+}) {
+  const game = getGame(gameId);
+  const purchasePrizes = bonusPurchasePrizeTable(gameId, costMultiplier);
+  const prizeWeight = purchasePrizes.reduce((total, prize) => total + prize.weight, 0);
+  const rng = await createFairRng(serverSeed, clientSeed, nonce);
+  const payoutScale = bonusPurchasePayoutScale(gameId, costMultiplier);
+  const picks = [];
+
+  for (let pick = 0; pick < game.bonusDraws; pick += 1) {
+    const ticket = await rng.int(prizeWeight);
+    picks.push(weightedItem(ticket, purchasePrizes).multiplier);
+  }
+
+  const bonusMultiplier = picks.reduce((total, value) => total + value, 0);
+  const bonusWin = bonusMultiplier * bet;
+  const purchaseCost = bet * costMultiplier;
+
+  return {
+    mode: "feature-buy",
+    gameId,
+    grid: [],
+    wins: [],
+    collectorCount: 0,
+    scatterCount: 0,
+    progressBoost: 0,
+    progressBefore,
+    progressAfter: progressBefore,
+    petalsBefore: progressBefore,
+    petalsAfter: progressBefore,
+    bonusRounds: [picks],
+    baseWin: 0,
+    bonusMultiplier,
+    bonusWin,
+    totalWin: bonusWin,
+    costMultiplier,
+    payoutScale,
+    purchaseCost
   };
 }
 
