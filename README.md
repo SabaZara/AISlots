@@ -35,7 +35,7 @@ The interface includes:
 - animated win count-ups, highlighted winning symbols, collection bursts, and themed bonus reveals;
 - tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
 - themed reel-start, reel-stop, anticipation, collection, payout, bonus, and celebration sound cues;
-- four sealed bonus presentations: Moon Balloon Ascent, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
+- four sealed bonus presentations: Celestial Case Roll, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
 - a clean balance, RTP, and free-play header without session-loss or elapsed-time readouts;
 - every positive payout receives a large animated credit count-up; returns below the bet remain honestly labeled as a payout rather than a profit win;
 - high-contrast generated reel symbols with distinct silhouettes and per-symbol color coding;
@@ -46,10 +46,10 @@ The interface includes:
 - opt-in high-energy WOW Sound cinematic music for Astral, plus original synthesized underwater, forge, and arena motifs for the other three worlds;
 - a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
 - synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
-- an Astral Bloom cinematic showcase with an original generated Moonwell guardian followed by a generated celestial balloon ascent: each balloon launches, rises through altitude rings while its X increases, bursts into a locked prize, and adds to the persistent total-X readout;
+- an Astral Bloom cinematic showcase with an original generated Moonwell guardian followed by a generated celestial case vault: multiplier capsules roll horizontally, the player presses Stop, and the pre-sealed X lands under the center marker before joining the persistent total-X readout;
 - Astral-only **Special bet** modes that guarantee +1 or +2 meter Blooms per spin at mathematically calibrated wager multipliers while preserving 99.00% theoretical RTP;
 - Astral-only 25×, 50×, and 100× **Buy bonus** options using demo credits only; each deterministic purchase preserves 99.00% theoretical RTP and produces a commit/reveal receipt;
-- a graphic Moonwell feature market with concise Special Bet and Buy Bonus explanations, plus a generated balloon-ascent bonus with three player-launched flights and overall round progress;
+- a graphic Moonwell feature market with concise Special Bet and Buy Bonus explanations, plus a generated case-opening bonus with three interactive horizontal rolls and overall round progress;
 - an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, explicit Normal/Fast speed choices, and visibly dancing winning symbols;
 - licensed WOW Sound Astral background, reel-start, reel-tick, victory, and cinematic big-win layers, reinforced with bright casino sparkles, high-frequency risers, crisp stops, and upper-register fanfares; source and license records are in `assets/audio/LICENSES.md`;
 - bet controls and a maximum-bet shortcut;
@@ -103,13 +103,14 @@ The project-bound world art was generated with the built-in OpenAI image-generat
 - `assets/ember-characters-cutout-v1.png` — an original forge queen and obsidian furnace warden.
 - `assets/ufc-characters-cutout-v1.png` — two original fictional MMA champions with no real-fighter likenesses or sponsor marks.
 
-Astral also includes five feature presentation assets:
+Astral also includes six feature presentation assets:
 
 - `assets/astral-bonus-chamber-v1.png` — a three-portal Moonwell bonus chamber.
 - `assets/astral-guardian-cinematic-v1.png` — the full-screen Moonwell awakening guardian.
 - `assets/astral-multiplier-gate-v1.png` — the original lunar apparatus retained behind the feature market.
-- `assets/astral-balloon-ascent-bg-v1.png` — the generated moonlit launch garden and altitude-ring flight path.
-- `assets/astral-balloon-sprite-v1.png` — the generated transparent sapphire-and-violet celestial balloon used as the animated flight sprite.
+- `assets/astral-case-machine-v1.png` — the generated celestial vault and wide multiplier roller chamber.
+- `assets/astral-case-capsule-blue-v1.png` — the transparent generated blue reward capsule used for common through epic multipliers.
+- `assets/astral-case-capsule-legendary-v1.png` — the transparent generated gold-and-violet capsule used for legendary multipliers.
 
 The four original background plates remain available as optimized 1672×941 JPEG assets:
 

@@ -15,7 +15,7 @@ test("Astral cinematic showcase markup and styles stay fully connected", async (
     "astralBonusStage", "astralLockedMultipliers", "astralMultiplierDial", "astralFreeSpinLabel",
     "astralRoundAward", "astralTotalMultiplier", "specialBetButton", "buyFeatureButton",
     "featureMarketOverlay", "returnChip", "returnAmount", "returnComparison",
-    "astralBalloon", "astralBalloonBurst", "astralChoiceProgress", "astralChoiceBar"
+    "astralCaseTrack", "astralCaseMarker", "astralChoiceProgress", "astralChoiceBar"
   ];
   requiredIds.forEach((id) => {
     assert.match(html, new RegExp(`id=["']${id}["']`));
@@ -23,9 +23,9 @@ test("Astral cinematic showcase markup and styles stay fully connected", async (
   });
   assert.match(css, /astral-guardian-cinematic-v1\.png/);
   assert.match(css, /astral-multiplier-gate-v1\.png/);
-  assert.match(css, /astral-balloon-ascent-bg-v1\.png/);
-  assert.match(css, /\.astral-balloon-flight/);
-  assert.match(css, /\.astral-balloon-burst/);
+  assert.match(css, /astral-case-machine-v1\.png/);
+  assert.match(css, /\.astral-case-track/);
+  assert.match(css, /\.astral-case-marker/);
   assert.match(css, /\.return-chip/);
   assert.match(css, /\.feature-market-overlay/);
   assert.match(css, /@media \(max-width: 560px\)/);
@@ -49,14 +49,30 @@ test("generated Astral multiplier gate is a project-local production PNG", async
   assert.ok(image.length > 500_000);
 });
 
-test("generated Moon Balloon assets are project-local production PNGs", async () => {
-  const background = await readFile(new URL("assets/astral-balloon-ascent-bg-v1.png", root));
-  const balloon = await readFile(new URL("assets/astral-balloon-sprite-v1.png", root));
-  for (const image of [background, balloon]) {
+test("generated Celestial Case Roll assets are project-local production PNGs", async () => {
+  const machine = await readFile(new URL("assets/astral-case-machine-v1.png", root));
+  const blueCapsule = await readFile(new URL("assets/astral-case-capsule-blue-v1.png", root));
+  const legendaryCapsule = await readFile(new URL("assets/astral-case-capsule-legendary-v1.png", root));
+  for (const image of [machine, blueCapsule, legendaryCapsule]) {
     assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
     assert.ok(image.length > 500_000);
   }
-  assert.equal(balloon[25], 6, "the animated balloon must retain RGBA transparency");
+  assert.equal(blueCapsule[25], 6, "the blue reward capsule must retain RGBA transparency");
+  assert.equal(legendaryCapsule[25], 6, "the legendary reward capsule must retain RGBA transparency");
+});
+
+test("Astral case Stop changes presentation timing but lands on the sealed multiplier", async () => {
+  const [app, model, html] = await Promise.all([
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("game-model.js", root), "utf8"),
+    readFile(new URL("index.html", root), "utf8")
+  ]);
+  assert.match(app, /const targetIndex = 45/);
+  assert.match(app, /index === targetIndex[\s\S]*?\? multiplier/);
+  assert.match(app, /activeRound\.stop\(\)/);
+  assert.match(app, /ui\.bonusAction\.textContent = "STOP"/);
+  assert.match(model, /Stop controls reveal timing only/);
+  assert.match(html, /Horizontal multiplier case roller/);
 });
 
 test("transparent Astral symbols and bonus chamber are project-local", async () => {
@@ -126,7 +142,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.17.0");
+  assert.equal(JSON.parse(packageJson).version, "2.18.0");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {

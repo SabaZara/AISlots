@@ -5184,6 +5184,408 @@ body {
   }
 }
 
+/* 2.18 Astral Celestial Case Roll. The Stop control changes reveal timing only. */
+.bonus-overlay[data-mode="astral-case-roll"] {
+  padding: 8px;
+  overflow: hidden;
+  background: rgba(1,3,14,.94);
+}
+
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-scene {
+  position: relative;
+  isolation: isolate;
+  width: min(1180px, calc(100vw - 16px));
+  height: min(672px, calc(100dvh - 16px));
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid rgba(220,231,255,.62);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(3,5,20,.02), rgba(3,4,18,.08) 64%, rgba(2,3,13,.38)),
+    url("./assets/astral-case-machine-v1.png") center / cover no-repeat;
+  box-shadow: 0 34px 120px rgba(0,0,0,.86), inset 0 0 75px rgba(31,13,95,.24), 0 0 76px rgba(82,205,255,.25);
+}
+
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-scene::before,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-scene::after,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-rays,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-scene > .eyebrow,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-scene > h2,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-scene > p,
+.bonus-overlay[data-mode="astral-case-roll"] .constellation-picks { display: none; }
+
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-mechanic {
+  position: absolute;
+  z-index: 15;
+  top: 3.2%;
+  left: 2.4%;
+  width: 190px;
+  margin: 0;
+  padding: 8px 11px;
+  border: 1px solid rgba(167,221,255,.48);
+  border-radius: 12px 4px 12px 4px;
+  background: linear-gradient(145deg, rgba(10,20,62,.88), rgba(4,6,25,.92));
+  box-shadow: inset 0 1px rgba(255,255,255,.14), 0 10px 28px rgba(0,0,0,.42), 0 0 24px rgba(89,214,255,.13);
+  backdrop-filter: blur(10px);
+}
+
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-mechanic > span { font-size: 8px; }
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-mechanic > strong { font-size: 9px; }
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-mechanic > small { color: #8fb3d8; }
+
+.bonus-overlay[data-mode="astral-case-roll"] .astral-bonus-stage {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers {
+  position: absolute;
+  z-index: 16;
+  top: 3.2%;
+  right: 2.4%;
+  width: 25%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers span {
+  width: clamp(48px, 6.2vw, 72px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(167,219,255,.44);
+  border-radius: 12px 4px 12px 4px;
+  color: rgba(224,239,255,.58);
+  background: radial-gradient(circle, rgba(88,204,255,.1), rgba(4,7,27,.9));
+  box-shadow: inset 0 0 18px rgba(94,211,255,.08), 0 8px 24px rgba(0,0,0,.42);
+  font: 700 clamp(12px, 1.6vw, 19px)/1 var(--serif);
+  transform: none;
+}
+
+.bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers span.is-locked {
+  color: #f7fcff;
+  border-color: #86ecff;
+  background: radial-gradient(circle, rgba(97,224,255,.38), rgba(42,35,111,.9));
+  box-shadow: inset 0 0 18px rgba(255,255,255,.16), 0 0 24px rgba(82,220,255,.42);
+  animation: astralCaseLock 620ms cubic-bezier(.16,1.25,.28,1) both;
+}
+
+.bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers span.rarity-legendary,
+.bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers span.rarity-jackpot {
+  color: #fff3a6;
+  border-color: #ffe37b;
+  background: radial-gradient(circle, rgba(239,106,255,.4), rgba(83,35,118,.94));
+  box-shadow: inset 0 0 20px rgba(255,255,255,.18), 0 0 31px rgba(255,205,76,.52);
+}
+
+.astral-case-machine {
+  position: absolute;
+  inset: 0;
+}
+
+.astral-case-round {
+  position: absolute;
+  z-index: 14;
+  top: 23.5%;
+  left: 50%;
+  min-width: 150px;
+  padding: 6px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(191,225,255,.47);
+  border-radius: 999px;
+  color: #edf9ff;
+  background: rgba(3,7,28,.8);
+  box-shadow: inset 0 1px rgba(255,255,255,.13), 0 0 24px rgba(80,209,255,.18);
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+.astral-case-round span { font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.astral-case-round small { color: #7cecff; font-size: 7px; font-weight: 900; letter-spacing: .08em; }
+
+.astral-case-window {
+  position: absolute;
+  z-index: 7;
+  top: 34%;
+  left: 15.6%;
+  right: 15.6%;
+  height: 30.5%;
+  overflow: hidden;
+  border: 1px solid rgba(165,215,255,.44);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(1,3,18,.84), rgba(9,8,40,.76) 50%, rgba(1,3,18,.9));
+  box-shadow: inset 0 0 34px rgba(0,0,0,.9), inset 0 1px rgba(255,255,255,.12), 0 0 26px rgba(75,203,255,.15);
+}
+
+.astral-case-track {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+  height: 92%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  will-change: transform, filter;
+}
+
+.astral-case-item {
+  position: relative;
+  flex: 0 0 clamp(98px, 10.2vw, 128px);
+  height: 94%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(122,205,255,.4);
+  border-radius: 17px 5px 17px 5px;
+  background: radial-gradient(circle at 50% 38%, rgba(80,210,255,.19), transparent 48%), linear-gradient(160deg, rgba(18,34,85,.92), rgba(5,7,27,.98));
+  box-shadow: inset 0 1px rgba(255,255,255,.14), inset 0 0 24px rgba(69,197,255,.08), 0 8px 20px rgba(0,0,0,.46);
+}
+
+.astral-case-item::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(232,225,161,.16);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.astral-case-item img {
+  width: 82%;
+  height: 72%;
+  margin-top: -11%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)) drop-shadow(0 0 12px rgba(76,216,255,.32));
+}
+
+.astral-case-item strong {
+  position: absolute;
+  z-index: 3;
+  left: 7px;
+  right: 7px;
+  bottom: 15%;
+  color: #f6fcff;
+  font: 700 clamp(16px, 2.2vw, 26px)/1 var(--serif);
+  text-align: center;
+  text-shadow: 0 2px 8px #000, 0 0 15px rgba(79,223,255,.55);
+}
+
+.astral-case-item small {
+  position: absolute;
+  z-index: 3;
+  bottom: 5%;
+  color: #8ec5eb;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.astral-case-item.rarity-epic { border-color: rgba(178,126,255,.7); background-color: rgba(62,28,112,.45); }
+.astral-case-item.rarity-legendary,
+.astral-case-item.rarity-jackpot {
+  border-color: rgba(255,226,102,.84);
+  background: radial-gradient(circle at 50% 35%, rgba(237,101,255,.3), transparent 53%), linear-gradient(155deg, rgba(100,47,128,.94), rgba(20,8,48,.98));
+  box-shadow: inset 0 1px rgba(255,255,255,.2), inset 0 0 25px rgba(255,209,82,.14), 0 0 20px rgba(255,200,72,.25);
+}
+.astral-case-item.rarity-legendary small,
+.astral-case-item.rarity-jackpot small { color: #ffe582; }
+
+.astral-case-marker {
+  position: absolute;
+  z-index: 12;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  background: linear-gradient(180deg, #fff8b2, #66e9ff 48%, #fff8b2);
+  box-shadow: 0 0 9px #76eaff, 0 0 22px rgba(255,224,91,.7);
+  transform: translateX(-50%);
+}
+
+.astral-case-marker::before,
+.astral-case-marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-right: 13px solid transparent;
+  border-left: 13px solid transparent;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 8px rgba(103,228,255,.9));
+}
+.astral-case-marker::before { top: 0; border-top: 18px solid #fff09a; }
+.astral-case-marker::after { bottom: 0; border-bottom: 18px solid #fff09a; }
+.astral-case-marker i { position: absolute; inset: 37% -6px; border-radius: 50%; background: #fff; box-shadow: 0 0 20px #7feaff; opacity: .68; }
+.astral-case-marker.is-locked { animation: astralMarkerLock 720ms cubic-bezier(.16,1.2,.28,1) both; }
+
+.astral-case-glass {
+  position: absolute;
+  z-index: 11;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(112deg, transparent 0 24%, rgba(255,255,255,.1) 29%, transparent 36% 64%, rgba(104,225,255,.08) 70%, transparent 78%);
+  mix-blend-mode: screen;
+}
+
+.astral-case-machine.is-rolling .astral-case-window { box-shadow: inset 0 0 38px rgba(0,0,0,.9), 0 0 34px rgba(79,215,255,.32); }
+.astral-case-machine.is-rolling .astral-case-item { animation: astralCaseBob 280ms ease-in-out infinite alternate; }
+.astral-case-machine.is-decelerating .astral-case-marker { animation: astralMarkerPulse 320ms ease-in-out infinite alternate; }
+.astral-case-item.is-winning {
+  z-index: 8;
+  animation: astralCaseWinner 900ms cubic-bezier(.15,1.25,.25,1) both;
+}
+
+.astral-case-award {
+  position: absolute;
+  z-index: 15;
+  top: 66.5%;
+  left: 50%;
+  min-width: 180px;
+  padding: 7px 20px 8px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(231,223,161,.56);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(12,19,61,.9), rgba(5,7,26,.94));
+  box-shadow: inset 0 1px rgba(255,255,255,.14), 0 10px 28px rgba(0,0,0,.44), 0 0 26px rgba(91,216,255,.16);
+  transform: translateX(-50%);
+}
+.astral-case-award small { color: #9fc5e5; font-size: 6px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.astral-case-award strong { color: #fff0a4; font: 700 clamp(26px, 4vw, 46px)/.9 var(--serif); text-shadow: 0 0 19px rgba(255,213,85,.42); }
+
+.astral-case-progress {
+  position: absolute;
+  z-index: 15;
+  left: 50%;
+  bottom: 14.5%;
+  width: 48%;
+  display: grid;
+  gap: 5px;
+  transform: translateX(-50%);
+}
+.astral-case-progress > span { color: #dcecff; font-size: 7px; font-weight: 900; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
+.astral-case-progress > i { height: 7px; overflow: hidden; border: 1px solid rgba(148,211,255,.42); border-radius: 999px; background: rgba(2,4,20,.72); }
+.astral-case-progress > i > b { display: block; width: 0; height: 100%; background: linear-gradient(90deg, #7058e8, #74eaff, #ffe171); box-shadow: 0 0 13px #70dcff; transition: width 420ms ease; }
+
+.bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-total {
+  position: absolute;
+  z-index: 16;
+  bottom: 3.6%;
+  min-width: 150px;
+  padding: 7px 15px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(154,218,255,.44);
+  border-radius: 12px 4px 12px 4px;
+  background: rgba(4,8,29,.82);
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 9px 25px rgba(0,0,0,.42);
+  transform: none;
+  backdrop-filter: blur(8px);
+}
+.bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier { left: 2.4%; }
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-total { right: 2.4%; margin: 0; }
+.bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier span,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-total span { color: #a9c8e4; font-size: 6px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier strong,
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-total strong { margin: 2px 0 0; color: #fff0a0; font: 700 clamp(17px, 2.2vw, 28px)/1 var(--serif); }
+
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-action {
+  position: absolute;
+  z-index: 25;
+  left: 50%;
+  bottom: 2.6%;
+  width: min(36%, 370px);
+  min-width: 220px;
+  min-height: 55px;
+  border: 2px solid rgba(255,238,153,.72);
+  border-radius: 15px 5px 15px 5px;
+  color: white;
+  background: radial-gradient(circle at 50% 0, rgba(103,230,255,.3), transparent 55%), linear-gradient(180deg, #6155c8, #27206f);
+  box-shadow: inset 0 1px rgba(255,255,255,.28), 0 12px 32px rgba(0,0,0,.52), 0 0 30px rgba(87,216,255,.34);
+  font: 900 clamp(12px, 1.6vw, 18px)/1 var(--sans);
+  letter-spacing: .12em;
+  transform: translateX(-50%);
+  text-transform: uppercase;
+}
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-action:hover:not(:disabled) { filter: brightness(1.18); transform: translateX(-50%) translateY(-2px); }
+.bonus-overlay[data-mode="astral-case-roll"] .bonus-action.is-stop {
+  color: #fff7d1;
+  border-color: #ffe16f;
+  background: radial-gradient(circle at 50% 0, rgba(255,233,106,.4), transparent 56%), linear-gradient(180deg, #d84869, #761d51);
+  box-shadow: inset 0 1px rgba(255,255,255,.3), 0 12px 35px rgba(0,0,0,.55), 0 0 38px rgba(255,81,144,.48);
+  animation: astralStopPulse 460ms ease-in-out infinite alternate;
+}
+
+@keyframes astralCaseBob { to { transform: translateY(-3px); filter: brightness(1.08); } }
+@keyframes astralMarkerPulse { to { filter: brightness(1.6); box-shadow: 0 0 14px #fff, 0 0 32px #7feaff; } }
+@keyframes astralMarkerLock { 0% { transform: translateX(-50%) scaleY(.3); filter: brightness(3); } 55% { transform: translateX(-50%) scale(2.1,1.18); } 100% { transform: translateX(-50%); filter: none; } }
+@keyframes astralCaseLock { 0% { opacity: .2; transform: scale(.42) rotate(-8deg); filter: brightness(3); } 66% { opacity: 1; transform: scale(1.16) rotate(2deg); } 100% { transform: none; filter: none; } }
+@keyframes astralCaseWinner { 0% { transform: scale(.82); filter: brightness(1); } 35% { transform: scale(1.12); filter: brightness(2.3); box-shadow: 0 0 48px #fff0a0; } 100% { transform: scale(1.04); filter: brightness(1.14); box-shadow: 0 0 32px rgba(113,229,255,.65); } }
+@keyframes astralStopPulse { to { filter: brightness(1.22); box-shadow: inset 0 1px rgba(255,255,255,.36), 0 12px 38px rgba(0,0,0,.55), 0 0 48px rgba(255,92,153,.65); } }
+
+@media (max-width: 620px) {
+  .bonus-overlay[data-mode="astral-case-roll"] { padding: 4px; }
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-scene { width: calc(100vw - 8px); height: calc(100dvh - 8px); border-radius: 14px; background-size: auto 100%; }
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-mechanic { top: 1.8%; left: 2%; width: 142px; padding: 6px 8px; }
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-mechanic > small { display: none; }
+  .bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers { top: 1.8%; right: 2%; width: 42%; gap: 4px; }
+  .bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers span { width: 31%; max-width: 54px; }
+  .astral-case-round { top: 25.5%; min-width: 128px; padding: 5px 10px; }
+  .astral-case-window { top: 34%; left: 3%; right: 3%; height: 31%; border-radius: 12px; }
+  .astral-case-track { gap: 6px; }
+  .astral-case-item { flex-basis: 88px; border-radius: 12px 4px; }
+  .astral-case-item strong { font-size: 18px; }
+  .astral-case-item small { font-size: 5px; }
+  .astral-case-award { top: 66.5%; min-width: 142px; padding: 5px 13px; }
+  .astral-case-progress { bottom: 17%; width: 68%; }
+  .bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier,
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-total { bottom: 9%; min-width: 104px; padding: 5px 7px; }
+  .bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier { left: 2%; }
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-total { right: 2%; }
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-action { bottom: 1.8%; width: 58%; min-width: 180px; min-height: 47px; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-scene { width: calc(100vw - 8px); height: calc(100dvh - 8px); border-radius: 13px; }
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-mechanic { top: 1.5%; left: 1.5%; width: 150px; padding: 5px 7px; }
+  .bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers { top: 1.5%; right: 1.5%; }
+  .bonus-overlay[data-mode="astral-case-roll"] .astral-locked-multipliers span { width: 48px; }
+  .astral-case-round { top: 21%; padding-block: 4px; }
+  .astral-case-window { top: 31%; left: 15%; right: 15%; height: 34%; }
+  .astral-case-item { flex-basis: 92px; }
+  .astral-case-award { top: 66%; min-width: 140px; padding-block: 4px; }
+  .astral-case-progress { bottom: 13%; width: 42%; }
+  .bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier,
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-total { bottom: 2.5%; min-width: 130px; padding-block: 4px; }
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-action { bottom: 1.5%; min-height: 41px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astral-case-machine,
+  .astral-case-item,
+  .astral-case-marker,
+  .bonus-overlay[data-mode="astral-case-roll"] .bonus-action { animation-duration: 1ms !important; }
+}
+
 @media (orientation: landscape) and (min-height: 521px) and (max-height: 800px) and (max-width: 1100px) {
   .game-stage[data-game="astral"] .machine-title h1 { visibility: hidden; }
 }

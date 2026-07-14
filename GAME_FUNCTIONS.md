@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.17.0**
+Version reviewed: **2.18.0**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -18,7 +18,7 @@ This is the team-review checklist for the current build. “Implemented” means
 | Spin speed | Implemented | Clearly labeled Normal 1× and Fast 3× choices sit beside the main Spin control. The selection persists between visits and Fast changes reel/presentation timing only; outcome generation and RTP are unchanged. |
 | Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits or a feature presentation. |
 | Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. The panel explains that the higher price guarantees meter progress; exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
-| Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet opens three sealed Moon Balloon flights immediately using demo credits only. Each flight is launched separately; purchase prizes remain scaled to 99.00% theoretical RTP and receive a fairness receipt. |
+| Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet opens three sealed Celestial Case rolls immediately using demo credits only. Each case is stopped separately; purchase prizes remain scaled to 99.00% theoretical RTP and receive a fairness receipt. |
 | Sound | Implemented | Sound is opt-in and can be turned on or off from the top bar. |
 | Last result | Implemented | Info button shows total returned, collector count, individual base-game payouts, and bonus payout. No paylines are drawn over the reels. |
 | Reset demo | Implemented | Resets demo credits, progress, statistics, and receipt state. |
@@ -40,7 +40,7 @@ This is the team-review checklist for the current build. “Implemented” means
 
 | World | Character layer | Reel motion | Meter | Trigger | Bonus presentation |
 | --- | --- | --- | --- | ---: | --- |
-| Astral Bloom | Moon-garden oracle + crystal-antler sentinel | Celestial cascade | 12-star constellation Moonwell | 12 Blooms | Three or more Moon Balloon flights rise through altitude rings, inflate, burst at their sealed X, and add to the running total X. |
+| Astral Bloom | Moon-garden oracle + crystal-antler sentinel | Celestial cascade | 12-star constellation Moonwell | 12 Blooms | Three or more multiplier cases roll horizontally beneath a center marker. The player presses Stop, the pre-sealed X lands, and every locked multiplier joins the running total. |
 | Neon Tides | Pearl-current navigator + deep-sea guardian | Underwater wave | 10-step pearl current | 10 Pearl Keys | Four Pearl Cluster Cascade reveals added into one bonus total. |
 | Ember Crown | Forge queen + obsidian furnace warden | Heavy forge slam | 15-rune forge heat | 15 Crown Runes | Two higher-volatility Multiplier Forge strikes added into one bonus total. |
 | UFC Octagon Gold | Two original fictional MMA champions | Fast left-to-right strike | 10-step fight card | 10 Fight Tokens | Three Championship Hold & Win cards combined into the final purse. |
@@ -58,7 +58,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Returned credits count upward with synchronized payout notes.
 - Nice, Big, Mega, and Epic tiers use different labels, timing, particles, scale, lighting, and full-screen celebration intensity.
 - Feature prizes are sealed before any bonus choice or reveal animation begins; selections are presentation only.
-- Astral includes a clearly labeled no-wager **Bonus demo** for reviewing the cinematic multiplier sequence. It does not spend credits, award credits, advance the meter, or replace the real triggered bonus.
+- Astral includes a clearly labeled no-wager **Bonus demo** for manually starting and stopping the full Celestial Case Roll sequence. It does not spend credits, award credits, advance the meter, or replace the real triggered bonus.
 - Astral places **Bonus demo** in the upper-right game area and gives **Autoplay** its own centered utility dock below the main controls; short landscape layouts keep the Autoplay dock visible as a compact floating control.
 - Astral winning tiles remain stationary and transparent while only the isolated symbol artwork jumps. The other three games retain their existing winner treatment.
 - Astral removes the near-miss callout and the visible narration row below the reels. Result details remain available from the compact info control and fairness receipt.
@@ -74,8 +74,8 @@ All characters are transparent foreground cutouts placed independently over envi
 - Each bonus uses its own draw count, prize weights, presentation name, sound sequence, and visual meter.
 - Each world uses a transparent generated HUD frame with a live count and one deterministic progress light per required collector.
 - Bonus payout equals the sum of the pre-sealed prize multipliers multiplied by the spin’s total bet.
-- The Astral Moon Balloon Ascent presents every sealed multiplier as its own interactive launch. The balloon rises higher as the displayed X increases, then bursts into a locked prize while the cumulative total X remains visible.
-- Players launch flights one at a time. A global flight-progress bar shows the current flight and total completion; autoplay launches and closes the same sequence automatically. The sealed prize is unchanged by the animation.
+- The Astral Celestial Case Roll presents every sealed multiplier as its own interactive horizontal capsule reel with rarity colors, a bright center marker, deceleration, impact glow, and a persistent total X.
+- Players open cases one at a time and press Stop to begin the deceleration. A global case-progress bar shows the current case and total completion; autoplay starts, stops, and closes the same sequence automatically. Stop changes reveal timing only—the sealed prize is unchanged by the animation.
 - Special-bet progress boosts participate in the same meter rollover logic as natural Blooms. The higher wager is derived from the feature’s exact expected value so all three Astral wager modes remain at 99.00% theoretical RTP.
 - Feature purchases draw the same three sealed Astral prize values, scale them for the selected 25×, 50×, or 100× demo-credit cost, and preserve 99.00% theoretical RTP at each tier.
 
