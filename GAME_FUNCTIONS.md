@@ -82,10 +82,10 @@ All characters are transparent foreground cutouts placed independently over envi
 ## Audio and effects
 
 - Web Audio engine with separate profiles for Astral, Neon, Ember, and UFC.
-- Four original low-volume music loops are synthesized in the browser: the revised 94-BPM Astral lunar pulse, underwater pulse, forge ostinato, and arena rhythm. Switching worlds restarts the matching motif; disabling sound stops it.
+- Astral uses a licensed seamless WOW Sound background loop; Neon, Ember, and UFC retain their original synthesized underwater, forge, and arena motifs. Switching worlds restarts the matching soundtrack; disabling sound stops it.
 - Per-world spin-start, spin-bed, tick rhythm, reel-stop, anticipation, collection, win, payout-count, bonus-start, bonus-reveal, and celebration cues.
 - Stereo movement, dynamics compression, synthesized room/reverb treatment, impact noise, musical win chords, particles, reel flashes, cabinet shake, and screen-level big-win scenes.
-- Astral can use the locally stored licensed wheel and “you win” samples. Sources and license notes are recorded in `assets/audio/LICENSES.md`.
+- Astral uses locally stored WOW Sound layers for background music, spin launch, reel ticks, regular victories, and a 13-second cinematic big-win cue. The background automatically ducks during the big-win cue and returns after the cue or Collect action. Source, credit, and license records are stored in `assets/audio/LICENSES.md`.
 - Audio remains off until the player explicitly enables it.
 
 ## Provable fairness

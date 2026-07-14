@@ -1,20 +1,23 @@
 # Licensed audio used by AISlots
 
-Downloaded on 2026-07-14. These files are bundled as part of the game experience and are not offered as standalone downloads.
+Downloaded on 2026-07-14. These files are bundled as synchronized parts of the game experience and are not offered as standalone downloads.
 
-## Astral win voice
+## WOW Sound Starter Pack — Astral Bloom
 
-- File: `astral-you-win-mrstokes302.mp3`
-- Title: “You Win SFX @MRSTOKES302”
-- Creator: Mrstokes302
-- Source: https://pixabay.com/sound-effects/film-special-effects-you-win-sfx-mrstokes302-442128/
-- License: Pixabay Content License — https://pixabay.com/service/license-summary/
+- Source: https://wowsound.com/wow-sound-starter-pack/
+- Product page: https://wowsound.com/p/wow-sound-starter-pack/
+- License: Creative Commons Attribution-NoDerivs 3.0 Unported — https://creativecommons.org/licenses/by-nd/3.0/
+- Required credit: Music and sound effects by WOW Sound — https://wowsound.com/
+- Archived license document: `wow-sound-starter-pack-license.pdf`
 
-## Astral reel spin
+| Game role | Bundled file | Original pack file |
+| --- | --- | --- |
+| Seamless background music | `wow-astral-background-safe-haven-loop.ogg` | `CS_Safe Haven - Short Loop.ogg` |
+| Reel launch | `wow-astral-spin-start.ogg` | `CGM3_Save_Load_02_2.ogg` |
+| Rolling and reel-stop tick | `wow-astral-reel-tick.ogg` | `CGM3_Cute_Chirpy_Button_03_2.ogg` |
+| Regular victory sting | `wow-astral-victory-sting.ogg` | `LQ_Win_Sting_01_3.ogg` |
+| Big-win music | `wow-astral-big-win-cinematic.ogg` | `Modern Cinematic Logo 2 heavy_sfx.ogg` |
 
-- File: `mixkit-slot-machine-random-wheel-1930.mp3`
-- Title: “Slot machine random wheel” (item 1930)
-- Source: https://mixkit.co/free-sound-effects/casino/
-- License: Mixkit Sound Effects Free License — https://mixkit.co/license/
+The files are used without waveform edits. Runtime gain, panning, looping, and layering are playback behavior rather than redistributed derivative audio files. The in-game rules dialog, this license record, and the project README provide attribution.
 
-Before a commercial launch, the publisher should retain a copy of the source pages and review the current full license terms.
+Before a commercial launch, the publisher should retain the checkout receipt and review the current full license terms.

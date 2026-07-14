@@ -126,7 +126,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.14.0");
+  assert.equal(JSON.parse(packageJson).version, "2.15.0");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
@@ -156,27 +156,38 @@ test("generated bonus HUDs and unclipped winner state are wired for every world"
   assert.match(css, /data-game="astral"\] \.control-deck/);
 });
 
-test("all audio profiles provide distinct synthesized music motifs", async () => {
+test("all audio profiles provide distinct music identities", async () => {
   const audioEngine = await readFile(new URL("experience-engine.js", root), "utf8");
   assert.match(audioEngine, /playMusicStep\(\)/);
   assert.match(audioEngine, /startMusic\(\)/);
   assert.match(audioEngine, /restartMusic\(\)/);
+  assert.match(audioEngine, /wowAstralBackground/);
+  assert.match(audioEngine, /wowAstralBigWin/);
   for (const percussion of ["moonpulse", "bubble", "forge", "arena"]) {
     assert.match(audioEngine, new RegExp(`percussion: ["']${percussion}["']`));
   }
 });
 
-test("licensed Astral spin and win samples include source attribution", async () => {
-  const [spin, voice, licenses, audioEngine] = await Promise.all([
-    readFile(new URL("assets/audio/mixkit-slot-machine-random-wheel-1930.mp3", root)),
-    readFile(new URL("assets/audio/astral-you-win-mrstokes302.mp3", root)),
+test("licensed WOW Sound Astral layers include source attribution", async () => {
+  const paths = [
+    "assets/audio/wow-astral-background-safe-haven-loop.ogg",
+    "assets/audio/wow-astral-spin-start.ogg",
+    "assets/audio/wow-astral-reel-tick.ogg",
+    "assets/audio/wow-astral-victory-sting.ogg",
+    "assets/audio/wow-astral-big-win-cinematic.ogg"
+  ];
+  const [files, licensePdf, licenses, audioEngine, html] = await Promise.all([
+    Promise.all(paths.map((path) => readFile(new URL(path, root)))),
+    readFile(new URL("assets/audio/wow-sound-starter-pack-license.pdf", root)),
     readFile(new URL("assets/audio/LICENSES.md", root), "utf8"),
-    readFile(new URL("experience-engine.js", root), "utf8")
+    readFile(new URL("experience-engine.js", root), "utf8"),
+    readFile(new URL("index.html", root), "utf8")
   ]);
-  assert.ok(spin.length > 50_000);
-  assert.ok(voice.length > 50_000);
-  assert.match(licenses, /Pixabay Content License/);
-  assert.match(licenses, /Mixkit Sound Effects Free License/);
-  assert.match(audioEngine, /astralWinVoice/);
-  assert.match(audioEngine, /astralSpin/);
+  files.forEach((file) => assert.ok(file.length > 5_000));
+  assert.ok(licensePdf.length > 100_000);
+  assert.match(licenses, /WOW Sound Starter Pack/);
+  assert.match(licenses, /Creative Commons Attribution-NoDerivs 3\.0/);
+  assert.match(audioEngine, /ASTRAL_SAMPLE_LIBRARY/);
+  assert.match(audioEngine, /wowAstralVictory/);
+  assert.match(html, /Astral music and sound effects by[\s\S]*?WOW Sound/);
 });

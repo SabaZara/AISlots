@@ -89,6 +89,14 @@ export function audioProfileFor(gameId) {
   return AUDIO_PROFILES[gameId] ?? AUDIO_PROFILES.astral;
 }
 
+export const ASTRAL_SAMPLE_LIBRARY = Object.freeze({
+  background: "./assets/audio/wow-astral-background-safe-haven-loop.ogg",
+  spinStart: "./assets/audio/wow-astral-spin-start.ogg",
+  reelTick: "./assets/audio/wow-astral-reel-tick.ogg",
+  victory: "./assets/audio/wow-astral-victory-sting.ogg",
+  bigWin: "./assets/audio/wow-astral-big-win-cinematic.ogg"
+});
+
 export class SlotAudioEngine {
   constructor(getGameId) {
     this.getGameId = getGameId;
@@ -97,6 +105,8 @@ export class SlotAudioEngine {
     this.graph = null;
     this.spinVoice = null;
     this.spinSample = null;
+    this.musicSample = null;
+    this.celebrationSample = null;
     this.sampleBuffers = new Map();
     this.samplePromises = new Map();
     this.lastWinVoiceAt = 0;
@@ -112,6 +122,7 @@ export class SlotAudioEngine {
     this.enabled = enabled;
     if (!enabled) {
       this.stopSpinLoop({ immediate: true });
+      this.stopBigWin({ immediate: true });
       this.stopMusic();
     }
     if (enabled) {
@@ -203,13 +214,10 @@ export class SlotAudioEngine {
 
   preloadSamples() {
     if (!this.enabled) return Promise.resolve([]);
-    return Promise.all([
-      this.loadSample("astralSpin", "./assets/audio/mixkit-slot-machine-random-wheel-1930.mp3"),
-      this.loadSample("astralWinVoice", "./assets/audio/astral-you-win-mrstokes302.mp3")
-    ]);
+    return Promise.all(Object.entries(ASTRAL_SAMPLE_LIBRARY).map(([name, url]) => this.loadSample(`wowAstral${name[0].toUpperCase()}${name.slice(1)}`, url)));
   }
 
-  playSample(name, { volume = 0.2, rate = 1, pan = 0, wet = 0, spin = false } = {}) {
+  playSample(name, { volume = 0.2, rate = 1, pan = 0, wet = 0, spin = false, music = false, loop = false } = {}) {
     if (!this.enabled) return null;
     const context = this.ensure();
     const buffer = this.sampleBuffers.get(name);
@@ -221,9 +229,10 @@ export class SlotAudioEngine {
     const gain = context.createGain();
     source.buffer = buffer;
     source.playbackRate.value = rate;
+    source.loop = loop;
     gain.gain.value = volume;
     source.connect(gain);
-    this.connectVoice(gain, { pan, wet, spin });
+    this.connectVoice(gain, { pan, wet, spin, music });
     source.start();
     return { source, gain };
   }
@@ -367,6 +376,17 @@ export class SlotAudioEngine {
   startMusic() {
     this.stopMusic();
     if (!this.enabled || !this.ensure()) return;
+    if (this.getGameId() === "astral") {
+      const voice = this.playSample("wowAstralBackground", { volume: 0.3, wet: 0, music: true, loop: true });
+      if (voice) {
+        this.musicSample = voice;
+      } else {
+        void this.preloadSamples().then(() => {
+          if (this.enabled && this.getGameId() === "astral" && !this.musicSample) this.startMusic();
+        });
+      }
+      return;
+    }
     const music = this.profile().music;
     if (!music) return;
     this.musicStep = 0;
@@ -379,6 +399,11 @@ export class SlotAudioEngine {
     if (this.musicTimer !== null) window.clearInterval(this.musicTimer);
     this.musicTimer = null;
     this.musicStep = 0;
+    if (this.musicSample) {
+      const voice = this.musicSample;
+      this.musicSample = null;
+      try { voice.source.stop(); } catch { /* already stopped */ }
+    }
   }
 
   restartMusic() {
@@ -467,7 +492,7 @@ export class SlotAudioEngine {
     this.tone(profile.spinBase * 0.7, 0.26, { frequencyEnd: profile.spinBase * 1.25, volume: 0.055, filter: profile.spinFilter * 0.55, filterEnd: profile.spinFilter });
     this.startSpinLoop();
     if (this.getGameId() === "astral") {
-      this.spinSample = this.playSample("astralSpin", { volume: 0.3, spin: true });
+      this.spinSample = this.playSample("wowAstralSpinStart", { volume: 0.34, spin: true });
     }
   }
 
@@ -476,12 +501,21 @@ export class SlotAudioEngine {
     const now = Date.now();
     if (now - this.lastWinVoiceAt < 2800) return;
     this.lastWinVoiceAt = now;
-    this.playSample("astralWinVoice", { volume: 0.42, wet: 0.08 });
+    this.playSample("wowAstralVictory", { volume: 0.54, wet: 0.08 });
   }
 
   spinTick(tick) {
     this.updateSpin(tick);
     if (tick % 2 !== 0) return;
+    if (this.getGameId() === "astral") {
+      const sample = this.playSample("wowAstralReelTick", {
+        volume: 0.22,
+        pan: (tick % 10) / 5 - 1,
+        wet: 0.05,
+        spin: true
+      });
+      if (sample) return;
+    }
     const profile = this.profile();
     const note = profile.tickNotes[Math.floor(tick / 2) % profile.tickNotes.length];
     this.tone(note, 0.055, { volume: 0.018, pan: (tick % 10) / 5 - 1, wet: profile.wet * 0.65, filter: note * 2.4 });
@@ -491,6 +525,9 @@ export class SlotAudioEngine {
     const profile = this.profile();
     const pan = reelIndex / 2 - 1;
     const thud = this.getGameId() === "ember" || this.getGameId() === "ufc";
+    if (this.getGameId() === "astral") {
+      this.playSample("wowAstralReelTick", { volume: 0.3, pan, wet: 0.08 });
+    }
     this.noise(thud ? 0.15 : 0.09, { volume: thud ? 0.075 : 0.042, pan, wet: 0.08, frequency: thud ? 260 : 1450, frequencyEnd: thud ? 90 : 720, filterType: thud ? "lowpass" : "bandpass" });
     this.tone(profile.stopBase + reelIndex * (this.getGameId() === "astral" ? -58 : 18), thud ? 0.21 : 0.16, {
       volume: thud ? 0.075 : 0.055,
@@ -539,6 +576,39 @@ export class SlotAudioEngine {
         this.tone(profile.winBase * ratio, 0.5, { delay: run * 0.29 + index * 0.055, volume: 0.065, wet: profile.wet + 0.1, pan: index / 1.5 - 1 });
       });
     }
+  }
+
+  bigWin(tierId) {
+    this.winTier(tierId);
+    if (this.getGameId() !== "astral") return;
+    this.stopBigWin({ immediate: true });
+    const volume = { big: 0.42, mega: 0.5, epic: 0.58 }[tierId] ?? 0.42;
+    const voice = this.playSample("wowAstralBigWin", { volume, wet: 0.1 });
+    if (!voice) return;
+    this.celebrationSample = voice;
+    if (this.context && this.graph?.musicBus) {
+      this.graph.musicBus.gain.setTargetAtTime(0.18, this.context.currentTime, 0.08);
+    }
+    voice.source.onended = () => {
+      if (this.celebrationSample !== voice) return;
+      this.celebrationSample = null;
+      this.restoreMusicLevel();
+    };
+  }
+
+  restoreMusicLevel() {
+    if (!this.context || !this.graph?.musicBus) return;
+    this.graph.musicBus.gain.setTargetAtTime(0.72, this.context.currentTime, 0.12);
+  }
+
+  stopBigWin({ immediate = false } = {}) {
+    if (this.celebrationSample) {
+      const voice = this.celebrationSample;
+      this.celebrationSample = null;
+      if (this.context) voice.gain.gain.setTargetAtTime(0.0001, this.context.currentTime, immediate ? 0.004 : 0.08);
+      try { voice.source.stop(this.context ? this.context.currentTime + (immediate ? 0.02 : 0.16) : 0); } catch { /* already stopped */ }
+    }
+    this.restoreMusicLevel();
   }
 
   collect(count = 1) {

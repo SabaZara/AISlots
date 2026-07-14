@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { AUDIO_PROFILES, audioProfileFor } from "../experience-engine.js";
+import { ASTRAL_SAMPLE_LIBRARY, AUDIO_PROFILES, audioProfileFor } from "../experience-engine.js";
 
 test("all four games have distinct layered audio identities", () => {
   const ids = ["astral", "neon", "ember", "ufc"];
@@ -18,4 +18,10 @@ test("all four games have distinct layered audio identities", () => {
 
 test("unknown audio themes fall back safely to Astral", () => {
   assert.equal(audioProfileFor("missing"), AUDIO_PROFILES.astral);
+});
+
+test("Astral sample library separates all production audio roles", () => {
+  assert.deepEqual(Object.keys(ASTRAL_SAMPLE_LIBRARY), ["background", "spinStart", "reelTick", "victory", "bigWin"]);
+  Object.values(ASTRAL_SAMPLE_LIBRARY).forEach((path) => assert.match(path, /^\.\/assets\/audio\/wow-astral-.+\.ogg$/));
+  assert.equal(new Set(Object.values(ASTRAL_SAMPLE_LIBRARY)).size, 5);
 });

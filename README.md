@@ -42,7 +42,7 @@ The interface includes:
 - winning-symbol animation without drawn payline overlays;
 - larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
 - four distinct continuous spin-tick patterns plus themed reel-stop cues instead of one shared generic tick;
-- four original opt-in ambient music motifs—Astral lunar pulse, underwater pulse, forge ostinato, and arena rhythm—generated live by Web Audio rather than copied music;
+- opt-in licensed WOW Sound background music for Astral, plus original synthesized underwater, forge, and arena motifs for the other three worlds;
 - a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
 - synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
 - an Astral Bloom cinematic showcase with an original generated Moonwell guardian followed by a generated celestial balloon ascent: each balloon launches, rises through altitude rings while its X increases, bursts into a locked prize, and adds to the persistent total-X readout;
@@ -50,7 +50,7 @@ The interface includes:
 - Astral-only 25×, 50×, and 100× **Buy bonus** options using demo credits only; each deterministic purchase preserves 99.00% theoretical RTP and produces a commit/reveal receipt;
 - a graphic Moonwell feature market with concise Special Bet and Buy Bonus explanations, plus a generated balloon-ascent bonus with three player-launched flights and overall round progress;
 - an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, turbo timing, and visibly dancing winning symbols;
-- opt-in licensed Astral audio samples for the reel wheel and “you win” voice, with source and license records in `assets/audio/LICENSES.md`;
+- licensed WOW Sound Astral background, reel-start, reel-tick, victory, and cinematic big-win layers, with source and license records in `assets/audio/LICENSES.md`;
 - bet controls and a maximum-bet shortcut;
 - an Astral-only Autoplay dock below the main controls while the other games retain their original inline Autoplay placement;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;

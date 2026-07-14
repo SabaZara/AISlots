@@ -597,7 +597,7 @@ function playAnticipationSound() {
 }
 
 function playWinTierSound(tierId) {
-  audio.winTier(tierId);
+  audio.bigWin(tierId);
 }
 
 function setAnticipationUi(active, copy = currentGame().anticipationCopy) {
@@ -659,7 +659,7 @@ function animateCreditValue(element, amount, duration = 900, { sound = false, ti
     const start = performance.now();
     let lastSoundAt = -100;
     const draw = (now) => {
-      const progress = Math.min(1, (now - start) / duration);
+      const progress = Math.max(0, Math.min(1, (now - start) / duration));
       const eased = 1 - (1 - progress) ** 3;
       element.textContent = `${formatCredits(amount * eased)} CR`;
       if (sound && now - lastSoundAt >= 82) {
@@ -717,6 +717,7 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
     const close = () => {
       if (closed) return;
       closed = true;
+      audio.stopBigWin();
       ui.celebrationOverlay.classList.remove("is-entering", "is-counting", "is-resolved");
       ui.celebrationOverlay.hidden = true;
       ui.celebrationOverlay.setAttribute("aria-hidden", "true");
