@@ -43,6 +43,11 @@ The interface includes:
 - truthful natural near-miss traces for unmodified RNG results where two leftmost symbols connect and reel three breaks the line;
 - larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
 - four distinct continuous spin-tick patterns plus themed reel-stop cues instead of one shared generic tick;
+- a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, line-win cues, payout-count notes, and bonus reveal hits;
+- synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, sequential win-line nodes, staged bonus reveals, and multi-phase big-win scenes;
+- an Astral Bloom cinematic showcase inspired by the supplied production reference: an original generated Moonwell guardian, full-screen awakening transition, explicit three-free-spin award, falling-symbol bonus boards, cascade clears/refills, staged award counting, and a no-wager preview button for immediate review;
+- an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, turbo timing, and visibly dancing winning symbols;
+- opt-in licensed Astral audio samples for the reel wheel and “you win” voice, with source and license records in `assets/audio/LICENSES.md`;
 - bet controls and a maximum-bet shortcut;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;
 - balance, last win, session net, recent result details, and feature progression;
@@ -81,16 +86,22 @@ This static demo holds the unrevealed seed in browser memory. A real-money imple
 
 ## Original artwork
 
-The four project-bound background plates were generated with the built-in OpenAI image-generation tool, then converted to optimized 1672×941 JPEG assets:
+The project-bound world art was generated with the built-in OpenAI image-generation tool. Astral also includes three production PNG plates created for the new visual-first cabinet:
+
+- `assets/astral-cabinet-two-guardians-v1.png` — a wide reel cabinet flanked by an original moon-garden oracle and crystal-antler sentinel.
+- `assets/astral-bonus-chamber-v1.png` — a three-portal Moonwell bonus chamber.
+- `assets/astral-guardian-cinematic-v1.png` — the full-screen Moonwell awakening guardian.
+
+The four original background plates remain available as optimized 1672×941 JPEG assets:
 
 - `assets/astral-bloom-bg.jpg` — an enchanted celestial greenhouse with a calm central play area.
 - `assets/neon-tides-bg.jpg` — a bioluminescent underwater pearl treasury with shell architecture.
 - `assets/ember-crown-bg.jpg` — a monumental obsidian sky forge with molten channels and a crown furnace.
 - `assets/ufc-octagon-bg.jpg` — a cinematic logo-free mixed-martial-arts arena with an illuminated octagonal cage.
 
-Each game also has a dedicated transparent 1774×887 raster symbol sheet generated with the same built-in image tool:
+Each game also has a dedicated 1774×887 raster symbol sheet generated with the same built-in image tool:
 
-- `assets/symbols-astral-v3.png` — celestial orbs, comet, dewdrop, moonleaf, and Bloom.
+- `assets/symbols-astral-v4.png` — large high-contrast moonflower, orbit crystal, crown gem, comet lantern, dewdrop, leaf shield, and petal rosette icons.
 - `assets/symbols-neon-v2.png` — pearl, tide ring, starfish gem, coral spear, shell, and Pearl Key.
 - `assets/symbols-ember-v2.png` — sunsteel seal, forge ring, star anvil, ember spear, scale, and Crown Rune.
 - `assets/symbols-ufc-v2.png` — logo-free championship belt, octagon, event star, strike, clock, glove, and Fight Token.

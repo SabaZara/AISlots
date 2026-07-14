@@ -34,7 +34,7 @@ export const GAMES = {
     accent: "#6be4ff",
     secondary: "#a77cff",
     background: "./assets/astral-bloom-bg.jpg",
-    symbolSheet: "./assets/symbols-astral-v3.png",
+    symbolSheet: "./assets/symbols-astral-v4.png",
     actionLabel: "Bloom",
     lobbyTag: "Celestial collector",
     volatility: "Balanced",

@@ -6,7 +6,8 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="The Lumen Collection — four free-play slot games with published 99.00% theoretical RTP, including UFC Octagon Gold." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="preload" href="./assets/astral-bloom-bg.jpg" as="image" />
+    <link rel="preload" href="./assets/astral-cabinet-two-guardians-v1.png" as="image" />
+    <link rel="preload" href="./assets/symbols-astral-v4.png" as="image" />
     <link rel="stylesheet" href="./styles.css" />
     <title>The Lumen Collection · Four free-play slots</title>
   </head>
@@ -91,12 +92,19 @@
 
             <div class="reel-frame">
               <div class="reel-meta">
-                <span><i></i> 20 lines active</span>
-                <span id="reelCommitment">Next result locked</span>
+                <span><i></i> 20</span>
+                <span id="reelCommitment">RTP 99%</span>
               </div>
               <div class="reel-viewport">
                 <div class="reels" id="reels" aria-label="Five reels and four rows" aria-live="off"></div>
+                <div class="reel-speed-layer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="reel-impact-layer" id="reelImpactLayer" aria-hidden="true"></div>
                 <svg class="payline-overlay" id="paylineOverlay" viewBox="0 0 500 400" preserveAspectRatio="none" aria-hidden="true"></svg>
+                <div class="anticipation-callout" id="anticipationCallout" hidden aria-hidden="true">
+                  <span>Bonus</span>
+                  <strong id="anticipationCopy">Final reel in motion</strong>
+                  <i><b></b></i>
+                </div>
               </div>
               <div class="win-banner" id="winBanner" aria-hidden="true">
                 <span id="winBannerLabel">Celestial win</span>
@@ -106,26 +114,26 @@
               <div class="near-miss-banner" id="nearMissBanner" hidden aria-hidden="true">
                 <strong>One symbol short</strong>
                 <span id="nearMissCopy">Line connection stopped on reel 3.</span>
-                <small>Natural RNG result · no payout · frequency is not increased</small>
+                <small>Natural RNG</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">
                   <span class="status-spark" aria-hidden="true">✦</span>
                   <span>Collect Blooms. Reveal the Moonwell.</span>
                 </div>
-                <button class="text-button" id="lastWinButton" type="button" disabled>Last win details</button>
+                <button class="text-button" id="lastWinButton" type="button" aria-label="Open last win details" disabled><span aria-hidden="true">ⓘ</span></button>
               </div>
             </div>
 
             <div class="control-deck">
               <div class="bet-control">
-                <span class="control-label">Total bet</span>
+                <span class="control-label">Bet</span>
                 <div class="stepper">
                   <button id="betDown" type="button" aria-label="Decrease bet">−</button>
                   <strong><span id="betAmount">2.00</span><small> CR</small></strong>
                   <button id="betUp" type="button" aria-label="Increase bet">+</button>
                 </div>
-                <button class="mini-action" id="maxBetButton" type="button">Max bet</button>
+                <button class="mini-action" id="maxBetButton" type="button">MAX</button>
               </div>
 
               <button class="spin-button" id="spinButton" type="button" aria-label="Spin for 2 credits">
@@ -136,11 +144,14 @@
 
               <div class="win-panel">
                 <div class="win-readout">
-                  <span class="control-label">Last win</span>
+                  <span class="control-label">Win</span>
                   <strong><span id="lastWin">0.00</span><small> CR</small></strong>
                   <span id="lastMultiplier">—</span>
                 </div>
-                <button class="auto-button" id="autoButton" type="button" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span>Auto</span><strong>10 / 25 / 50</strong></button>
+                <div class="spin-options">
+                  <button class="turbo-button" id="turboButton" type="button" aria-label="Turn turbo spins on" aria-pressed="false"><span aria-hidden="true">⚡</span></button>
+                  <button class="auto-button" id="autoButton" type="button" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong></button>
+                </div>
               </div>
             </div>
             <div class="autoplay-menu" id="autoplayMenu" hidden>
@@ -156,7 +167,10 @@
                 <small id="lossLimitStatus">0.00 of 100.00 CR net loss</small>
               </div>
             </div>
-            <p class="keyboard-hint">Press <kbd>Space</kbd> to spin · Finite autoplay · Result shown for at least 2.5 seconds</p>
+            <div class="showcase-row">
+              <p class="keyboard-hint">Press <kbd>Space</kbd> to spin · Finite autoplay · Result shown for at least 2.5 seconds</p>
+              <button class="showcase-button" id="astralShowcaseButton" type="button"><span>✦</span> Preview</button>
+            </div>
           </section>
 
           <aside class="game-switcher glass-panel" aria-labelledby="collectionTitle">
@@ -307,6 +321,19 @@
       </section>
     </div>
 
+    <div class="cinematic-overlay" id="cinematicOverlay" hidden aria-hidden="true" data-phase="sleeping">
+      <div class="cinematic-guardian" aria-hidden="true"></div>
+      <div class="cinematic-vignette" aria-hidden="true"></div>
+      <div class="cinematic-energy" aria-hidden="true"><i></i><i></i><i></i></div>
+      <section class="cinematic-copy" role="status" aria-live="polite">
+        <span>Bonus</span>
+        <h2 id="cinematicTitle">The guardian awakens</h2>
+        <p id="cinematicCopy">Moonwell opening</p>
+        <strong id="cinematicAward">3 FREE SPINS</strong>
+        <small>Sealed result</small>
+      </section>
+    </div>
+
     <div class="bonus-overlay" id="bonusOverlay" hidden aria-hidden="true">
       <div class="bonus-scene" role="dialog" aria-modal="true" aria-labelledby="bonusTitle">
         <div class="bonus-rays" aria-hidden="true"></div>
@@ -317,10 +344,16 @@
           <span id="bonusMechanicName">Moonwell Free Spins</span>
           <strong id="bonusMechanicProgress">0 / 3</strong>
           <i><b id="bonusMechanicBar"></b></i>
-          <small>Outcome and prizes were sealed before this animation began.</small>
+          <small>Sealed result</small>
+        </div>
+        <div class="astral-bonus-stage" id="astralBonusStage" hidden>
+          <div class="astral-free-spin-head"><span id="astralFreeSpinLabel">1 / 3</span><strong id="astralCascadeLabel">Ready</strong></div>
+          <div class="astral-bonus-grid" id="astralBonusGrid" aria-label="Astral free-spin presentation"></div>
+          <div class="astral-round-award"><span>Win</span><strong id="astralRoundAward">0.00×</strong></div>
+          <small class="astral-presentation-note">Sealed result</small>
         </div>
         <div class="constellation-picks" id="constellationPicks"></div>
-        <div class="bonus-total"><span>Bonus win</span><strong id="bonusTotal">0.00 CR</strong></div>
+        <div class="bonus-total"><span id="bonusTotalLabel">Bonus win</span><strong id="bonusTotal">0.00 CR</strong></div>
         <button class="primary-button bonus-action" id="bonusAction" type="button">Reveal constellations</button>
       </div>
     </div>
@@ -328,8 +361,8 @@
     <div class="lobby-overlay" id="lobbyOverlay" aria-hidden="false">
       <section class="lobby-shell" role="dialog" aria-modal="true" aria-labelledby="lobbyTitle">
         <div class="lobby-heading">
-          <div><span class="eyebrow">The Lumen Collection · 18+</span><h2 id="lobbyTitle">Choose your slot.</h2></div>
-          <p>Four different worlds, four different feature rhythms. Choosing a game confirms you are 18+ and entering free play.</p>
+          <div><span class="eyebrow">18+ · Free play</span><h2 id="lobbyTitle">Choose a world</h2></div>
+          <p>Four slots · 99% RTP</p>
         </div>
         <div class="lobby-games" id="lobbyGames" aria-label="Available slot games"></div>
         <div class="lobby-foot"><span>99.00% theoretical RTP in every game</span><span>18+ · Free play · no cash value</span></div>

@@ -1,4 +1,5 @@
 import { randomSeed, sha256Hex } from "./fairness.js";
+import { SlotAudioEngine } from "./experience-engine.js";
 import {
   COLS,
   DEFAULT_GAME_ID,
@@ -31,6 +32,10 @@ const ui = {
   lastWin: $("lastWin"),
   lastMultiplier: $("lastMultiplier"),
   reels: $("reels"),
+  reelViewport: document.querySelector(".reel-viewport"),
+  reelImpactLayer: $("reelImpactLayer"),
+  anticipationCallout: $("anticipationCallout"),
+  anticipationCopy: $("anticipationCopy"),
   paylineOverlay: $("paylineOverlay"),
   nearMissBanner: $("nearMissBanner"),
   nearMissCopy: $("nearMissCopy"),
@@ -65,6 +70,7 @@ const ui = {
   bonusOverlay: $("bonusOverlay"),
   constellationPicks: $("constellationPicks"),
   bonusTotal: $("bonusTotal"),
+  bonusTotalLabel: $("bonusTotalLabel"),
   bonusAction: $("bonusAction"),
   bonusEyebrow: $("bonusEyebrow"),
   bonusCopy: $("bonusCopy"),
@@ -72,6 +78,7 @@ const ui = {
   bonusMechanicProgress: $("bonusMechanicProgress"),
   bonusMechanicBar: $("bonusMechanicBar"),
   autoButton: $("autoButton"),
+  turboButton: $("turboButton"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
   lobbyOverlay: $("lobbyOverlay"),
@@ -86,6 +93,16 @@ const ui = {
   celebrationGame: $("celebrationGame"),
   celebrationKicker: $("celebrationKicker"),
   celebrationCollect: $("celebrationCollect"),
+  cinematicOverlay: $("cinematicOverlay"),
+  cinematicTitle: $("cinematicTitle"),
+  cinematicCopy: $("cinematicCopy"),
+  cinematicAward: $("cinematicAward"),
+  astralShowcaseButton: $("astralShowcaseButton"),
+  astralBonusStage: $("astralBonusStage"),
+  astralBonusGrid: $("astralBonusGrid"),
+  astralFreeSpinLabel: $("astralFreeSpinLabel"),
+  astralCascadeLabel: $("astralCascadeLabel"),
+  astralRoundAward: $("astralRoundAward"),
   lossLimitSelect: $("lossLimitSelect"),
   lossLimitStatus: $("lossLimitStatus"),
   realityCheckDialog: $("realityCheckDialog"),
@@ -122,10 +139,12 @@ const state = {
   autoStopRequested: false,
   ageConfirmed: false,
   soundEnabled: false,
+  turboMode: false,
   lastOutcome: null,
-  lastReceipt: null,
-  audioContext: null
+  lastReceipt: null
 };
+
+const audio = new SlotAudioEngine(() => state.gameId);
 
 function currentGame() {
   return getGame(state.gameId);
@@ -144,6 +163,13 @@ function formatCredits(value) {
 
 function delay(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function jumpText(element) {
+  if (!element) return;
+  element.classList.remove("is-jumping");
+  void element.offsetWidth;
+  element.classList.add("is-jumping");
 }
 
 function formatElapsed(milliseconds) {
@@ -263,6 +289,8 @@ function renderGrid(grid, { shuffling = false, settling = false, winnerCells = n
       if (nearMiss?.breakCell === index) cell.classList.add("is-line-break");
       if (id === "petal") cell.classList.add("is-scatter");
       cell.dataset.symbol = id;
+      cell.dataset.col = String(col);
+      cell.dataset.row = String(row);
       cell.style.gridColumn = String(col + 1);
       cell.style.gridRow = String(row + 1);
       cell.style.setProperty("--delay", `${col * 65 + row * 22}ms`);
@@ -319,6 +347,7 @@ function renderGameStats() {
 
 function setStatus(message) {
   ui.resultStatus.lastElementChild.textContent = message;
+  jumpText(ui.resultStatus);
 }
 
 function updateUi() {
@@ -331,13 +360,18 @@ function updateUi() {
   ui.betUp.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.maxBetButton.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.spinButton.disabled = controlsLocked;
+  ui.astralShowcaseButton.disabled = controlsLocked || state.gameId !== "astral";
   ui.saveClientSeed.disabled = controlsLocked;
   ui.clientSeedInput.disabled = controlsLocked;
   ui.autoButton.disabled = state.isSpinning && !state.autoActive;
   ui.autoButton.classList.toggle("is-running", state.autoActive);
   ui.autoButton.innerHTML = state.autoActive
-    ? `<span>Stop autoplay</span><strong>${state.autoRemaining} left</strong>`
-    : `<span>Auto</span><strong>10 / 25 / 50</strong>`;
+    ? `<span aria-hidden="true">■</span><strong>${state.autoRemaining}</strong>`
+    : `<span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong>`;
+  ui.turboButton.classList.toggle("is-active", state.turboMode);
+  ui.turboButton.setAttribute("aria-pressed", String(state.turboMode));
+  ui.turboButton.setAttribute("aria-label", state.turboMode ? "Turn turbo spins off" : "Turn turbo spins on");
+  ui.turboButton.disabled = controlsLocked;
   document.querySelectorAll(".game-choice").forEach((button) => { button.disabled = controlsLocked; });
 
   const sign = state.sessionNet > 0 ? "+" : "";
@@ -420,7 +454,8 @@ function buildLobby() {
     button.className = `lobby-game lobby-game-${game.id}`;
     button.type = "button";
     button.dataset.lobbyGameId = game.id;
-    button.style.setProperty("--lobby-bg", `url("${game.background}")`);
+    const lobbyBackground = game.id === "astral" ? "./assets/astral-cabinet-two-guardians-v1.png" : game.background;
+    button.style.setProperty("--lobby-bg", `url("${lobbyBackground}")`);
     button.style.setProperty("--lobby-accent", game.accent);
     button.innerHTML = `
       <span class="lobby-game-art" aria-hidden="true"></span>
@@ -428,10 +463,9 @@ function buildLobby() {
       <span class="lobby-game-content">
         <span class="lobby-game-kicker">${game.lobbyTag}</span>
         <strong>${game.name}</strong>
-        <span class="lobby-game-copy">${game.lobbyCopy}</span>
-        <span class="lobby-game-meta"><b>${game.volatility} rhythm</b><i>${game.threshold} ${game.collectionPlural}</i><i>${game.bonusDraws} reveals</i></span>
-        <span class="lobby-game-won" data-lobby-won="${game.id}">0.00 CR won</span>
-        <span class="lobby-game-action">18+ · Play ${game.actionLabel} <b>→</b></span>
+        <span class="lobby-game-meta"><b>99%</b><i>${game.bonusDraws}× bonus</i></span>
+        <span class="lobby-game-won" data-lobby-won="${game.id}">0.00 CR</span>
+        <span class="lobby-game-action"><span>Play</span><b>→</b></span>
       </span>`;
     fragment.append(button);
   });
@@ -515,6 +549,10 @@ function switchGame(gameId) {
   state.lastOutcome = null;
   ui.lastWinButton.disabled = true;
   ui.winBanner.classList.remove("is-visible");
+  audio.stopSpinLoop({ immediate: true });
+  setAnticipationUi(false);
+  ui.reelViewport.classList.remove("is-spinning", "is-stopping");
+  ui.reelImpactLayer.replaceChildren();
   renderPaylineOverlay();
   ui.nearMissBanner.hidden = true;
   ui.nearMissBanner.classList.remove("is-visible");
@@ -557,7 +595,9 @@ function renderPaylineOverlay(outcome = null, nearMiss = null) {
   const winLines = outcome.wins.slice(0, 6).map((win, index) => {
     const rows = PAYLINES[win.line - 1];
     const color = palette[index % palette.length];
-    return `<polyline class="payline-shadow" points="${paylinePoints(rows)}"></polyline><polyline class="payline-win" style="--line-color:${color}" points="${paylinePoints(rows, win.count)}"></polyline><text class="payline-label" x="${Math.min(win.count * 100 - 42, 458)}" y="${rows[Math.min(win.count - 1, rows.length - 1)] * 100 + 42}">L${win.line}</text>`;
+    const lineDelay = index * 240;
+    const nodes = rows.slice(0, win.count).map((row, col) => `<circle class="payline-win-node" style="--line-color:${color};--line-delay:${lineDelay}ms" cx="${col * 100 + 50}" cy="${row * 100 + 50}" r="8"></circle>`).join("");
+    return `<polyline class="payline-shadow" style="--line-delay:${lineDelay}ms" points="${paylinePoints(rows, win.count)}"></polyline><polyline class="payline-win" style="--line-color:${color};--line-delay:${lineDelay}ms" points="${paylinePoints(rows, win.count)}"></polyline>${nodes}<text class="payline-label" style="--line-delay:${lineDelay}ms" x="${Math.min(win.count * 100 - 42, 440)}" y="${rows[Math.min(win.count - 1, rows.length - 1)] * 100 + 42}">L${win.line} · ${formatCredits(win.amount)} CR</text>`;
   }).join("");
   let nearLine = "";
   if (nearMiss) {
@@ -583,142 +623,81 @@ function showNaturalNearMiss(nearMiss) {
 }
 
 function playTone(frequency, duration = 0.12, type = "sine", delaySeconds = 0) {
-  if (!state.soundEnabled) return;
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-  state.audioContext ??= new AudioContext();
-  const context = state.audioContext;
-  if (context.state === "suspended") void context.resume();
-  const start = context.currentTime + delaySeconds;
-  const oscillator = context.createOscillator();
-  const gain = context.createGain();
-  oscillator.type = type;
-  oscillator.frequency.setValueAtTime(frequency, start);
-  gain.gain.setValueAtTime(0.0001, start);
-  gain.gain.exponentialRampToValueAtTime(0.12, start + 0.015);
-  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-  oscillator.connect(gain).connect(context.destination);
-  oscillator.start(start);
-  oscillator.stop(start + duration + 0.02);
+  audio.tone(frequency, duration, { type, delay: delaySeconds });
 }
 
 function playWinChord() {
-  const chords = {
-    astral: [523.25, 659.25, 783.99, 1046.5],
-    neon: [392, 523.25, 659.25, 987.77],
-    ember: [220, 329.63, 440, 659.25],
-    ufc: [196, 293.66, 392, 587.33]
-  };
-  chords[state.gameId].forEach((frequency, index) => playTone(frequency, 0.4, index % 2 ? "triangle" : "sine", index * 0.075));
+  audio.lineWin(0, 8);
+  window.setTimeout(() => audio.lineWin(1, 14), 90);
 }
 
 function playNoise(duration = 0.22, volume = 0.05) {
-  if (!state.soundEnabled) return;
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-  state.audioContext ??= new AudioContext();
-  const context = state.audioContext;
-  if (context.state === "suspended") void context.resume();
-  const frameCount = Math.floor(context.sampleRate * duration);
-  const buffer = context.createBuffer(1, frameCount, context.sampleRate);
-  const channel = buffer.getChannelData(0);
-  for (let index = 0; index < frameCount; index += 1) channel[index] = (Math.random() * 2 - 1) * (1 - index / frameCount);
-  const source = context.createBufferSource();
-  const filter = context.createBiquadFilter();
-  const gain = context.createGain();
-  filter.type = state.gameId === "neon" ? "lowpass" : state.gameId === "ufc" ? "highpass" : "bandpass";
-  filter.frequency.value = state.gameId === "ember" ? 520 : state.gameId === "ufc" ? 850 : 1100;
-  gain.gain.value = volume;
-  source.buffer = buffer;
-  source.connect(filter).connect(gain).connect(context.destination);
-  source.start();
+  audio.noise(duration, { volume });
 }
 
 function playSpinSound() {
-  const settings = {
-    astral: { roots: [230, 285, 350], type: "triangle", noise: .04 },
-    neon: { roots: [160, 205, 265], type: "sine", noise: .035 },
-    ember: { roots: [92, 118, 146], type: "sawtooth", noise: .075 },
-    ufc: { roots: [145, 218, 290], type: "square", noise: .055 }
-  }[state.gameId];
-  playNoise(.32, settings.noise);
-  settings.roots.forEach((frequency, index) => playTone(frequency, .22, settings.type, index * .055));
+  audio.spinStart();
 }
 
 function playSpinTick(tick) {
-  if (state.gameId === "astral") {
-    const notes = [523.25, 659.25, 783.99, 987.77];
-    playTone(notes[tick % notes.length], .07, "triangle");
-  } else if (state.gameId === "neon") {
-    playTone(170 + tick % 5 * 18, .085, "sine");
-    if (tick % 2 === 0) playTone(620 + tick % 4 * 55, .055, "sine", .025);
-  } else if (state.gameId === "ember") {
-    playTone(76 + tick % 3 * 11, .11, "sawtooth");
-    if (tick % 2 === 0) playNoise(.055, .024);
-  } else {
-    playTone(tick % 4 === 3 ? 720 : 135 + tick % 3 * 24, tick % 4 === 3 ? .13 : .065, tick % 4 === 3 ? "triangle" : "square");
-  }
+  audio.spinTick(tick);
 }
 
 function playNearMissCue() {
-  const roots = { astral: 440, neon: 360, ember: 220, ufc: 300 };
-  const type = state.gameId === "ember" ? "sawtooth" : state.gameId === "ufc" ? "square" : "triangle";
-  [1, .82, .64].forEach((ratio, index) => playTone(roots[state.gameId] * ratio, .16, type, index * .12));
+  audio.nearMiss();
 }
 
 function playCollectSound(count = 1) {
-  for (let index = 0; index < Math.min(count, 5); index += 1) {
-    playTone(680 + index * 115, .26, ["ember", "ufc"].includes(state.gameId) ? "square" : "sine", index * .07);
-  }
+  audio.collect(count);
 }
 
 function playGameChangeSound() {
-  [330, 494, 740].forEach((frequency, index) => playTone(frequency, .24, "sine", index * .055));
+  audio.gameChange();
 }
 
 function playBonusSting() {
-  const stings = {
-    astral: { notes: [261.63, 392, 523.25, 783.99, 1046.5], type: "triangle" },
-    neon: { notes: [196, 293.66, 440, 659.25, 987.77], type: "sine" },
-    ember: { notes: [110, 164.81, 220, 329.63, 440], type: "sawtooth" },
-    ufc: { notes: [220, 440, 880, 660, 990], type: "square" }
-  }[state.gameId];
-  playNoise(.5, .085);
-  stings.notes.forEach((frequency, index) => playTone(frequency, .58, stings.type, index * .075));
+  audio.bonusStart();
 }
 
 function playReelStopSound(reelIndex) {
-  if (state.gameId === "astral") {
-    playTone(880 - reelIndex * 65, .18, "triangle");
-  } else if (state.gameId === "neon") {
-    playTone(310 + reelIndex * 42, .2, "sine");
-    playTone(620 + reelIndex * 55, .09, "sine", .03);
-  } else if (state.gameId === "ember") {
-    playNoise(.1, .035);
-    playTone(82 + reelIndex * 8, .2, "sawtooth");
-  } else {
-    playTone(reelIndex === 4 ? 880 : 180 + reelIndex * 24, reelIndex === 4 ? .42 : .13, reelIndex === 4 ? "sine" : "square");
-  }
+  audio.reelStop(reelIndex, reelIndex === COLS - 1);
 }
 
 function playAnticipationSound() {
-  const roots = { astral: 420, neon: 330, ember: 150, ufc: 220 };
-  const types = { astral: "triangle", neon: "sine", ember: "sawtooth", ufc: "square" };
-  for (let index = 0; index < 5; index += 1) {
-    playTone(roots[state.gameId] * (1 + index * .17), .22, types[state.gameId], index * .12);
-  }
+  audio.anticipation();
 }
 
 function playWinTierSound(tierId) {
-  const strength = { big: 1, mega: 2, epic: 3 }[tierId] ?? 0;
-  if (!strength) return;
-  playNoise(.35 + strength * .12, .055 + strength * .018);
-  const base = { astral: 392, neon: 329.63, ember: 164.81, ufc: 220 }[state.gameId];
-  for (let run = 0; run <= strength; run += 1) {
-    [1, 1.25, 1.5, 2].forEach((ratio, index) => {
-      playTone(base * ratio, .45, state.gameId === "ember" ? "sawtooth" : state.gameId === "ufc" ? "square" : "triangle", run * .28 + index * .055);
-    });
-  }
+  audio.winTier(tierId);
+}
+
+function setAnticipationUi(active, copy = currentGame().anticipationCopy) {
+  ui.reels.classList.toggle("is-anticipating", active);
+  ui.reelViewport.classList.toggle("is-anticipating", active);
+  ui.anticipationCallout.hidden = !active;
+  ui.anticipationCallout.setAttribute("aria-hidden", String(!active));
+  ui.anticipationCopy.textContent = copy;
+}
+
+function flashReelStop(reelIndex, { collector = false, final = false } = {}) {
+  const impact = document.createElement("span");
+  impact.className = `reel-impact${collector ? " is-collector" : ""}${final ? " is-final" : ""}`;
+  impact.style.setProperty("--impact-left", `${(reelIndex + .5) / COLS * 100}%`);
+  impact.innerHTML = "<i></i><b></b><em></em>";
+  ui.reelImpactLayer.append(impact);
+  const machine = document.querySelector(".machine");
+  machine?.style.setProperty("--impact-direction", reelIndex % 2 ? "-1" : "1");
+  machine?.classList.remove("is-reel-impact");
+  void machine?.offsetWidth;
+  machine?.classList.add("is-reel-impact");
+  window.setTimeout(() => impact.remove(), 920);
+  window.setTimeout(() => machine?.classList.remove("is-reel-impact"), 260);
+}
+
+function sequenceLineWinSounds(outcome, bet) {
+  outcome.wins.slice(0, 6).forEach((win, index) => {
+    window.setTimeout(() => audio.lineWin(index, win.amount / bet), 220 + index * 240);
+  });
 }
 
 function burstParticles(count = 18, intensity = 1) {
@@ -728,28 +707,36 @@ function burstParticles(count = 18, intensity = 1) {
     const particle = document.createElement("span");
     const angle = Math.random() * Math.PI * 2;
     const distance = (70 + Math.random() * 170) * intensity;
-    particle.className = index % 4 === 0 ? "fx-particle is-star" : "fx-particle";
+    particle.className = index % 7 === 0 ? "fx-particle is-coin" : index % 4 === 0 ? "fx-particle is-star" : "fx-particle is-spark";
     particle.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
     particle.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
+    particle.style.setProperty("--fall", `${45 + Math.random() * 130}px`);
     particle.style.setProperty("--c", colors[index % colors.length]);
     particle.style.setProperty("--r", `${Math.random() * 320}deg`);
+    particle.style.setProperty("--scale", `${.65 + Math.random() * .9}`);
     particle.style.animationDelay = `${Math.random() * 110}ms`;
+    particle.style.animationDuration = `${820 + Math.random() * 520}ms`;
     layer.append(particle);
-    window.setTimeout(() => particle.remove(), 1200);
+    window.setTimeout(() => particle.remove(), 1650);
   }
 }
 
-function animateCreditValue(element, amount, duration = 900) {
+function animateCreditValue(element, amount, duration = 900, { sound = false, tierId = "nice" } = {}) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || duration <= 0) {
     element.textContent = `${formatCredits(amount)} CR`;
     return Promise.resolve();
   }
   return new Promise((resolve) => {
     const start = performance.now();
+    let lastSoundAt = -100;
     const draw = (now) => {
       const progress = Math.min(1, (now - start) / duration);
       const eased = 1 - (1 - progress) ** 3;
       element.textContent = `${formatCredits(amount * eased)} CR`;
+      if (sound && now - lastSoundAt >= 82) {
+        lastSoundAt = now;
+        audio.payoutTick(eased, tierId);
+      }
       if (progress < 1) window.requestAnimationFrame(draw);
       else resolve();
     };
@@ -764,7 +751,11 @@ function showWinBanner(amount, bet) {
   ui.winBannerMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
   ui.winBannerAmount.textContent = "0.00 CR";
   ui.winBanner.classList.add("is-visible");
-  void animateCreditValue(ui.winBannerAmount, amount, tier.id === "nice" ? 1050 : 720);
+  jumpText(ui.winBannerLabel);
+  jumpText(ui.winBannerAmount);
+  audio.winVoice();
+  void animateCreditValue(ui.winBannerAmount, amount, tier.id === "nice" ? 1050 : 720, { sound: true, tierId: tier.id })
+    .then(() => jumpText(ui.winBannerAmount));
   window.setTimeout(() => ui.winBanner.classList.remove("is-visible"), tier.id === "nice" ? 2100 : 1650);
 }
 
@@ -777,6 +768,7 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
     const close = () => {
       if (closed) return;
       closed = true;
+      ui.celebrationOverlay.classList.remove("is-entering", "is-counting", "is-resolved");
       ui.celebrationOverlay.hidden = true;
       ui.celebrationOverlay.setAttribute("aria-hidden", "true");
       $("appShell").inert = false;
@@ -793,24 +785,52 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
     ui.celebrationCollect.onclick = close;
     ui.celebrationOverlay.hidden = false;
     ui.celebrationOverlay.setAttribute("aria-hidden", "false");
+    ui.celebrationOverlay.classList.add("is-entering");
     $("appShell").inert = true;
     ui.celebrationCollect.focus();
     playWinTierSound(tier.id);
     burstParticles(tier.id === "epic" ? 90 : tier.id === "mega" ? 68 : 50, tier.id === "epic" ? 1.8 : 1.4);
-    void animateCreditValue(ui.celebrationAmount, amount, tier.id === "epic" ? 2600 : tier.id === "mega" ? 2100 : 1600);
+    window.setTimeout(() => {
+      ui.celebrationOverlay.classList.remove("is-entering");
+      ui.celebrationOverlay.classList.add("is-counting");
+    }, 540);
+    void animateCreditValue(ui.celebrationAmount, amount, tier.id === "epic" ? 2600 : tier.id === "mega" ? 2100 : 1600, { sound: true, tierId: tier.id }).then(() => {
+      if (closed) return;
+      ui.celebrationOverlay.classList.remove("is-counting");
+      ui.celebrationOverlay.classList.add("is-resolved");
+      burstParticles(tier.id === "epic" ? 60 : 36, tier.id === "epic" ? 1.6 : 1.15);
+      audio.lineWin(2, amount / bet);
+    });
     if (autoAdvance) window.setTimeout(close, tier.id === "epic" ? 3200 : 2600);
   });
 }
 
 async function settleOutcome(outcome, nearMiss = null) {
   const game = currentGame();
-  ui.reels.classList.remove("is-anticipating");
-  renderGrid(outcome.grid, { settling: true, winnerCells: winningCells(outcome), nearMiss });
-  renderPaylineOverlay(outcome, nearMiss);
-  for (let reel = 0; reel < COLS; reel += 1) {
-    window.setTimeout(() => playReelStopSound(reel), reel * game.reelStopGap);
+  setAnticipationUi(false);
+  audio.stopSpinLoop();
+  ui.reelViewport.classList.remove("is-spinning");
+  ui.reelViewport.classList.add("is-stopping");
+  if (state.gameId === "astral") {
+    ui.reels.classList.add("is-board-clearing");
+    await cinematicDelay(280);
   }
-  await delay(game.reelStopGap * (COLS - 1) + 800);
+  renderGrid(outcome.grid, { settling: true, winnerCells: winningCells(outcome), nearMiss });
+  ui.reels.classList.remove("is-board-clearing");
+  if (state.gameId === "astral") ui.reels.classList.add("is-cinematic-drop");
+  renderPaylineOverlay();
+  for (let reel = 0; reel < COLS; reel += 1) {
+    const collector = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).includes("petal");
+    window.setTimeout(() => {
+      playReelStopSound(reel);
+      flashReelStop(reel, { collector, final: reel === COLS - 1 });
+    }, reel * game.reelStopGap);
+  }
+  await delay(game.reelStopGap * (COLS - 1) + 620);
+  ui.reels.classList.remove("is-cinematic-drop");
+  ui.reelViewport.classList.remove("is-stopping");
+  renderPaylineOverlay(outcome, nearMiss);
+  sequenceLineWinSounds(outcome, BET_OPTIONS[state.betIndex]);
 }
 
 function receiptOutcomeLabel(outcome) {
@@ -902,11 +922,199 @@ function renderWinDetails() {
   ui.winDetailsContent.innerHTML = `<div class="win-summary"><div><span>${game.name} total</span><strong>${formatCredits(outcome.totalWin)} CR</strong></div><div><span>${game.collectionPlural} landed</span><strong>${outcome.collectorCount}</strong></div></div><div class="win-line-list">${lines}${bonus}</div>`;
 }
 
-function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
+function cinematicDelay(milliseconds) {
+  return delay(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? Math.min(80, milliseconds) : milliseconds);
+}
+
+async function runAstralCinematicTransition({ preview = false } = {}) {
+  ui.cinematicOverlay.dataset.phase = "sleeping";
+  ui.cinematicTitle.textContent = preview ? "Preview" : "Awaken";
+  ui.cinematicCopy.textContent = preview ? "No wager" : "Moonwell opening";
+  ui.cinematicAward.textContent = preview ? "SHOWCASE" : "3 SPINS";
+  ui.cinematicOverlay.hidden = false;
+  ui.cinematicOverlay.setAttribute("aria-hidden", "false");
+  $("appShell").inert = true;
+  audio.bonusStart();
+  await cinematicDelay(120);
+  ui.cinematicOverlay.dataset.phase = "emerging";
+  await cinematicDelay(1050);
+  ui.cinematicOverlay.dataset.phase = "awakened";
+  ui.cinematicTitle.textContent = "Moonwell";
+  ui.cinematicCopy.textContent = preview ? "No payout" : "Sealed prizes";
+  ui.cinematicAward.textContent = "3 SPINS";
+  jumpText(ui.cinematicTitle);
+  jumpText(ui.cinematicAward);
+  burstParticles(70, 1.65);
+  audio.winTier("big");
+  await cinematicDelay(1450);
+  ui.cinematicOverlay.dataset.phase = "departing";
+  await cinematicDelay(520);
+  ui.cinematicOverlay.hidden = true;
+  ui.cinematicOverlay.setAttribute("aria-hidden", "true");
+  $("appShell").inert = false;
+}
+
+function astralBonusLayout(roundIndex, variant = 0) {
+  const ids = ["luma", "orbit", "nova", "comet", "dew", "leaf"];
+  return Array.from({ length: COLS * ROWS }, (_, index) => {
+    const col = Math.floor(index / ROWS);
+    const row = index % ROWS;
+    return ids[(index * 3 + col + roundIndex * 2 + variant * 5 + row) % ids.length];
+  });
+}
+
+function astralCascadeCells(roundIndex) {
+  const patterns = [
+    [0, 5, 10, 15],
+    [3, 6, 9, 12, 15],
+    [1, 4, 7, 10, 13, 16]
+  ];
+  return patterns[roundIndex % patterns.length];
+}
+
+function renderAstralBonusGrid(roundIndex, variant = 0) {
+  const fragment = document.createDocumentFragment();
+  const layout = astralBonusLayout(roundIndex, variant);
+  layout.forEach((symbolId, index) => {
+    const col = Math.floor(index / ROWS);
+    const row = index % ROWS;
+    const cell = document.createElement("div");
+    const symbolName = currentSymbols().find((symbol) => symbol.id === symbolId)?.name ?? symbolId;
+    cell.className = "astral-bonus-cell is-dropping";
+    cell.dataset.symbol = symbolId;
+    cell.dataset.index = String(index);
+    cell.style.setProperty("--drop-delay", `${col * 85 + row * 42}ms`);
+    cell.style.gridColumn = String(col + 1);
+    cell.style.gridRow = String(row + 1);
+    cell.setAttribute("aria-label", symbolName);
+    cell.innerHTML = symbolGraphic(symbolId);
+    fragment.append(cell);
+  });
+  ui.astralBonusGrid.replaceChildren(fragment);
+}
+
+async function playAstralFreeSpin(roundIndex, multiplier, bet, multiplierTotal) {
+  ui.astralFreeSpinLabel.textContent = `${roundIndex + 1} / 3`;
+  ui.astralCascadeLabel.textContent = "↓";
+  ui.astralRoundAward.textContent = "0.00×";
+  ui.astralBonusGrid.classList.remove("is-cascade-impact", "is-refilling");
+  ui.astralBonusGrid.classList.add("is-clearing-board");
+  await cinematicDelay(roundIndex === 0 ? 120 : 360);
+  renderAstralBonusGrid(roundIndex, 0);
+  ui.astralBonusGrid.classList.remove("is-clearing-board");
+  await cinematicDelay(920);
+
+  const winningIndexes = astralCascadeCells(roundIndex);
+  ui.astralCascadeLabel.textContent = `${multiplier.toFixed(2)}×`;
+  jumpText(ui.astralCascadeLabel);
+  winningIndexes.forEach((index) => ui.astralBonusGrid.querySelector(`[data-index="${index}"]`)?.classList.add("is-cascade-win"));
+  ui.astralBonusGrid.classList.add("is-cascade-impact");
+  audio.bonusReveal(roundIndex, multiplier);
+  burstParticles(22, .78);
+  await cinematicDelay(620);
+
+  winningIndexes.forEach((index) => ui.astralBonusGrid.querySelector(`[data-index="${index}"]`)?.classList.add("is-clearing"));
+  await cinematicDelay(430);
+  ui.astralBonusGrid.classList.remove("is-cascade-impact");
+  ui.astralBonusGrid.classList.add("is-refilling");
+  const refill = astralBonusLayout(roundIndex, 1);
+  winningIndexes.forEach((index, refillIndex) => {
+    const cell = ui.astralBonusGrid.querySelector(`[data-index="${index}"]`);
+    if (!cell) return;
+    const symbolId = refill[(index + refillIndex) % refill.length];
+    cell.className = "astral-bonus-cell is-refill";
+    cell.dataset.symbol = symbolId;
+    cell.innerHTML = symbolGraphic(symbolId);
+  });
+  await cinematicDelay(650);
+  ui.astralRoundAward.textContent = `${multiplier.toFixed(2)}×`;
+  jumpText(ui.astralRoundAward);
+  ui.bonusMechanicProgress.textContent = `${roundIndex + 1} / 3`;
+  ui.bonusMechanicBar.style.width = `${(roundIndex + 1) / 3 * 100}%`;
+  void animateCreditValue(ui.bonusTotal, multiplierTotal * bet, 520, { sound: true, tierId: multiplier >= 5 ? "big" : "nice" });
+  await cinematicDelay(620);
+}
+
+async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview = false } = {}) {
+  const picks = bonusRounds.flat().slice(0, 3);
+  await runAstralCinematicTransition({ preview });
+  return new Promise((resolve) => {
+    ui.bonusOverlay.dataset.mode = "cinematic-free-spins";
+    ui.bonusEyebrow.textContent = preview ? "Preview" : "Bonus";
+    $("bonusTitle").textContent = "Moonwell";
+    ui.bonusCopy.textContent = preview ? "No wager · no payout" : "3 sealed spins";
+    ui.bonusTotalLabel.textContent = preview ? "Preview" : "Win";
+    ui.bonusTotal.textContent = "0.00 CR";
+    ui.bonusMechanicName.textContent = "3 Spins";
+    ui.bonusMechanicProgress.textContent = `0 / ${picks.length}`;
+    ui.bonusMechanicBar.style.width = "0%";
+    ui.astralBonusStage.hidden = false;
+    ui.constellationPicks.hidden = true;
+    ui.constellationPicks.replaceChildren();
+    ui.bonusAction.textContent = preview ? "Start" : `Start ${picks.length}`;
+    ui.bonusAction.disabled = false;
+    ui.bonusOverlay.hidden = false;
+    ui.bonusOverlay.setAttribute("aria-hidden", "false");
+    ui.bonusOverlay.classList.remove("is-playing", "is-resolved");
+    ui.bonusOverlay.classList.add("is-entering");
+    $("appShell").inert = true;
+    ui.bonusAction.focus();
+    let completed = false;
+
+    const close = () => {
+      ui.bonusOverlay.classList.remove("is-entering", "is-playing", "is-resolved");
+      ui.bonusOverlay.hidden = true;
+      ui.bonusOverlay.setAttribute("aria-hidden", "true");
+      ui.astralBonusStage.hidden = true;
+      ui.constellationPicks.hidden = false;
+      $("appShell").inert = false;
+      resolve();
+    };
+
+    ui.bonusAction.onclick = async () => {
+      if (completed) {
+        close();
+        return;
+      }
+      completed = true;
+      ui.bonusOverlay.classList.remove("is-entering");
+      ui.bonusOverlay.classList.add("is-playing");
+      ui.bonusAction.disabled = true;
+      let multiplierTotal = 0;
+      for (let index = 0; index < picks.length; index += 1) {
+        multiplierTotal += picks[index];
+        await playAstralFreeSpin(index, picks[index], bet, multiplierTotal);
+      }
+      ui.bonusOverlay.classList.remove("is-playing");
+      ui.bonusOverlay.classList.add("is-resolved");
+      ui.astralCascadeLabel.textContent = preview ? "Done" : "Complete";
+      jumpText(ui.astralCascadeLabel);
+      playWinChord();
+      burstParticles(54, 1.45);
+      ui.bonusAction.textContent = preview ? "Close" : `+${formatCredits(multiplierTotal * bet)} CR`;
+      ui.bonusAction.disabled = false;
+      ui.bonusAction.focus();
+    };
+
+    if (autoAdvance) {
+      void (async () => {
+        await cinematicDelay(650);
+        await ui.bonusAction.onclick();
+        await cinematicDelay(900);
+        await ui.bonusAction.onclick();
+      })();
+    }
+  });
+}
+
+function showCardBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
   return new Promise((resolve) => {
     const game = currentGame();
     const picks = bonusRounds.flat();
     ui.bonusOverlay.dataset.mode = game.bonusMode;
+    ui.astralBonusStage.hidden = true;
+    ui.constellationPicks.hidden = false;
+    ui.bonusTotalLabel.textContent = "Bonus win";
     ui.constellationPicks.replaceChildren();
     ui.bonusTotal.textContent = "0.00 CR";
     ui.bonusMechanicName.textContent = game.bonusMechanicName;
@@ -924,6 +1132,8 @@ function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
 
     ui.bonusOverlay.hidden = false;
     ui.bonusOverlay.setAttribute("aria-hidden", "false");
+    ui.bonusOverlay.classList.remove("is-playing", "is-resolved");
+    ui.bonusOverlay.classList.add("is-entering");
     $("appShell").inert = true;
     ui.bonusAction.focus();
     playBonusSting();
@@ -932,6 +1142,7 @@ function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
 
     ui.bonusAction.onclick = async () => {
       if (revealed) {
+        ui.bonusOverlay.classList.remove("is-entering", "is-playing", "is-resolved");
         ui.bonusOverlay.hidden = true;
         ui.bonusOverlay.setAttribute("aria-hidden", "true");
         $("appShell").inert = false;
@@ -940,6 +1151,8 @@ function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
       }
 
       revealed = true;
+      ui.bonusOverlay.classList.remove("is-entering");
+      ui.bonusOverlay.classList.add("is-playing");
       ui.bonusAction.disabled = true;
       let multiplierTotal = 0;
       const cards = Array.from(ui.constellationPicks.children);
@@ -947,14 +1160,21 @@ function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
         await delay(index === 0 ? 160 : 430);
         multiplierTotal += picks[index];
         cards[index].classList.add("is-revealed");
+        const bonusScene = ui.bonusOverlay.querySelector(".bonus-scene");
+        bonusScene.classList.remove("is-bonus-impact");
+        void bonusScene.offsetWidth;
+        bonusScene.classList.add("is-bonus-impact");
         ui.bonusMechanicProgress.textContent = `${index + 1} / ${picks.length} · ${game.bonusProgressLabel}`;
         ui.bonusMechanicBar.style.width = `${(index + 1) / picks.length * 100}%`;
-        ui.bonusTotal.textContent = `${formatCredits(multiplierTotal * bet)} CR`;
-        playTone(480 + index * 105, 0.35, ["ember", "ufc"].includes(state.gameId) ? "square" : "sine");
-        burstParticles(7, .55);
+        void animateCreditValue(ui.bonusTotal, multiplierTotal * bet, 320);
+        audio.bonusReveal(index, picks[index]);
+        burstParticles(12, .68);
       }
       await delay(300);
       playWinChord();
+      ui.bonusOverlay.classList.remove("is-playing");
+      ui.bonusOverlay.classList.add("is-resolved");
+      burstParticles(34, 1.15);
       ui.bonusAction.textContent = `Collect ${formatCredits(multiplierTotal * bet)} CR`;
       ui.bonusAction.disabled = false;
       ui.bonusAction.focus();
@@ -969,6 +1189,29 @@ function showBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
       })();
     }
   });
+}
+
+function showBonus(bonusRounds, bet, options = {}) {
+  return state.gameId === "astral"
+    ? showAstralBonus(bonusRounds, bet, options)
+    : showCardBonus(bonusRounds, bet, options);
+}
+
+async function runAstralShowcasePreview() {
+  if (state.gameId !== "astral" || state.isSpinning || state.autoActive || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
+  state.isSpinning = true;
+  ui.astralShowcaseButton.disabled = true;
+  updateUi();
+  setStatus(state.soundEnabled ? "Astral cinematic preview · no wager · no payout" : "Astral cinematic preview · turn sound on afterward to hear the full mix");
+  try {
+    await showAstralBonus([[0.5, 1, 3]], 1, { autoAdvance: true, preview: true });
+    setStatus("Astral cinematic preview complete · no credits or feature progress changed");
+  } finally {
+    state.isSpinning = false;
+    ui.astralShowcaseButton.disabled = false;
+    updateUi();
+    ui.astralShowcaseButton.focus();
+  }
 }
 
 async function spin({ fromAuto = false } = {}) {
@@ -995,7 +1238,9 @@ async function spin({ fromAuto = false } = {}) {
   state.sessionWagered += bet;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
-  ui.reels.classList.remove("is-anticipating");
+  setAnticipationUi(false);
+  ui.reelViewport.classList.remove("is-stopping");
+  ui.reelViewport.classList.add("is-spinning");
   ui.winBanner.classList.remove("is-visible");
   renderPaylineOverlay();
   ui.nearMissBanner.hidden = true;
@@ -1029,11 +1274,12 @@ async function spin({ fromAuto = false } = {}) {
 
   const outcome = await outcomePromise;
   const nearMiss = outcome.bonusRounds.length === 0 ? findNaturalNearMiss(outcome) : null;
-  const remainingDelay = Math.max(0, MIN_RESULT_DISPLAY_MS - (performance.now() - startedAt));
+  const resultDisplayMs = state.turboMode ? 900 : MIN_RESULT_DISPLAY_MS;
+  const remainingDelay = Math.max(0, resultDisplayMs - (performance.now() - startedAt));
   const anticipation = outcome.bonusRounds.length > 0;
   if (anticipation && remainingDelay > 760) {
     await delay(remainingDelay - 760);
-    ui.reels.classList.add("is-anticipating");
+    setAnticipationUi(true, game.anticipationCopy);
     setStatus(game.anticipationCopy);
     playAnticipationSound();
     await delay(760);
@@ -1147,7 +1393,7 @@ async function startAutoplay(count) {
     if (!completed) break;
     state.autoRemaining -= 1;
     updateUi();
-    if (state.autoRemaining > 0 && state.autoActive && !state.autoStopRequested) await delay(650);
+    if (state.autoRemaining > 0 && state.autoActive && !state.autoStopRequested) await delay(state.turboMode ? 180 : 650);
   }
 
   const completedAll = state.autoRemaining === 0;
@@ -1196,7 +1442,15 @@ function bindEvents() {
     updateUi();
     playTone(520, .14, "triangle");
   });
+  ui.astralShowcaseButton.addEventListener("click", runAstralShowcasePreview);
   ui.spinButton.addEventListener("click", () => spin());
+  ui.turboButton.addEventListener("click", () => {
+    if (state.isSpinning || state.autoActive) return;
+    state.turboMode = !state.turboMode;
+    updateUi();
+    setStatus(state.turboMode ? "Turbo on" : "Turbo off");
+    playTone(state.turboMode ? 880 : 440, .12, "triangle");
+  });
   ui.autoButton.addEventListener("click", () => {
     if (state.autoActive) {
       stopAutoplay("Autoplay will stop after the current spin");
@@ -1217,9 +1471,10 @@ function bindEvents() {
   });
   ui.soundButton.addEventListener("click", () => {
     state.soundEnabled = !state.soundEnabled;
+    audio.setEnabled(state.soundEnabled);
     ui.soundButton.setAttribute("aria-pressed", String(state.soundEnabled));
     ui.soundButton.setAttribute("aria-label", state.soundEnabled ? "Turn sound off" : "Turn sound on");
-    if (state.soundEnabled) playTone(660, .18, "sine");
+    if (state.soundEnabled) audio.interfaceOn();
   });
 
   $("rulesButton").addEventListener("click", () => openDialog("rulesDialog"));
@@ -1266,6 +1521,10 @@ function bindEvents() {
     state.lastRealityCheckMinute = 0;
     state.lastOutcome = null;
     ui.lastWinButton.disabled = true;
+    audio.stopSpinLoop({ immediate: true });
+    setAnticipationUi(false);
+    ui.reelViewport.classList.remove("is-spinning", "is-stopping");
+    ui.reelImpactLayer.replaceChildren();
     renderPaylineOverlay();
     ui.nearMissBanner.hidden = true;
     setStatus("Demo balance reset. All four feature meters start anew.");
