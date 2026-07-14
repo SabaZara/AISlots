@@ -11,6 +11,8 @@
     <link rel="preload" href="./assets/symbols-astral-transparent-v5.png" as="image" />
     <link rel="preload" href="./assets/astral-bonusbar-frame-v1.png" as="image" />
     <link rel="preload" href="./assets/astral-multiplier-gate-v1.png" as="image" />
+    <link rel="preload" href="./assets/astral-balloon-ascent-bg-v1.png" as="image" />
+    <link rel="preload" href="./assets/astral-balloon-sprite-v1.png" as="image" />
     <link rel="stylesheet" href="./styles.css" />
     <title>The Lumen Collection · Four free-play slots</title>
   </head>
@@ -316,7 +318,7 @@
         <h2 id="bonusTitle">The garden remembers.</h2>
         <p id="bonusCopy">Three constellations are already sealed into your spin receipt. Reveal their light.</p>
         <div class="bonus-mechanic">
-          <span id="bonusMechanicName">Moonwell Multiplier Gate</span>
+          <span id="bonusMechanicName">Moon Balloon Ascent</span>
           <strong id="bonusMechanicProgress">0 / 3</strong>
           <i><b id="bonusMechanicBar"></b></i>
           <small>Sealed result</small>
@@ -325,23 +327,33 @@
           <div class="astral-locked-multipliers" id="astralLockedMultipliers" aria-label="Locked bonus multipliers">
             <span>—</span><span>—</span><span>—</span>
           </div>
-          <div class="astral-multiplier-dial" id="astralMultiplierDial">
-            <span id="astralFreeSpinLabel">1 / 3</span>
-            <strong id="astralRoundAward">0.00×</strong>
-            <small id="astralCascadeLabel">Sealed</small>
+          <div class="astral-altitude-track" aria-hidden="true">
+            <span style="--altitude: 8%">10×</span>
+            <span style="--altitude: 28%">5×</span>
+            <span style="--altitude: 49%">2×</span>
+            <span style="--altitude: 69%">1×</span>
+            <span style="--altitude: 88%">0.25×</span>
           </div>
-          <div class="astral-choice-race" aria-label="Multiplier selection progress">
-            <div class="astral-choice-candidates" id="astralChoiceCandidates" aria-live="polite">
-              <span>?</span><span class="is-active">?</span><span>?</span>
+          <div class="astral-balloon-flight" id="astralMultiplierDial">
+            <div class="astral-flight-round">
+              <span id="astralFreeSpinLabel">Flight 1 / 3</span>
+              <small id="astralCascadeLabel">Ready</small>
             </div>
-            <div class="astral-choice-progress">
-              <span id="astralChoiceProgress">Pick 1 of 3</span>
-              <i><b id="astralChoiceBar"></b></i>
+            <div class="astral-balloon" id="astralBalloon" aria-hidden="true">
+              <img src="./assets/astral-balloon-sprite-v1.png" alt="" />
+              <i class="astral-balloon-flame"></i>
             </div>
-            <div class="astral-rejected-row">
-              <small>Passed</small>
-              <div id="astralRejectedMultipliers"><span>—</span></div>
+            <div class="astral-balloon-burst" id="astralBalloonBurst" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
             </div>
+            <div class="astral-flight-award" aria-live="polite">
+              <small>Rising multiplier</small>
+              <strong id="astralRoundAward">0.00×</strong>
+            </div>
+          </div>
+          <div class="astral-flight-progress">
+            <span id="astralChoiceProgress">Flight 1 of 3</span>
+            <i><b id="astralChoiceBar"></b></i>
           </div>
           <div class="astral-total-multiplier"><span>Total multiplier</span><strong id="astralTotalMultiplier">0.00×</strong></div>
         </div>
@@ -371,7 +383,7 @@
           <article class="feature-market-card is-buy-card" id="buyFeaturePanel">
             <div class="market-card-emblem" aria-hidden="true">☾</div>
             <h3>Buy bonus</h3>
-            <p class="market-card-copy">Pay 25×, 50×, or 100× the bet to open three sealed X picks now. RTP stays 99%.</p>
+            <p class="market-card-copy">Pay 25×, 50×, or 100× the bet to launch three sealed multiplier balloons now. RTP stays 99%.</p>
             <div class="buy-feature-options" role="group" aria-label="Buy a sealed Moonwell bonus with free-play credits">
               <button type="button" data-buy-feature="25"><span>Moonwell</span><strong>25×</strong><small data-buy-price="25">50.00 CR</small></button>
               <button type="button" data-buy-feature="50"><span>Super</span><strong>50×</strong><small data-buy-price="50">100.00 CR</small></button>

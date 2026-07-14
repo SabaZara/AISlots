@@ -5403,7 +5403,7 @@ body {
   }
 }
 
-/* 2.12 Astral feature market and Moonwell multiplier gate. */
+/* 2.14 Astral feature market and Moon Balloon Ascent. */
 .astral-feature-dock { display: none; }
 
 .game-stage[data-game="astral"] .astral-feature-dock {
@@ -5677,7 +5677,7 @@ body {
   border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(2,5,20,.04), rgba(2,4,17,.06) 66%, rgba(2,3,13,.26)),
-    url("./assets/astral-multiplier-gate-v1.png") center / cover no-repeat;
+    url("./assets/astral-balloon-ascent-bg-v1.png") center / cover no-repeat;
   box-shadow: 0 32px 120px rgba(0,0,0,.84), inset 0 0 70px rgba(34,13,98,.2), 0 0 70px rgba(91,211,255,.22);
 }
 .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene::before,
@@ -5720,14 +5720,13 @@ body {
 }
 .astral-locked-multipliers {
   position: absolute;
-  z-index: 6;
-  top: 11.3%;
-  left: 50%;
-  width: 34.2%;
+  z-index: 9;
+  top: 3.2%;
+  right: 2.2%;
+  width: 24%;
   display: flex;
   justify-content: center;
   gap: 4.5%;
-  transform: translateX(-50%);
 }
 .astral-locked-multipliers span {
   width: 28.5%;
@@ -5749,49 +5748,159 @@ body {
   box-shadow: inset 0 0 23px rgba(126,224,255,.24), 0 0 27px rgba(103,221,255,.5);
   animation: multiplierSocketLock 640ms cubic-bezier(.16,1.2,.28,1) both;
 }
-.astral-multiplier-dial {
+.astral-balloon-flight {
   position: absolute;
   z-index: 6;
-  left: 50%;
-  top: 50.5%;
-  width: 29%;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 4px;
-  border-radius: 50%;
+  inset: 5% 19% 15%;
+  overflow: visible;
+  --balloon-y: 84%;
+  --balloon-scale: .72;
+}
+.astral-flight-round {
+  position: absolute;
+  z-index: 10;
+  top: 32%;
+  left: 80%;
+  min-width: 128px;
+  padding: 5px 14px;
+  border: 1px solid rgba(203,232,255,.42);
+  border-radius: 999px;
   color: white;
-  background: radial-gradient(circle, rgba(38,43,111,.24), rgba(3,6,25,.08) 67%, transparent 70%);
+  background: rgba(3,9,30,.72);
+  box-shadow: inset 0 1px rgba(255,255,255,.13), 0 8px 24px rgba(0,0,0,.36), 0 0 18px rgba(92,219,255,.14);
+  text-align: center;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+.astral-flight-round span { display: block; color: #e7f8ff; font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.astral-flight-round small { display: block; margin-top: 1px; color: #93dfff; font-size: 6px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.astral-balloon {
+  position: absolute;
+  z-index: 7;
+  top: var(--balloon-y);
+  left: 50%;
+  width: 29%;
+  transform: translate(-50%, -50%) scale(var(--balloon-scale));
+  transform-origin: 50% 58%;
+  filter: drop-shadow(0 18px 18px rgba(0,0,0,.58)) drop-shadow(0 0 18px rgba(102,220,255,.38));
+  transition: top 80ms linear, transform 80ms linear, opacity 160ms ease;
+  will-change: top, transform, opacity;
+}
+.astral-balloon img { display: block; width: 100%; height: auto; }
+.astral-balloon-flame {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: 10%;
+  width: 12%;
+  aspect-ratio: .72;
+  border-radius: 50% 50% 65% 65%;
+  background: radial-gradient(ellipse at 50% 20%, white 0 8%, #7deaff 22%, #735bff 54%, transparent 72%);
+  filter: blur(1px) drop-shadow(0 0 12px #7deaff);
+  opacity: .75;
+  transform: translateX(-50%);
+}
+.astral-balloon-flight.is-launching.is-rising .astral-balloon { animation: balloonLaunch 420ms cubic-bezier(.16,1.2,.28,1) both, balloonSway 650ms 420ms ease-in-out infinite alternate; }
+.astral-balloon-flight.is-rising:not(.is-launching) .astral-balloon { animation: balloonSway 650ms ease-in-out infinite alternate; }
+.astral-balloon-flight.is-rising .astral-balloon-flame { animation: balloonFlame 130ms ease-in-out infinite alternate; }
+.astral-balloon-flight.is-bursting .astral-balloon { animation: balloonPop 440ms cubic-bezier(.2,.9,.2,1) both; }
+.astral-balloon-flight.is-locked .astral-balloon { opacity: 0; }
+.astral-flight-award {
+  position: absolute;
+  z-index: 11;
+  top: 47%;
+  left: 50%;
+  min-width: 180px;
   text-align: center;
   transform: translate(-50%, -50%);
+  pointer-events: none;
 }
-.astral-multiplier-dial::before {
+.astral-flight-award small { display: block; color: #c7efff; font-size: 7px; font-weight: 900; letter-spacing: .16em; text-shadow: 0 2px 10px #000; text-transform: uppercase; }
+.astral-flight-award strong {
+  display: block;
+  margin-top: 3px;
+  color: #fff0a0;
+  font: 600 clamp(44px, 7vw, 90px)/.86 var(--serif);
+  letter-spacing: -.05em;
+  text-shadow: 0 5px 25px #000, 0 0 28px rgba(255,227,103,.56), 0 0 50px rgba(92,214,255,.42);
+}
+.astral-balloon-burst {
+  position: absolute;
+  z-index: 12;
+  top: var(--balloon-y);
+  left: 50%;
+  width: 24%;
+  aspect-ratio: 1;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.2);
+  pointer-events: none;
+}
+.astral-balloon-burst::before,
+.astral-balloon-burst::after {
   content: "";
   position: absolute;
-  inset: 3%;
-  border: 1px solid rgba(136,229,255,.24);
+  inset: 5%;
+  border: 5px solid #fff0a0;
   border-radius: 50%;
-  box-shadow: inset 0 0 30px rgba(104,216,255,.12), 0 0 18px rgba(104,217,255,.1);
+  box-shadow: 0 0 28px #fff0a0, inset 0 0 28px #72eaff;
 }
-.astral-multiplier-dial span,
-.astral-multiplier-dial small,
-.astral-multiplier-dial strong { position: relative; z-index: 2; display: block; }
-.astral-multiplier-dial span { color: #b8d2ec; font-size: clamp(8px, 1vw, 13px); font-weight: 900; letter-spacing: .12em; }
-.astral-multiplier-dial strong {
-  color: #fff0a0;
-  font: 600 clamp(40px, 7vw, 92px)/.86 var(--serif);
-  letter-spacing: -.05em;
-  text-shadow: 0 5px 24px #000, 0 0 28px rgba(255,227,103,.4), 0 0 48px rgba(92,214,255,.32);
+.astral-balloon-burst::after { inset: 24%; border-color: #77eaff; filter: blur(2px); }
+.astral-balloon-burst i { position: absolute; top: 46%; left: 46%; width: 9%; aspect-ratio: 1; border-radius: 2px 50% 50%; background: linear-gradient(135deg, #fff6ad, #70e8ff 52%, #855fff); box-shadow: 0 0 12px #7deaff; }
+.astral-balloon-burst i:nth-child(1) { --burst-x: -540%; --burst-y: -70%; }
+.astral-balloon-burst i:nth-child(2) { --burst-x: 490%; --burst-y: -90%; }
+.astral-balloon-burst i:nth-child(3) { --burst-x: -80%; --burst-y: -520%; }
+.astral-balloon-burst i:nth-child(4) { --burst-x: 70%; --burst-y: 510%; }
+.astral-balloon-burst i:nth-child(5) { --burst-x: -390%; --burst-y: -390%; }
+.astral-balloon-burst i:nth-child(6) { --burst-x: 380%; --burst-y: -370%; }
+.astral-balloon-burst i:nth-child(7) { --burst-x: -400%; --burst-y: 360%; }
+.astral-balloon-burst i:nth-child(8) { --burst-x: 410%; --burst-y: 390%; }
+.astral-balloon-burst.is-active { animation: balloonBurstRing 560ms cubic-bezier(.12,.8,.2,1) both; }
+.astral-balloon-burst.is-active i { animation: balloonShard 620ms cubic-bezier(.12,.8,.2,1) both; }
+.astral-altitude-track {
+  position: absolute;
+  z-index: 6;
+  top: 14%;
+  left: 20.5%;
+  width: 14%;
+  height: 60%;
+  border-left: 1px solid rgba(161,224,255,.42);
+  filter: drop-shadow(0 0 8px rgba(108,222,255,.32));
 }
-.astral-multiplier-dial small { color: #cbeeff; font-size: clamp(8px, 1.1vw, 14px); font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
-.astral-multiplier-dial.is-spinning { animation: multiplierDialCharge 420ms ease-in-out infinite alternate; }
-.astral-multiplier-dial.is-locked { animation: multiplierDialLock 620ms cubic-bezier(.16,1.2,.28,1) both; }
+.astral-altitude-track span {
+  position: absolute;
+  top: var(--altitude);
+  left: -1px;
+  min-width: 42px;
+  padding: 2px 6px;
+  border-left: 14px solid rgba(126,224,255,.7);
+  border-radius: 0 999px 999px 0;
+  color: #dff8ff;
+  background: rgba(3,10,31,.64);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  transform: translateY(-50%);
+}
+.astral-flight-progress {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  bottom: 13.5%;
+  width: 42%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+.astral-flight-progress > span { color: #e0f5ff; font-size: 7px; font-weight: 900; letter-spacing: .09em; text-shadow: 0 2px 7px #000; text-transform: uppercase; white-space: nowrap; }
+.astral-flight-progress i { height: 7px; overflow: hidden; border: 1px solid rgba(202,231,255,.47); border-radius: 999px; background: rgba(2,6,24,.82); box-shadow: inset 0 0 8px rgba(0,0,0,.6); }
+.astral-flight-progress b { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #755ce8, #69e5ff, #fff09e); box-shadow: 0 0 15px rgba(103,225,255,.72); transition: width 120ms linear; }
 .astral-total-multiplier {
   position: absolute;
   z-index: 7;
-  left: 50%;
-  top: 63.5%;
+  left: 2.5%;
+  bottom: 4.5%;
   min-width: 180px;
   padding: 7px 18px;
   border: 1px solid rgba(213,234,255,.27);
@@ -5800,74 +5909,10 @@ body {
   background: rgba(4,7,27,.72);
   box-shadow: 0 10px 30px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.1), 0 0 22px rgba(103,220,255,.13);
   text-align: center;
-  transform: translateX(-50%);
   backdrop-filter: blur(7px);
 }
 .astral-total-multiplier span { display: block; color: #b7cce5; font-size: 7px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
 .astral-total-multiplier strong { display: block; margin-top: 1px; color: #fff0a0; font: 600 clamp(23px, 3vw, 38px)/1 var(--serif); text-shadow: 0 0 18px rgba(255,228,106,.32); }
-
-.astral-choice-race {
-  position: absolute;
-  z-index: 8;
-  top: 72%;
-  left: 50%;
-  width: 40%;
-  display: grid;
-  gap: 5px;
-  transform: translateX(-50%);
-}
-.astral-choice-candidates {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-}
-.astral-choice-candidates span {
-  position: relative;
-  min-height: 28px;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border: 1px solid rgba(184,219,255,.3);
-  border-radius: 8px 2px 8px 2px;
-  color: #a8bdd8;
-  background: linear-gradient(180deg, rgba(17,29,67,.88), rgba(4,8,28,.92));
-  box-shadow: inset 0 1px rgba(255,255,255,.09);
-  font: 600 clamp(12px, 1.5vw, 20px)/1 var(--serif);
-  text-shadow: 0 2px 8px #000;
-}
-.astral-choice-candidates span.is-active {
-  border-color: #a6edff;
-  color: #e8fbff;
-  background: radial-gradient(circle, rgba(94,218,255,.36), rgba(31,22,83,.92));
-  box-shadow: inset 0 0 19px rgba(105,222,255,.22), 0 0 20px rgba(104,221,255,.34);
-}
-.astral-choice-candidates span.is-selected {
-  border-color: #fff0a0;
-  color: #fff0a0;
-  background: radial-gradient(circle, rgba(255,222,95,.24), rgba(52,31,92,.94));
-  box-shadow: inset 0 0 19px rgba(255,225,105,.16), 0 0 22px rgba(255,225,104,.36);
-  animation: multiplierSocketLock 520ms cubic-bezier(.16,1.2,.28,1) both;
-}
-.astral-choice-candidates span.is-rejected { opacity: .48; filter: saturate(.5); }
-.astral-choice-candidates span.is-rejected::after {
-  content: "";
-  position: absolute;
-  width: 70%;
-  height: 1px;
-  background: rgba(255,125,147,.85);
-  transform: rotate(-14deg);
-  box-shadow: 0 0 7px rgba(255,84,115,.42);
-}
-.astral-choice-candidates.is-rolling .is-active { animation: astralCandidateTick 150ms ease both; }
-.astral-choice-progress { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; }
-.astral-choice-progress > span { color: #d8e9fb; font-size: 7px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
-.astral-choice-progress i { height: 5px; overflow: hidden; border: 1px solid rgba(192,222,255,.28); border-radius: 999px; background: rgba(2,6,24,.78); }
-.astral-choice-progress b { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #765de8, #71e6ff, #fff0a0); box-shadow: 0 0 13px rgba(107,225,255,.65); transition: width 170ms ease; }
-.astral-rejected-row { min-height: 14px; display: flex; align-items: center; justify-content: center; gap: 7px; }
-.astral-rejected-row small { color: #7f95af; font-size: 6px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
-.astral-rejected-row > div { display: flex; gap: 4px; }
-.astral-rejected-row span { padding: 2px 5px; border: 1px solid rgba(255,126,147,.2); border-radius: 999px; color: #a3b0c2; background: rgba(8,10,29,.6); font-size: 6px; text-decoration: line-through; }
-@keyframes astralCandidateTick { from { opacity: .35; transform: translateY(-7px) scale(.82); } to { opacity: 1; transform: none; } }
 
 .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total {
   position: absolute;
@@ -5903,8 +5948,12 @@ body {
 .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action:hover:not(:disabled) { filter: brightness(1.18); box-shadow: inset 0 1px rgba(255,255,255,.32), 0 10px 34px rgba(0,0,0,.5), 0 0 34px rgba(103,221,255,.38); }
 
 @keyframes featureMarketEnter { from { opacity: 0; transform: scale(.82) translateY(28px); filter: brightness(1.7); } to { opacity: 1; transform: none; filter: none; } }
-@keyframes multiplierDialCharge { to { filter: brightness(1.28); transform: translate(-50%, -50%) scale(1.025); } }
-@keyframes multiplierDialLock { 0% { filter: brightness(2.2); transform: translate(-50%, -50%) scale(.82); } 62% { transform: translate(-50%, -50%) scale(1.08); } 100% { filter: none; transform: translate(-50%, -50%); } }
+@keyframes balloonLaunch { from { opacity: .2; transform: translate(-50%, -50%) scale(.42); filter: brightness(2.2) blur(2px); } to { opacity: 1; transform: translate(-50%, -50%) scale(var(--balloon-scale)); filter: none; } }
+@keyframes balloonSway { from { transform: translate(-52%, -50%) scale(var(--balloon-scale)) rotate(-1.8deg); } to { transform: translate(-48%, -51%) scale(var(--balloon-scale)) rotate(1.8deg); } }
+@keyframes balloonFlame { from { opacity: .48; transform: translateX(-50%) scale(.76,.7); } to { opacity: 1; transform: translateX(-50%) scale(1.08,1.26); } }
+@keyframes balloonPop { 0% { opacity: 1; transform: translate(-50%, -50%) scale(var(--balloon-scale)); filter: brightness(1); } 35% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); filter: brightness(2.5); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.55); filter: brightness(3) blur(5px); } }
+@keyframes balloonBurstRing { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.18) rotate(-12deg); } 35% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.7) rotate(8deg); } }
+@keyframes balloonShard { from { opacity: 1; transform: translate(0,0) scale(.4) rotate(0); } to { opacity: 0; transform: translate(var(--burst-x), var(--burst-y)) scale(1.2) rotate(190deg); } }
 @keyframes multiplierSocketLock { 0% { opacity: .2; transform: scale(.35) rotate(-16deg); filter: brightness(2.4); } 70% { transform: scale(1.13) rotate(2deg); } 100% { opacity: 1; transform: none; filter: none; } }
 
 @media (max-height: 760px) and (min-width: 821px) {
@@ -5985,14 +6034,18 @@ body {
     background-size: auto 100%;
   }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-mechanic { top: 1.5%; left: 2%; width: 145px; padding: 6px 8px; }
-  .astral-locked-multipliers { top: 13.3%; width: 72%; gap: 4%; }
+  .astral-locked-multipliers { top: 7%; right: auto; left: 50%; width: 64%; gap: 4%; transform: translateX(-50%); }
   .astral-locked-multipliers span { font-size: clamp(11px, 4.3vw, 18px); }
-  .astral-multiplier-dial { top: 49%; width: min(68vw, 290px); }
-  .astral-multiplier-dial strong { font-size: clamp(46px, 17vw, 76px); }
-  .astral-total-multiplier { top: 64%; min-width: 150px; padding: 5px 14px; }
-  .astral-choice-race { top: 71%; width: 72%; gap: 3px; }
-  .astral-choice-candidates span { min-height: 26px; font-size: clamp(11px, 4vw, 17px); }
-  .astral-choice-progress > span { font-size: 6px; }
+  .astral-balloon-flight { inset: 8% 3% 18%; }
+  .astral-balloon { width: min(43%, 190px); }
+  .astral-flight-round { top: 20%; left: 78%; min-width: 112px; padding: 4px 10px; }
+  .astral-flight-award { top: 49%; min-width: 150px; }
+  .astral-flight-award strong { font-size: clamp(44px, 16vw, 72px); }
+  .astral-altitude-track { top: 20%; left: 2%; width: 18%; height: 52%; }
+  .astral-altitude-track span { min-width: 36px; padding-right: 4px; border-left-width: 10px; font-size: 5.5px; }
+  .astral-flight-progress { bottom: 17%; width: 70%; gap: 5px; }
+  .astral-flight-progress > span { font-size: 6px; }
+  .astral-total-multiplier { left: 2%; bottom: 11.5%; min-width: 130px; padding: 5px 10px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total { right: 3%; bottom: 12%; min-width: 104px; padding: 6px 8px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action { bottom: 3%; width: 58%; min-width: 168px; min-height: 45px; }
 }
@@ -6039,20 +6092,25 @@ body {
 
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-scene { width: calc(100vw - 8px); height: calc(100dvh - 8px); border-radius: 13px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-mechanic { top: 2%; left: 1.5%; width: 145px; padding: 5px 7px; }
-  .astral-locked-multipliers { top: 10.5%; width: 34%; }
-  .astral-multiplier-dial { top: 50%; width: 29%; }
-  .astral-multiplier-dial strong { font-size: clamp(38px, 9vw, 67px); }
-  .astral-total-multiplier { top: 63.5%; min-width: 140px; padding: 4px 12px; }
-  .astral-choice-race { top: 71%; width: 40%; gap: 3px; }
-  .astral-choice-candidates span { min-height: 22px; font-size: 11px; }
-  .astral-rejected-row { display: none; }
+  .astral-locked-multipliers { top: 3%; right: 1.5%; left: auto; width: 25%; transform: none; }
+  .astral-balloon-flight { inset: 2% 18% 17%; }
+  .astral-balloon { width: 25%; }
+  .astral-flight-round { top: 20%; left: 78%; min-width: 102px; padding: 3px 8px; }
+  .astral-flight-round span { font-size: 6px; }
+  .astral-flight-award { top: 47%; }
+  .astral-flight-award strong { font-size: clamp(36px, 8vw, 62px); }
+  .astral-altitude-track { top: 13%; left: 20%; height: 58%; }
+  .astral-flight-progress { bottom: 13%; width: 42%; }
+  .astral-total-multiplier { left: 1.5%; bottom: 3%; min-width: 140px; padding: 4px 12px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total { bottom: 4%; padding: 5px 8px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action { bottom: 2%; min-height: 39px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .feature-market-scene,
-  .astral-multiplier-dial,
+  .astral-balloon-flight,
+  .astral-balloon,
+  .astral-balloon-burst,
   .astral-locked-multipliers span { animation-duration: 1ms !important; }
 }
 
