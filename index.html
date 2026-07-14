@@ -30,14 +30,6 @@
             <span>Balance</span>
             <strong><span id="balance">1,000.00</span> <small>CR</small></strong>
           </div>
-          <div class="session-stat">
-            <span>Session net</span>
-            <strong id="sessionNet" class="neutral">0.00 CR</strong>
-          </div>
-          <div class="session-stat session-clock">
-            <span>Session time</span>
-            <strong id="sessionTime">00:00</strong>
-          </div>
           <span class="rtp-pill">RTP 99.00%</span>
           <span class="demo-pill">Free play</span>
         </div>
@@ -120,6 +112,11 @@
                 <span id="winBannerLabel">Celestial win</span>
                 <strong id="winBannerAmount">0.00 CR</strong>
                 <small id="winBannerMultiplier">0.00× bet</small>
+              </div>
+              <div class="return-chip" id="returnChip" hidden aria-live="polite" aria-hidden="true">
+                <span>Returned</span>
+                <strong id="returnAmount">0.00 CR</strong>
+                <small id="returnComparison">0.00× · 0.00 CR bet</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">
@@ -333,6 +330,19 @@
             <strong id="astralRoundAward">0.00×</strong>
             <small id="astralCascadeLabel">Sealed</small>
           </div>
+          <div class="astral-choice-race" aria-label="Multiplier selection progress">
+            <div class="astral-choice-candidates" id="astralChoiceCandidates" aria-live="polite">
+              <span>?</span><span class="is-active">?</span><span>?</span>
+            </div>
+            <div class="astral-choice-progress">
+              <span id="astralChoiceProgress">Pick 1 of 3</span>
+              <i><b id="astralChoiceBar"></b></i>
+            </div>
+            <div class="astral-rejected-row">
+              <small>Passed</small>
+              <div id="astralRejectedMultipliers"><span>—</span></div>
+            </div>
+          </div>
           <div class="astral-total-multiplier"><span>Total multiplier</span><strong id="astralTotalMultiplier">0.00×</strong></div>
         </div>
         <div class="constellation-picks" id="constellationPicks"></div>
@@ -351,6 +361,7 @@
           <article class="feature-market-card is-special-card" id="specialBetPanel">
             <div class="market-card-emblem" aria-hidden="true">✦</div>
             <h3>Special bets</h3>
+            <p class="market-card-copy">Pay a little more to guarantee +1 or +2 meter Blooms every spin. RTP stays 99%.</p>
             <div class="special-bet-options" role="group" aria-label="Choose Astral special bet">
               <button type="button" data-progress-boost="0" aria-pressed="true"><span>Standard</span><strong>1.00×</strong><small>Normal meter</small></button>
               <button type="button" data-progress-boost="1" aria-pressed="false"><span>Moon charge</span><strong>1.30×</strong><small>+1 Bloom every spin</small></button>
@@ -360,6 +371,7 @@
           <article class="feature-market-card is-buy-card" id="buyFeaturePanel">
             <div class="market-card-emblem" aria-hidden="true">☾</div>
             <h3>Buy bonus</h3>
+            <p class="market-card-copy">Pay 25×, 50×, or 100× the bet to open three sealed X picks now. RTP stays 99%.</p>
             <div class="buy-feature-options" role="group" aria-label="Buy a sealed Moonwell bonus with free-play credits">
               <button type="button" data-buy-feature="25"><span>Moonwell</span><strong>25×</strong><small data-buy-price="25">50.00 CR</small></button>
               <button type="button" data-buy-feature="50"><span>Super</span><strong>50×</strong><small data-buy-price="50">100.00 CR</small></button>

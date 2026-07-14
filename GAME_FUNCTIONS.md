@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.12.1**
+Version reviewed: **2.13.0**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -17,11 +17,11 @@ This is the team-review checklist for the current build. “Implemented” means
 | Maximum bet | Implemented | `MAX` selects 20 CR. There is no real-money purchase or deposit path. |
 | Turbo | Implemented | Shortens the presentation wait while preserving the exact same outcome generation and RTP. |
 | Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits or a feature presentation. |
-| Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. Exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
-| Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet buys a deterministic Moonwell Multiplier Gate using demo credits only. Purchase prizes are scaled to 99.00% theoretical RTP and receive a fairness receipt. |
+| Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. The panel explains that the higher price guarantees meter progress; exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
+| Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet opens three sealed Moonwell X picks immediately using demo credits only. The panel explains the cost and reveal; purchase prizes are scaled to 99.00% theoretical RTP and receive a fairness receipt. |
 | Sound | Implemented | Sound is opt-in and can be turned on or off from the top bar. |
 | Last result | Implemented | Info button shows total returned, collector count, individual base-game payouts, and bonus payout. No paylines are drawn over the reels. |
-| Reset demo | Implemented | Resets demo credits, progress, statistics, receipt state, and session totals. |
+| Reset demo | Implemented | Resets demo credits, progress, statistics, and receipt state. |
 
 ## Shared game math
 
@@ -33,7 +33,7 @@ This is the team-review checklist for the current build. “Implemented” means
 | Published RTP | Implemented and tested | Every world has an exact theoretical combined RTP of 99.00%. RTP is a long-run average, never a promise for one spin or session. |
 | Weighted symbol mapping | Implemented | Each game uses the same audited mapping structure with game-specific display names and calibrated low-symbol payout. |
 | Collection symbol | Implemented | The special collector does not pay as a base symbol. Each occurrence advances that world’s persistent meter. |
-| Loss presentation | Implemented | A return smaller than the bet remains a partial return/net loss and does not receive a win celebration. |
+| Partial-return presentation | Implemented | A return smaller than the bet stays visibly labeled as credits returned, including the amount and bet comparison, but does not receive a net-win celebration. |
 | Outcome classes | Implemented | No return, partial return, break-even, net win, and tiered large-win presentation are separated. |
 
 ## World-specific design
@@ -62,7 +62,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Astral places **Bonus demo** in the upper-right game area and gives **Autoplay** its own centered utility dock below the main controls; short landscape layouts keep the Autoplay dock visible as a compact floating control.
 - Astral winning tiles remain stationary and transparent while only the isolated symbol artwork jumps. The other three games retain their existing winner treatment.
 - Astral removes the near-miss callout and the visible narration row below the reels. Result details remain available from the compact info control and fairness receipt.
-- Astral’s graphic **Special bet** and **Buy bonus** controls are isolated to the first game; Neon, Ember, and UFC retain their existing cabinets.
+- Astral’s graphic **Special bet** and **Buy bonus** controls are isolated to the first game and sit below the character faces; phone and iPad layouts move them into the lower control dock. Neon, Ember, and UFC retain their existing cabinets.
 
 ## Persistent meters and bonuses
 
@@ -75,6 +75,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Each world uses a transparent generated HUD frame with a live count and one deterministic progress light per required collector.
 - Bonus payout equals the sum of the pre-sealed prize multipliers multiplied by the spin’s total bet.
 - The Astral Multiplier Gate animates every sealed multiplier individually, locks each X into its own socket, and keeps the cumulative total X visible. Rare multi-trigger spins create enough sockets for every multiplier rather than truncating the presentation.
+- Each Astral gate pick shows three moving candidate X values, visually crosses out passed values, highlights the selected X, and advances a global pick-progress bar. The sealed prize is unchanged by this animation.
 - Special-bet progress boosts participate in the same meter rollover logic as natural Blooms. The higher wager is derived from the feature’s exact expected value so all three Astral wager modes remain at 99.00% theoretical RTP.
 - Feature purchases draw the same three sealed Astral prize values, scale them for the selected 25×, 50×, or 100× demo-credit cost, and preserve 99.00% theoretical RTP at each tier.
 
@@ -102,8 +103,8 @@ All characters are transparent foreground cutouts placed independently over envi
 ## Session safety and accessibility
 
 - Clearly marked 18+ free-play prototype with no deposits, real-money purchases, or cash value. Astral feature buys spend demo credits only.
-- Visible balance, current bet, last return, session net, elapsed session time, total wagered, total returned, per-world wins, spin count, and biggest win.
-- Passive session time and session-net displays remain visible without timed reality-check dialogs or loss-limit interruptions.
+- Visible balance, current bet, last return, per-world wins, spin count, and biggest win. Astral also keeps any positive return visible over the reel frame, even when it is smaller than the bet.
+- The compact header shows balance, RTP, and free-play status without session-loss or elapsed-time readouts.
 - Reduced-motion media query support.
 - Keyboard operation, focus states, ARIA labels, live result status, and dialog close controls.
 - Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, turbo, autoplay, sound, lobby, and verification controls.

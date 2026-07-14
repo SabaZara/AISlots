@@ -36,8 +36,8 @@ The interface includes:
 - tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
 - themed reel-start, reel-stop, anticipation, collection, payout, bonus, and celebration sound cues;
 - four sealed bonus presentations: Moonwell Multiplier Gate, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
-- a passive session timer and visible session-net summary without interruption dialogs;
-- honest partial-return messaging: a payout below the bet is shown as a net loss and never receives a win celebration;
+- a clean balance, RTP, and free-play header without session-loss or elapsed-time readouts;
+- honest partial-return messaging: any returned credits stay prominent, while a return below the bet does not receive a win celebration;
 - high-contrast generated reel symbols with distinct silhouettes and per-symbol color coding;
 - winning-symbol animation without drawn payline overlays;
 - larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
@@ -48,13 +48,13 @@ The interface includes:
 - an Astral Bloom cinematic showcase with an original generated Moonwell guardian and multiplier apparatus, a full-screen awakening transition, individually locking X prizes, a persistent total-X readout, staged award counting, and a clearly labeled no-wager **Bonus demo** button at the top of the game;
 - Astral-only **Special bet** modes that guarantee +1 or +2 meter Blooms per spin at mathematically calibrated wager multipliers while preserving 99.00% theoretical RTP;
 - Astral-only 25×, 50×, and 100× **Buy bonus** options using demo credits only; each deterministic purchase preserves 99.00% theoretical RTP and produces a commit/reveal receipt;
-- a graphic Moonwell feature market and generated multiplier-gate scene with no below-board result narration or near-miss banner on Astral;
+- a graphic Moonwell feature market with concise Special Bet and Buy Bonus explanations, plus a generated multiplier-gate scene that shows live candidate X values, passed values, the selected X, and overall round progress;
 - an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, turbo timing, and visibly dancing winning symbols;
 - opt-in licensed Astral audio samples for the reel wheel and “you win” voice, with source and license records in `assets/audio/LICENSES.md`;
 - bet controls and a maximum-bet shortcut;
 - an Astral-only Autoplay dock below the main controls while the other games retain their original inline Autoplay placement;
 - finite 10, 25, or 50-spin autoplay with an always-visible stop control;
-- balance, last win, session net, recent result details, and feature progression;
+- balance, last return, recent result details, and feature progression, including a persistent Astral return badge that compares credits returned with the current bet;
 - themed synthesized sound effects, win chords, collection tones, particles, bonus reveals, and big-win motion;
 - reduced-motion support and keyboard spinning;
 - viewport-locked desktop, phone, and iPad gameplay with no page scrolling, dynamic-viewport sizing, safe-area padding, compact portrait controls, and a dedicated horizontal cabinet after rotation;

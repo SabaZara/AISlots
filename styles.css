@@ -1505,6 +1505,35 @@ a:focus-visible {
   box-shadow: 0 14px 42px rgba(0,0,0,.5), 0 0 42px rgba(245,216,153,.3);
 }
 
+.return-chip { display: none; }
+.game-stage[data-game="astral"] .return-chip {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  bottom: 33px;
+  min-width: min(250px, 72%);
+  padding: 8px 18px 7px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(205,235,255,.7);
+  border-radius: 999px;
+  color: white;
+  background: linear-gradient(180deg, rgba(31,61,102,.95), rgba(5,13,34,.96));
+  box-shadow: inset 0 1px rgba(255,255,255,.2), 0 10px 28px rgba(0,0,0,.48), 0 0 25px rgba(100,220,255,.25);
+  text-align: center;
+  pointer-events: none;
+  transform: translateX(-50%);
+  backdrop-filter: blur(10px);
+  animation: returnChipEnter 520ms cubic-bezier(.16,1.2,.28,1) both;
+}
+.game-stage[data-game="astral"] .return-chip[hidden] { display: none !important; }
+.return-chip span { color: #bfeeff; font-size: 7px; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+.return-chip strong { color: #e8fbff; font: 600 clamp(20px, 2.6vw, 31px)/1 var(--serif); text-shadow: 0 0 18px rgba(98,221,255,.38); }
+.return-chip small { margin-top: 2px; color: #b4c8df; font-size: 7px; letter-spacing: .04em; }
+.return-chip.is-profit { border-color: rgba(255,232,138,.86); box-shadow: inset 0 1px rgba(255,255,255,.2), 0 10px 30px rgba(0,0,0,.5), 0 0 31px rgba(255,219,92,.32); }
+.return-chip.is-profit strong { color: #fff0a0; text-shadow: 0 0 20px rgba(255,224,103,.48); }
+@keyframes returnChipEnter { from { opacity: 0; transform: translate(-50%, 16px) scale(.8); } to { opacity: 1; transform: translateX(-50%); } }
+
 .result-status {
   display: flex;
   align-items: center;
@@ -5380,7 +5409,7 @@ body {
 .game-stage[data-game="astral"] .astral-feature-dock {
   position: absolute;
   z-index: 43;
-  top: clamp(118px, 15vh, 154px);
+  top: clamp(260px, 38vh, 340px);
   left: calc(24.5% - 145px);
   width: 132px;
   display: grid;
@@ -5575,6 +5604,13 @@ body {
 }
 .is-buy-card .market-card-emblem { background: radial-gradient(circle at 35% 26%, white 0 5%, #ffe986 18%, #9c5fe4 55%, #19072c 100%); }
 .feature-market-card h3 { margin: 0 0 8px; color: white; font: 600 17px/1 var(--serif); letter-spacing: .03em; text-transform: uppercase; }
+.market-card-copy {
+  margin: -2px 0 8px;
+  color: #c6d8ef;
+  font-size: 7px;
+  font-weight: 650;
+  line-height: 1.35;
+}
 .special-bet-options,
 .buy-feature-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
 .special-bet-options button,
@@ -5755,7 +5791,7 @@ body {
   position: absolute;
   z-index: 7;
   left: 50%;
-  top: 70.5%;
+  top: 63.5%;
   min-width: 180px;
   padding: 7px 18px;
   border: 1px solid rgba(213,234,255,.27);
@@ -5769,6 +5805,69 @@ body {
 }
 .astral-total-multiplier span { display: block; color: #b7cce5; font-size: 7px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
 .astral-total-multiplier strong { display: block; margin-top: 1px; color: #fff0a0; font: 600 clamp(23px, 3vw, 38px)/1 var(--serif); text-shadow: 0 0 18px rgba(255,228,106,.32); }
+
+.astral-choice-race {
+  position: absolute;
+  z-index: 8;
+  top: 72%;
+  left: 50%;
+  width: 40%;
+  display: grid;
+  gap: 5px;
+  transform: translateX(-50%);
+}
+.astral-choice-candidates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.astral-choice-candidates span {
+  position: relative;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(184,219,255,.3);
+  border-radius: 8px 2px 8px 2px;
+  color: #a8bdd8;
+  background: linear-gradient(180deg, rgba(17,29,67,.88), rgba(4,8,28,.92));
+  box-shadow: inset 0 1px rgba(255,255,255,.09);
+  font: 600 clamp(12px, 1.5vw, 20px)/1 var(--serif);
+  text-shadow: 0 2px 8px #000;
+}
+.astral-choice-candidates span.is-active {
+  border-color: #a6edff;
+  color: #e8fbff;
+  background: radial-gradient(circle, rgba(94,218,255,.36), rgba(31,22,83,.92));
+  box-shadow: inset 0 0 19px rgba(105,222,255,.22), 0 0 20px rgba(104,221,255,.34);
+}
+.astral-choice-candidates span.is-selected {
+  border-color: #fff0a0;
+  color: #fff0a0;
+  background: radial-gradient(circle, rgba(255,222,95,.24), rgba(52,31,92,.94));
+  box-shadow: inset 0 0 19px rgba(255,225,105,.16), 0 0 22px rgba(255,225,104,.36);
+  animation: multiplierSocketLock 520ms cubic-bezier(.16,1.2,.28,1) both;
+}
+.astral-choice-candidates span.is-rejected { opacity: .48; filter: saturate(.5); }
+.astral-choice-candidates span.is-rejected::after {
+  content: "";
+  position: absolute;
+  width: 70%;
+  height: 1px;
+  background: rgba(255,125,147,.85);
+  transform: rotate(-14deg);
+  box-shadow: 0 0 7px rgba(255,84,115,.42);
+}
+.astral-choice-candidates.is-rolling .is-active { animation: astralCandidateTick 150ms ease both; }
+.astral-choice-progress { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; }
+.astral-choice-progress > span { color: #d8e9fb; font-size: 7px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.astral-choice-progress i { height: 5px; overflow: hidden; border: 1px solid rgba(192,222,255,.28); border-radius: 999px; background: rgba(2,6,24,.78); }
+.astral-choice-progress b { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #765de8, #71e6ff, #fff0a0); box-shadow: 0 0 13px rgba(107,225,255,.65); transition: width 170ms ease; }
+.astral-rejected-row { min-height: 14px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.astral-rejected-row small { color: #7f95af; font-size: 6px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.astral-rejected-row > div { display: flex; gap: 4px; }
+.astral-rejected-row span { padding: 2px 5px; border: 1px solid rgba(255,126,147,.2); border-radius: 999px; color: #a3b0c2; background: rgba(8,10,29,.6); font-size: 6px; text-decoration: line-through; }
+@keyframes astralCandidateTick { from { opacity: .35; transform: translateY(-7px) scale(.82); } to { opacity: 1; transform: none; } }
 
 .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total {
   position: absolute;
@@ -5809,7 +5908,7 @@ body {
 @keyframes multiplierSocketLock { 0% { opacity: .2; transform: scale(.35) rotate(-16deg); filter: brightness(2.4); } 70% { transform: scale(1.13) rotate(2deg); } 100% { opacity: 1; transform: none; filter: none; } }
 
 @media (max-height: 760px) and (min-width: 821px) {
-  .game-stage[data-game="astral"] .astral-feature-dock { top: 80px; }
+  .game-stage[data-game="astral"] .astral-feature-dock { top: 210px; }
   .astral-feature-button { min-height: 76px; }
   .feature-market-card { padding-top: 9px; padding-bottom: 9px; }
   .special-bet-options button,
@@ -5866,6 +5965,7 @@ body {
   .feature-market-card { padding: 8px 7px 8px 49px; border-radius: 13px 4px 13px 4px; }
   .market-card-emblem { left: 9px; top: 10px; width: 32px; height: 32px; font-size: 15px; }
   .feature-market-card h3 { margin-bottom: 5px; font-size: 12px; }
+  .market-card-copy { margin-bottom: 5px; font-size: 6px; line-height: 1.2; }
   .special-bet-options,
   .buy-feature-options { gap: 4px; }
   .special-bet-options button,
@@ -5889,7 +5989,10 @@ body {
   .astral-locked-multipliers span { font-size: clamp(11px, 4.3vw, 18px); }
   .astral-multiplier-dial { top: 49%; width: min(68vw, 290px); }
   .astral-multiplier-dial strong { font-size: clamp(46px, 17vw, 76px); }
-  .astral-total-multiplier { top: 70%; min-width: 150px; padding: 5px 14px; }
+  .astral-total-multiplier { top: 64%; min-width: 150px; padding: 5px 14px; }
+  .astral-choice-race { top: 71%; width: 72%; gap: 3px; }
+  .astral-choice-candidates span { min-height: 26px; font-size: clamp(11px, 4vw, 17px); }
+  .astral-choice-progress > span { font-size: 6px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total { right: 3%; bottom: 12%; min-width: 104px; padding: 6px 8px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action { bottom: 3%; width: 58%; min-width: 168px; min-height: 45px; }
 }
@@ -5925,6 +6028,7 @@ body {
   .feature-market-card { padding: 7px 7px 7px 48px; }
   .market-card-emblem { left: 8px; top: 9px; width: 31px; height: 31px; font-size: 14px; }
   .feature-market-card h3 { margin-bottom: 4px; font-size: 11px; }
+  .market-card-copy { margin-bottom: 4px; font-size: 5.5px; line-height: 1.15; }
   .special-bet-options button,
   .buy-feature-options button { min-height: 53px; padding: 3px 2px; }
   .special-bet-options strong,
@@ -5938,7 +6042,10 @@ body {
   .astral-locked-multipliers { top: 10.5%; width: 34%; }
   .astral-multiplier-dial { top: 50%; width: 29%; }
   .astral-multiplier-dial strong { font-size: clamp(38px, 9vw, 67px); }
-  .astral-total-multiplier { top: 70%; min-width: 140px; padding: 4px 12px; }
+  .astral-total-multiplier { top: 63.5%; min-width: 140px; padding: 4px 12px; }
+  .astral-choice-race { top: 71%; width: 40%; gap: 3px; }
+  .astral-choice-candidates span { min-height: 22px; font-size: 11px; }
+  .astral-rejected-row { display: none; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-total { bottom: 4%; padding: 5px 8px; }
   .bonus-overlay[data-mode="cinematic-free-spins"] .bonus-action { bottom: 2%; min-height: 39px; }
 }

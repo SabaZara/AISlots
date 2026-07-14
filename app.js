@@ -22,8 +22,6 @@ const SYMBOL_SHEET_INDEX = { luma: 0, orbit: 1, nova: 2, comet: 3, dew: 4, leaf:
 const $ = (id) => document.getElementById(id);
 const ui = {
   balance: $("balance"),
-  sessionNet: $("sessionNet"),
-  sessionTime: $("sessionTime"),
   betAmount: $("betAmount"),
   betDown: $("betDown"),
   betUp: $("betUp"),
@@ -40,6 +38,9 @@ const ui = {
   winBannerAmount: $("winBannerAmount"),
   winBannerLabel: $("winBannerLabel"),
   winBannerMultiplier: $("winBannerMultiplier"),
+  returnChip: $("returnChip"),
+  returnAmount: $("returnAmount"),
+  returnComparison: $("returnComparison"),
   featureCard: $("featureCard"),
   featureVisual: $("featureVisual"),
   petalMeter: $("petalMeter"),
@@ -107,17 +108,19 @@ const ui = {
   astralFreeSpinLabel: $("astralFreeSpinLabel"),
   astralCascadeLabel: $("astralCascadeLabel"),
   astralRoundAward: $("astralRoundAward"),
-  astralTotalMultiplier: $("astralTotalMultiplier")
+  astralTotalMultiplier: $("astralTotalMultiplier"),
+  astralChoiceCandidates: $("astralChoiceCandidates"),
+  astralRejectedMultipliers: $("astralRejectedMultipliers"),
+  astralChoiceProgress: $("astralChoiceProgress"),
+  astralChoiceBar: $("astralChoiceBar")
 };
 
 const state = {
   balance: INITIAL_BALANCE,
-  sessionNet: 0,
   betIndex: 1,
   gameId: DEFAULT_GAME_ID,
   progress: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0])),
   gameStats: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()])),
-  sessionStartedAt: Date.now(),
   nonce: 0,
   serverSeed: "",
   serverHash: "",
@@ -197,20 +200,6 @@ function jumpText(element) {
   element.classList.remove("is-jumping");
   void element.offsetWidth;
   element.classList.add("is-jumping");
-}
-
-function formatElapsed(milliseconds) {
-  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor(totalSeconds % 3600 / 60);
-  const seconds = totalSeconds % 60;
-  return hours > 0
-    ? `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
-    : `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-function tickSessionClock() {
-  ui.sessionTime.textContent = formatElapsed(Date.now() - state.sessionStartedAt);
 }
 
 function symbolSvg(id) {
@@ -371,12 +360,8 @@ function updateUi() {
   ui.turboButton.disabled = controlsLocked;
   document.querySelectorAll(".game-choice").forEach((button) => { button.disabled = controlsLocked; });
 
-  const sign = state.sessionNet > 0 ? "+" : "";
-  ui.sessionNet.textContent = `${sign}${formatCredits(state.sessionNet)} CR`;
-  ui.sessionNet.className = state.sessionNet > 0 ? "positive" : state.sessionNet < 0 ? "negative" : "neutral";
   renderPetalMeter();
   renderGameStats();
-  tickSessionClock();
 }
 
 function updateCommitmentUi() {
@@ -550,6 +535,7 @@ function switchGame(gameId) {
   state.lastOutcome = null;
   ui.lastWinButton.disabled = true;
   ui.winBanner.classList.remove("is-visible");
+  hideReturnChip();
   audio.stopSpinLoop({ immediate: true });
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-spinning", "is-stopping");
@@ -700,6 +686,26 @@ function showWinBanner(amount, bet) {
   void animateCreditValue(ui.winBannerAmount, amount, tier.id === "nice" ? 1050 : 720, { sound: true, tierId: tier.id })
     .then(() => jumpText(ui.winBannerAmount));
   window.setTimeout(() => ui.winBanner.classList.remove("is-visible"), tier.id === "nice" ? 2100 : 1650);
+}
+
+function hideReturnChip() {
+  ui.returnChip.hidden = true;
+  ui.returnChip.setAttribute("aria-hidden", "true");
+  ui.returnChip.classList.remove("is-partial", "is-profit");
+}
+
+function showReturnChip(amount, wager) {
+  if (state.gameId !== "astral" || amount <= 0 || wager <= 0) {
+    hideReturnChip();
+    return;
+  }
+  ui.returnAmount.textContent = `${formatCredits(amount)} CR`;
+  ui.returnComparison.textContent = `${(amount / wager).toFixed(2)}× · ${formatCredits(amount)} of ${formatCredits(wager)} CR bet`;
+  ui.returnChip.classList.toggle("is-partial", amount < wager);
+  ui.returnChip.classList.toggle("is-profit", amount > wager);
+  ui.returnChip.hidden = false;
+  ui.returnChip.setAttribute("aria-hidden", "false");
+  jumpText(ui.returnAmount);
 }
 
 function showCelebration(amount, bet, { autoAdvance = false } = {}) {
@@ -914,10 +920,48 @@ async function playAstralMultiplierRound(roundIndex, multiplier, bet, multiplier
   ui.astralMultiplierDial.classList.remove("is-locked");
   ui.astralMultiplierDial.classList.add("is-spinning");
   const reelValues = [.25, .5, 1, 2, 3, 5, 10];
-  for (let tick = 0; tick < 10; tick += 1) {
-    ui.astralRoundAward.textContent = formatMultiplier(reelValues[(tick + roundIndex * 2) % reelValues.length]);
+  const candidateSlots = Array.from(ui.astralChoiceCandidates.children);
+  const passedValues = [];
+  const totalTicks = 12;
+  for (let tick = 0; tick < totalTicks; tick += 1) {
+    const centerIndex = (tick + roundIndex * 2) % reelValues.length;
+    const candidates = [-1, 0, 1].map((offset) => reelValues[(centerIndex + offset + reelValues.length) % reelValues.length]);
+    candidateSlots.forEach((slot, index) => {
+      slot.className = index === 1 ? "is-active" : "";
+      slot.textContent = formatMultiplier(candidates[index]);
+    });
+    if (tick > 0) passedValues.push(reelValues[(centerIndex - 1 + reelValues.length) % reelValues.length]);
+    ui.astralRejectedMultipliers.replaceChildren(...passedValues.slice(-3).map((value) => {
+      const item = document.createElement("span");
+      item.textContent = formatMultiplier(value);
+      return item;
+    }));
+    ui.astralChoiceProgress.textContent = `Pick ${roundIndex + 1} of ${totalRounds} · ${tick + 1}/${totalTicks}`;
+    ui.astralChoiceBar.style.width = `${(roundIndex + (tick + 1) / totalTicks) / totalRounds * 100}%`;
+    ui.astralChoiceCandidates.classList.remove("is-rolling");
+    void ui.astralChoiceCandidates.offsetWidth;
+    ui.astralChoiceCandidates.classList.add("is-rolling");
+    ui.astralRoundAward.textContent = formatMultiplier(candidates[1]);
     await cinematicDelay(72 + tick * 5);
   }
+  const alternativeValues = reelValues.filter((value) => Math.abs(value - multiplier) > 1e-9);
+  const sideValues = [
+    alternativeValues[(roundIndex + 1) % alternativeValues.length],
+    multiplier,
+    alternativeValues[(roundIndex + 4) % alternativeValues.length]
+  ];
+  candidateSlots.forEach((slot, index) => {
+    slot.className = index === 1 ? "is-selected" : "is-rejected";
+    slot.textContent = formatMultiplier(sideValues[index]);
+  });
+  ui.astralRejectedMultipliers.replaceChildren(...[sideValues[0], sideValues[2]].map((value) => {
+    const item = document.createElement("span");
+    item.textContent = formatMultiplier(value);
+    return item;
+  }));
+  ui.astralChoiceCandidates.classList.remove("is-rolling");
+  ui.astralChoiceProgress.textContent = `Pick ${roundIndex + 1} of ${totalRounds} · selected`;
+  ui.astralChoiceBar.style.width = `${(roundIndex + 1) / totalRounds * 100}%`;
   ui.astralMultiplierDial.classList.remove("is-spinning");
   ui.astralMultiplierDial.classList.add("is-locked");
   ui.astralRoundAward.textContent = formatMultiplier(multiplier);
@@ -961,6 +1005,13 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     ui.astralRoundAward.textContent = "0.00×";
     ui.astralTotalMultiplier.textContent = "0.00×";
     ui.astralCascadeLabel.textContent = "Sealed";
+    Array.from(ui.astralChoiceCandidates.children).forEach((slot, index) => {
+      slot.className = index === 1 ? "is-active" : "";
+      slot.textContent = "?";
+    });
+    ui.astralRejectedMultipliers.innerHTML = "<span>—</span>";
+    ui.astralChoiceProgress.textContent = `Pick 1 of ${picks.length}`;
+    ui.astralChoiceBar.style.width = "0%";
     ui.constellationPicks.hidden = true;
     ui.constellationPicks.replaceChildren();
     ui.bonusAction.textContent = preview ? "Start" : `Start ${picks.length}`;
@@ -1000,6 +1051,8 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.bonusOverlay.classList.remove("is-playing");
       ui.bonusOverlay.classList.add("is-resolved");
       ui.astralCascadeLabel.textContent = preview ? "Done" : "Complete";
+      ui.astralChoiceProgress.textContent = `${picks.length} of ${picks.length} complete`;
+      ui.astralChoiceBar.style.width = "100%";
       jumpText(ui.astralCascadeLabel);
       playWinChord();
       burstParticles(54, 1.45);
@@ -1146,8 +1199,8 @@ async function buyAstralFeature(costMultiplier) {
   const progressBefore = state.progress.astral;
   closeFeatureMarket({ returnFocus: false });
   state.isSpinning = true;
+  hideReturnChip();
   state.balance -= purchaseCost;
-  state.sessionNet -= purchaseCost;
   updateUi();
 
   const outcome = await simulateBonusPurchase({
@@ -1162,9 +1215,9 @@ async function buyAstralFeature(costMultiplier) {
   state.lastOutcome = outcome;
   await showAstralBonus(outcome.bonusRounds, bet, { purchased: true });
   state.balance += outcome.totalWin;
-  state.sessionNet += outcome.totalWin;
   state.gameStats.astral = recordGameResult(state.gameStats.astral, outcome.totalWin, purchaseCost);
   updateUi();
+  showReturnChip(outcome.totalWin, purchaseCost);
 
   const outcomeClass = outcomeClassFor(outcome.totalWin, purchaseCost);
   if (outcomeClass === "net-win") showWinBanner(outcome.totalWin, purchaseCost);
@@ -1224,13 +1277,13 @@ async function spin({ fromAuto = false } = {}) {
 
   state.isSpinning = true;
   state.balance -= wager;
-  state.sessionNet -= wager;
   updateUi();
   ui.spinButton.classList.add("is-spinning");
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-stopping");
   ui.reelViewport.classList.add("is-spinning");
   ui.winBanner.classList.remove("is-visible");
+  hideReturnChip();
   ui.lastWinButton.disabled = true;
   setStatus(`${game.name} is aligning…`);
   playSpinSound();
@@ -1278,7 +1331,6 @@ async function spin({ fromAuto = false } = {}) {
   state.progress[state.gameId] = outcome.progressAfter;
   state.lastOutcome = outcome;
   state.balance += outcome.baseWin;
-  state.sessionNet += outcome.baseWin;
   updateUi();
   const baseOutcomeClass = outcomeClassFor(outcome.baseWin, wager);
 
@@ -1293,7 +1345,7 @@ async function spin({ fromAuto = false } = {}) {
   } else if (baseOutcomeClass === "break-even") {
     setStatus(`Bet returned exactly · ${formatCredits(outcome.baseWin)} CR returned on ${formatCredits(wager)} CR bet`);
   } else if (baseOutcomeClass === "partial-return") {
-    setStatus(`Partial return ${formatCredits(outcome.baseWin)} CR · net result −${formatCredits(wager - outcome.baseWin)} CR`);
+    setStatus(`${formatCredits(outcome.baseWin)} CR returned on ${formatCredits(wager)} CR bet`);
   } else {
     setStatus(`No win this spin. ${game.featureName} keeps your progress.`);
   }
@@ -1311,12 +1363,12 @@ async function spin({ fromAuto = false } = {}) {
     await delay(650);
     await showBonus(outcome.bonusRounds, bet, { autoAdvance: fromAuto });
     state.balance += outcome.bonusWin;
-    state.sessionNet += outcome.bonusWin;
     updateUi();
   }
 
   state.gameStats[state.gameId] = recordGameResult(state.gameStats[state.gameId], outcome.totalWin, wager);
   updateUi();
+  showReturnChip(outcome.totalWin, wager);
   const totalOutcomeClass = outcomeClassFor(outcome.totalWin, wager);
   if (outcome.bonusWin > 0 && totalOutcomeClass === "net-win") showWinBanner(outcome.totalWin, wager);
   await showCelebration(outcome.totalWin, wager, { autoAdvance: fromAuto });
@@ -1342,10 +1394,10 @@ async function spin({ fromAuto = false } = {}) {
   state.isSpinning = false;
   updateUi();
 
-  if (totalOutcomeClass === "net-win") setStatus(`Net win +${formatCredits(outcome.totalWin - wager)} CR · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
+  if (totalOutcomeClass === "net-win") setStatus(`${formatCredits(outcome.totalWin)} CR returned on ${formatCredits(wager)} CR bet · receipt ready`);
   else if (totalOutcomeClass === "break-even") setStatus(`Break-even result · ${formatCredits(outcome.totalWin)} CR returned · receipt ready`);
-  else if (totalOutcomeClass === "partial-return") setStatus(`Partial return ${formatCredits(outcome.totalWin)} CR · net −${formatCredits(wager - outcome.totalWin)} CR · receipt ready`);
-  else setStatus(`No return · net −${formatCredits(wager)} CR · receipt ready`);
+  else if (totalOutcomeClass === "partial-return") setStatus(`${formatCredits(outcome.totalWin)} CR returned on ${formatCredits(wager)} CR bet · receipt ready`);
+  else setStatus("No return · receipt ready");
   if (!fromAuto) ui.spinButton.focus();
   return true;
 }
@@ -1498,13 +1550,12 @@ function bindEvents() {
     if (state.isSpinning) return;
     stopAutoplay();
     state.balance = INITIAL_BALANCE;
-    state.sessionNet = 0;
     state.progress = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0]));
     state.gameStats = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()]));
-    state.sessionStartedAt = Date.now();
     state.specialBetBoost = 0;
     state.lastOutcome = null;
     ui.lastWinButton.disabled = true;
+    hideReturnChip();
     audio.stopSpinLoop({ immediate: true });
     setAnticipationUi(false);
     ui.reelViewport.classList.remove("is-spinning", "is-stopping");
@@ -1529,8 +1580,6 @@ async function init() {
   ui.clientSeedInput.value = state.clientSeed;
   bindEvents();
   updateUi();
-  tickSessionClock();
-  window.setInterval(tickSessionClock, 1000);
   try {
     state.ageConfirmed = window.sessionStorage.getItem("lumen-collection-age-confirmed") === "true"
       || window.sessionStorage.getItem("astral-bloom-age-confirmed") === "true";
