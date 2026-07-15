@@ -1001,32 +1001,78 @@ function astralCaseRarity(multiplier) {
   return "common";
 }
 
-function buildAstralCaseTrack(roundIndex, multiplier) {
-  const targetIndex = 45;
-  const itemCount = 52;
+function setAstralCaseItemValue(item, multiplier, { target = false } = {}) {
+  const rarity = astralCaseRarity(multiplier);
+  item.className = `astral-case-item rarity-${rarity}${target ? " is-target" : ""}`;
+  item.dataset.multiplier = String(multiplier);
+  item.innerHTML = `<img src="./assets/${multiplier >= 5 ? "astral-case-capsule-legendary-v1.png" : "astral-case-capsule-blue-v1.png"}" alt=""><strong>${formatMultiplier(multiplier)}</strong><small>${rarity}</small>`;
+}
+
+function buildAstralCaseTrack(roundIndex) {
+  const itemCount = 72;
   const fragment = document.createDocumentFragment();
-  let target = null;
+  const items = [];
   for (let index = 0; index < itemCount; index += 1) {
-    const cosmeticValue = index === targetIndex
-      ? multiplier
-      : ASTRAL_CASE_VALUES[(index * 3 + roundIndex * 2 + Math.floor(index / 5)) % ASTRAL_CASE_VALUES.length];
-    const rarity = astralCaseRarity(cosmeticValue);
+    const cosmeticValue = ASTRAL_CASE_VALUES[(index * 3 + roundIndex * 2 + Math.floor(index / 5)) % ASTRAL_CASE_VALUES.length];
     const item = document.createElement("span");
-    item.className = `astral-case-item rarity-${rarity}`;
-    item.dataset.multiplier = String(cosmeticValue);
-    item.innerHTML = `<img src="./assets/${cosmeticValue >= 5 ? "astral-case-capsule-legendary-v1.png" : "astral-case-capsule-blue-v1.png"}" alt=""><strong>${formatMultiplier(cosmeticValue)}</strong><small>${rarity}</small>`;
-    if (index === targetIndex) {
-      item.classList.add("is-target");
-      target = item;
-    }
+    setAstralCaseItemValue(item, cosmeticValue);
+    items.push(item);
     fragment.append(item);
   }
   ui.astralCaseTrack.replaceChildren(fragment);
-  return { target, targetIndex };
+  return items;
+}
+
+function astralCaseStopProfile(multiplier) {
+  if (multiplier >= 10) return { duration: 1550, minimumSteps: 12 };
+  if (multiplier >= 5) return { duration: 1250, minimumSteps: 10 };
+  if (multiplier >= 2) return { duration: 980, minimumSteps: 8 };
+  if (multiplier >= 1) return { duration: 760, minimumSteps: 6 };
+  return { duration: 620, minimumSteps: 5 };
+}
+
+function astralBrakeProgress(time, initialVelocityRatio) {
+  const t = Math.max(0, Math.min(1, time));
+  const velocity = Math.max(.2, Math.min(2.6, initialVelocityRatio));
+  return (-2 + velocity) * t ** 3 + (3 - 2 * velocity) * t ** 2 + velocity * t;
+}
+
+function animateAstralCaseBrake(track, { from, to, duration, rollSpeed, reducedMotion }) {
+  track.style.transform = `translate3d(${from}px,0,0)`;
+  if (reducedMotion) {
+    track.style.transform = `translate3d(${to}px,0,0)`;
+    return delay(duration);
+  }
+  const distance = to - from;
+  const velocityRatio = Math.abs(distance) > 0 ? rollSpeed * duration / 1000 / Math.abs(distance) : 1;
+  track.dataset.brakeVelocityRatio = velocityRatio.toFixed(3);
+  return new Promise((resolve) => {
+    let startedAt = null;
+    let drewFirstFrame = false;
+    const draw = (now) => {
+      if (startedAt === null) startedAt = now;
+      const time = Math.min(1, (now - startedAt) / duration);
+      const progress = astralBrakeProgress(time, velocityRatio);
+      const position = from + distance * progress;
+      track.style.transform = `translate3d(${position}px,0,0)`;
+      track.dataset.brakeProgress = time.toFixed(3);
+      if (!drewFirstFrame) {
+        drewFirstFrame = true;
+        track.dataset.firstBrakePosition = position.toFixed(3);
+        track.dataset.firstBrakeElapsed = (now - startedAt).toFixed(3);
+      }
+      if (time < 1) {
+        window.requestAnimationFrame(draw);
+      } else {
+        resolve();
+      }
+    };
+    window.requestAnimationFrame(draw);
+  });
 }
 
 function beginAstralCaseRoll(roundIndex, multiplier, bet, multiplierTotal, totalRounds) {
-  const { target, targetIndex } = buildAstralCaseTrack(roundIndex, multiplier);
+  const items = buildAstralCaseTrack(roundIndex);
   const track = ui.astralCaseTrack;
   const firstItem = track.firstElementChild;
   const itemWidth = firstItem?.getBoundingClientRect().width || 120;
@@ -1075,26 +1121,25 @@ function beginAstralCaseRoll(roundIndex, multiplier, bet, multiplierTotal, total
     ui.astralCascadeLabel.textContent = "Slowing";
     ui.astralMultiplierDial.classList.remove("is-rolling");
     ui.astralMultiplierDial.classList.add("is-decelerating");
-    const finalOffset = -(targetIndex * step + itemWidth / 2);
-    const duration = reducedMotion ? 80 : 980;
+    const profile = astralCaseStopProfile(multiplier);
+    const duration = reducedMotion ? 80 : profile.duration;
+    const markerIndex = Math.max(0, Math.ceil((-offset - itemWidth / 2) / step));
+    const naturalTravel = rollSpeed * duration / 1000 / 1.5;
+    const stepsAhead = Math.max(profile.minimumSteps, Math.round(naturalTravel / step));
+    const landingIndex = Math.min(items.length - 3, markerIndex + stepsAhead);
+    const target = items[landingIndex];
+    setAstralCaseItemValue(target, multiplier, { target: true });
+    const finalOffset = -(landingIndex * step + itemWidth / 2);
+    track.dataset.stopFrom = offset.toFixed(3);
+    track.dataset.stopTo = finalOffset.toFixed(3);
+    track.dataset.stopDuration = String(duration);
+    track.dataset.landingIndex = String(landingIndex);
     let stopTick = 0;
     const stopTicks = window.setInterval(() => {
       playTone(720 + stopTick % 4 * 110, .055, "triangle");
       stopTick += 1;
-    }, reducedMotion ? 40 : 92);
-    if (typeof track.animate === "function") {
-      const animation = track.animate([
-        { transform: `translate3d(${offset}px,0,0)`, filter: "blur(1.2px)" },
-        { transform: `translate3d(${finalOffset}px,0,0)`, filter: "blur(0)" }
-      ], { duration, easing: "cubic-bezier(.08,.72,.08,1)", fill: "forwards" });
-      try { await animation.finished; } catch { /* the final style below remains authoritative */ }
-      animation.cancel();
-    } else {
-      track.style.transition = `transform ${duration}ms cubic-bezier(.08,.72,.08,1)`;
-      track.style.transform = `translate3d(${finalOffset}px,0,0)`;
-      await delay(duration);
-      track.style.transition = "";
-    }
+    }, reducedMotion ? 40 : Math.max(76, Math.round(duration / (stepsAhead + 2))));
+    await animateAstralCaseBrake(track, { from: offset, to: finalOffset, duration, rollSpeed, reducedMotion });
     window.clearInterval(stopTicks);
     track.style.transform = `translate3d(${finalOffset}px,0,0)`;
     ui.astralMultiplierDial.classList.remove("is-decelerating");

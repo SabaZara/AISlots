@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.19.0**
+Version reviewed: **2.19.1**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -75,7 +75,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Each world uses a transparent generated HUD frame with a live count and one deterministic progress light per required collector.
 - Bonus payout equals the sum of the pre-sealed prize multipliers multiplied by the spin’s total bet.
 - The Astral Celestial Case Roll presents every sealed multiplier as its own interactive horizontal capsule reel with rarity colors, a bright center marker, deceleration, impact glow, and a persistent total X.
-- Players open cases one at a time and press Stop to begin a fast deceleration. The capsule belt now runs at casino pace and locks in about one second after Stop; a 2.4-second fallback keeps autoplay moving. A global case-progress bar shows the current case and total completion; Stop changes reveal timing only—the sealed prize is unchanged by the animation.
+- Players open cases one at a time and press Stop to begin a continuous deceleration from the belt's exact current position—there is no jump to a distant fixed capsule. Small sealed multipliers brake quickly, mid-tier results use a medium roll-out, and legendary or jackpot results slow for longer. A 2.4-second fallback keeps autoplay moving. A global case-progress bar shows the current case and total completion; Stop changes reveal timing only—the sealed prize is unchanged by the animation.
 - Special-bet progress boosts participate in the same meter rollover logic as natural Blooms. The higher wager is derived from the feature’s exact expected value so all three Astral wager modes remain at 99.00% theoretical RTP.
 - Feature purchases draw the same three sealed Astral prize values, scale them for the selected 25×, 50×, or 100× demo-credit cost, and preserve 99.00% theoretical RTP at each tier.
 

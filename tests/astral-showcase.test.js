@@ -61,14 +61,24 @@ test("generated Celestial Case Roll assets are project-local production PNGs", a
   assert.equal(legendaryCapsule[25], 6, "the legendary reward capsule must retain RGBA transparency");
 });
 
-test("Astral case Stop changes presentation timing but lands on the sealed multiplier", async () => {
+test("Astral case Stop decelerates from its current position and lands on the sealed multiplier", async () => {
   const [app, model, html] = await Promise.all([
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("game-model.js", root), "utf8"),
     readFile(new URL("index.html", root), "utf8")
   ]);
-  assert.match(app, /const targetIndex = 45/);
-  assert.match(app, /index === targetIndex[\s\S]*?\? multiplier/);
+  assert.match(app, /function astralCaseStopProfile\(multiplier\)/);
+  assert.match(app, /markerIndex = Math\.max\(0, Math\.ceil\(\(-offset - itemWidth \/ 2\) \/ step\)\)/);
+  assert.match(app, /landingIndex = Math\.min\(items\.length - 3, markerIndex \+ stepsAhead\)/);
+  assert.match(app, /setAstralCaseItemValue\(target, multiplier, \{ target: true \}\)/);
+  assert.match(app, /naturalTravel = rollSpeed \* duration \/ 1000 \/ 1\.5/);
+  assert.match(app, /track\.dataset\.stopFrom = offset\.toFixed\(3\)/);
+  assert.match(app, /function animateAstralCaseBrake/);
+  assert.match(app, /position = from \+ distance \* progress/);
+  assert.match(app, /rollSpeed \* duration \/ 1000 \/ Math\.abs\(distance\)/);
+  assert.match(app, /if \(startedAt === null\) startedAt = now/);
+  assert.match(app, /track\.dataset\.firstBrakePosition = position\.toFixed\(3\)/);
+  assert.doesNotMatch(app, /targetIndex = 45/);
   assert.match(app, /activeRound\.stop\(\)/);
   assert.match(app, /ui\.bonusAction\.textContent = "STOP"/);
   assert.match(model, /Stop controls reveal timing only/);
@@ -149,7 +159,7 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
   assert.match(inventory, /never cover bet, spin, Normal\/Fast, or Autoplay controls/i);
-  assert.equal(JSON.parse(packageJson).version, "2.19.0");
+  assert.equal(JSON.parse(packageJson).version, "2.19.1");
 });
 
 test("the complete reel board stays visible through five real stop phases", async () => {
@@ -169,9 +179,10 @@ test("the complete reel board stays visible through five real stop phases", asyn
 test("case rolls use fast presentation timing without changing the sealed target", async () => {
   const app = await readFile(new URL("app.js", root), "utf8");
   assert.match(app, /rollSpeed = reducedMotion \? 2600 : 1480 \+ roundIndex \* 90/);
-  assert.match(app, /duration = reducedMotion \? 80 : 980/);
+  assert.match(app, /multiplier >= 10[\s\S]*?duration: 1550/);
+  assert.match(app, /return \{ duration: 620, minimumSteps: 5/);
   assert.match(app, /reducedMotion \? 180 : 2400/);
-  assert.match(app, /finalOffset = -\(targetIndex \* step \+ itemWidth \/ 2\)/);
+  assert.match(app, /finalOffset = -\(landingIndex \* step \+ itemWidth \/ 2\)/);
 });
 
 test("hosted audio unlocks from game selection and keeps an explicit preference", async () => {
