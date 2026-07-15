@@ -159,7 +159,25 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
   assert.match(inventory, /never cover bet, spin, Normal\/Fast, or Autoplay controls/i);
-  assert.equal(JSON.parse(packageJson).version, "2.19.1");
+  assert.equal(JSON.parse(packageJson).version, "2.19.2");
+});
+
+test("autoplay uses an unclipped viewport dialog with phone-safe controls", async () => {
+  const [html, app, css, inventory] = await Promise.all([
+    readFile(new URL("index.html", root), "utf8"),
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("styles.css", root), "utf8"),
+    readFile(new URL("GAME_FUNCTIONS.md", root), "utf8")
+  ]);
+  assert.match(html, /id="autoplayOverlay"[\s\S]*?id="autoplayMenu"[\s\S]*?aria-modal="true"/);
+  assert.match(app, /function setAutoplayMenuOpen/);
+  assert.match(app, /ui\.autoplayOverlay\.hidden = !shouldOpen/);
+  assert.match(app, /event\.target === ui\.autoplayOverlay/);
+  assert.match(app, /event\.code === "Escape" && !ui\.autoplayOverlay\.hidden/);
+  assert.match(css, /\.autoplay-overlay \{[\s\S]*?position: fixed;[\s\S]*?inset: 0/);
+  assert.match(css, /\.autoplay-overlay \.autoplay-menu \{[\s\S]*?position: relative;[\s\S]*?transform: none/);
+  assert.match(css, /2\.19\.2 viewport-level autoplay dialog/);
+  assert.match(inventory, /viewport-level dialog that cannot be clipped/i);
 });
 
 test("the complete reel board stays visible through five real stop phases", async () => {

@@ -1759,6 +1759,40 @@ a:focus-visible {
 
 .autoplay-menu[hidden] { display: none; }
 
+.autoplay-overlay {
+  position: fixed;
+  z-index: 125;
+  inset: 0;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 46%, rgba(74,102,194,.2), transparent 44%), rgba(1,4,14,.78);
+  backdrop-filter: blur(10px) saturate(.82);
+}
+
+.autoplay-overlay[hidden] { display: none; }
+
+.autoplay-overlay .autoplay-menu {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  width: min(360px, 100%);
+  max-height: calc(100dvh - max(32px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+  overflow-y: auto;
+  border-color: color-mix(in srgb, var(--game-accent) 45%, rgba(255,255,255,.16));
+  border-radius: 20px 7px 20px 7px;
+  background: linear-gradient(150deg, rgba(17,27,68,.985), rgba(4,7,22,.99));
+  box-shadow: 0 28px 90px rgba(0,0,0,.75), inset 0 1px rgba(255,255,255,.09), 0 0 42px color-mix(in srgb, var(--game-accent) 15%, transparent);
+  transform: none;
+}
+
+.is-autoplay-open { overflow: hidden; }
+
 .autoplay-menu > div:first-child {
   display: flex;
   justify-content: space-between;
@@ -5964,6 +5998,9 @@ body {
 @media (max-width: 560px) and (orientation: portrait) and (max-height: 700px) {
   .game-stage[data-game="astral"] .astral-feature-dock { bottom: 3px; }
 
+  .game-stage[data-game="astral"] .showcase-row .auto-button:not(.is-running) > strong { display: none; }
+  .game-stage[data-game="astral"] .showcase-row .auto-button > span::after { font-size: 8px; }
+
   .bonus-overlay[data-mode="astral-case-roll"] .astral-total-multiplier,
   .bonus-overlay[data-mode="astral-case-roll"] .bonus-total {
     bottom: 52px;
@@ -5981,6 +6018,40 @@ body {
     bottom: 96px;
     width: 72%;
   }
+}
+
+/* 2.19.2 viewport-level autoplay dialog: never clipped by the cabinet on phones. */
+@media (max-width: 560px), (max-height: 520px) {
+  .autoplay-overlay {
+    padding:
+      max(10px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(10px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .autoplay-overlay .autoplay-menu {
+    width: min(348px, 100%);
+    max-height: calc(100dvh - max(20px, env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+    padding: 14px;
+    border-radius: 17px 6px 17px 6px;
+  }
+
+  .autoplay-overlay .autoplay-menu > div:first-child strong { font-size: 22px; }
+  .autoplay-overlay .autoplay-menu > div:first-child small { font-size: 9px; }
+  .autoplay-overlay .autoplay-menu > p { margin: 10px 0 14px; font-size: 10px; line-height: 1.4; }
+  .autoplay-overlay .menu-close { width: 34px; height: 34px; font-size: 18px; }
+  .autoplay-overlay .auto-options { gap: 8px; }
+  .autoplay-overlay .auto-options button { min-height: 66px; }
+  .autoplay-overlay .auto-options strong { font-size: 24px; }
+  .autoplay-overlay .auto-options span { font-size: 8px; }
+}
+
+@media (max-height: 420px) {
+  .autoplay-overlay .autoplay-menu { padding: 11px; }
+  .autoplay-overlay .autoplay-menu > p { display: none; }
+  .autoplay-overlay .auto-options { margin-top: 10px; }
+  .autoplay-overlay .auto-options button { min-height: 50px; }
 }
 
 /* 2.14 Astral feature market and Moon Balloon Ascent. */

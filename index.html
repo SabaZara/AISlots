@@ -13,7 +13,7 @@
     <link rel="preload" href="./assets/astral-multiplier-gate-v1.png" as="image" />
     <link rel="preload" href="./assets/astral-case-machine-v1.png" as="image" />
     <link rel="preload" href="./assets/astral-case-capsule-blue-v1.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=2.19.1" />
+    <link rel="stylesheet" href="./styles.css?v=2.19.2" />
     <title>The Lumen Collection · Four free-play slots</title>
   </head>
   <body>
@@ -161,15 +161,6 @@
                 </div>
               </div>
             </div>
-            <div class="autoplay-menu" id="autoplayMenu" hidden>
-              <div><span><strong>Autoplay</strong><small>Finite free-play sessions</small></span><button class="menu-close" id="closeAutoplay" type="button" aria-label="Close autoplay options">×</button></div>
-              <p>Choose a limit. You can stop at any time; autoplay also stops if the balance is too low.</p>
-              <div class="auto-options">
-                <button type="button" data-auto-count="10"><strong>10</strong><span>spins</span></button>
-                <button type="button" data-auto-count="25"><strong>25</strong><span>spins</span></button>
-                <button type="button" data-auto-count="50"><strong>50</strong><span>spins</span></button>
-              </div>
-            </div>
             <div class="showcase-row" id="showcaseRow">
               <p class="keyboard-hint">Press <kbd>Space</kbd> to spin · Finite autoplay · Result shown for at least 2.5 seconds</p>
             </div>
@@ -203,6 +194,18 @@
           <p><strong>Free-play prototype.</strong> No deposits, payments, or cash prizes. Play for entertainment.</p>
         <button id="resetSession" type="button">Reset demo balance</button>
       </footer>
+    </div>
+
+    <div class="autoplay-overlay" id="autoplayOverlay" hidden aria-hidden="true">
+      <section class="autoplay-menu" id="autoplayMenu" hidden role="dialog" aria-modal="true" aria-labelledby="autoplayTitle">
+        <div><span><strong id="autoplayTitle">Autoplay</strong><small>Finite free-play sessions</small></span><button class="menu-close" id="closeAutoplay" type="button" aria-label="Close autoplay options">×</button></div>
+        <p>Choose a limit. You can stop at any time; autoplay also stops if the balance is too low.</p>
+        <div class="auto-options">
+          <button type="button" data-auto-count="10"><strong>10</strong><span>spins</span></button>
+          <button type="button" data-auto-count="25"><strong>25</strong><span>spins</span></button>
+          <button type="button" data-auto-count="50"><strong>50</strong><span>spins</span></button>
+        </div>
+      </section>
     </div>
 
     <dialog class="modal rules-modal" id="rulesDialog">
@@ -401,6 +404,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=2.19.1"></script>
+    <script type="module" src="./app.js?v=2.19.2"></script>
   </body>
 </html>

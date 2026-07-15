@@ -85,6 +85,7 @@ const ui = {
   spinLabel: $("spinLabel"),
   showcaseRow: $("showcaseRow"),
   speedButtons: document.querySelectorAll("[data-spin-speed]"),
+  autoplayOverlay: $("autoplayOverlay"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
   lobbyOverlay: $("lobbyOverlay"),
@@ -554,8 +555,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   gameStage.dataset.game = game.id;
   const autoplayHome = game.id === "astral" ? ui.showcaseRow : ui.spinOptions;
   if (ui.autoButton.parentElement !== autoplayHome) autoplayHome.append(ui.autoButton);
-  ui.autoplayMenu.hidden = true;
-  ui.autoButton.setAttribute("aria-expanded", "false");
+  setAutoplayMenuOpen(false);
   ui.featureCard.dataset.game = game.id;
   ui.featureVisual.dataset.meter = game.meterMode;
   ui.reels.dataset.motion = game.reelMotion;
@@ -1628,8 +1628,7 @@ async function spin({ fromAuto = false } = {}) {
 function stopAutoplay(message = "Autoplay stopped") {
   state.autoStopRequested = true;
   state.autoActive = false;
-  ui.autoplayMenu.hidden = true;
-  ui.autoButton.setAttribute("aria-expanded", "false");
+  setAutoplayMenuOpen(false);
   updateUi();
   if (!state.isSpinning) setStatus(message);
 }
@@ -1639,8 +1638,7 @@ async function startAutoplay(count) {
   state.autoActive = true;
   state.autoStopRequested = false;
   state.autoRemaining = count;
-  ui.autoplayMenu.hidden = true;
-  ui.autoButton.setAttribute("aria-expanded", "false");
+  setAutoplayMenuOpen(false);
   updateUi();
   setStatus(`Autoplay started · ${count} finite spins`);
 
@@ -1664,6 +1662,21 @@ async function startAutoplay(count) {
 function openDialog(id) {
   const dialog = $(id);
   if (dialog && !dialog.open) dialog.showModal();
+}
+
+function setAutoplayMenuOpen(open, { returnFocus = false } = {}) {
+  const shouldOpen = Boolean(open) && !state.autoActive && !state.isSpinning;
+  ui.autoplayOverlay.hidden = !shouldOpen;
+  ui.autoplayOverlay.setAttribute("aria-hidden", String(!shouldOpen));
+  ui.autoplayMenu.hidden = !shouldOpen;
+  ui.autoButton.setAttribute("aria-expanded", String(shouldOpen));
+  document.body.classList.toggle("is-autoplay-open", shouldOpen);
+  $("appShell").inert = shouldOpen;
+  if (shouldOpen) {
+    window.requestAnimationFrame(() => ui.autoplayMenu.querySelector("[data-auto-count]")?.focus());
+  } else if (returnFocus) {
+    ui.autoButton.focus();
+  }
 }
 
 function updateSoundControl() {
@@ -1745,12 +1758,13 @@ function bindEvents() {
       stopAutoplay("Autoplay will stop after the current spin");
       return;
     }
-    ui.autoplayMenu.hidden = !ui.autoplayMenu.hidden;
-    ui.autoButton.setAttribute("aria-expanded", String(!ui.autoplayMenu.hidden));
+    setAutoplayMenuOpen(ui.autoplayMenu.hidden);
   });
   $("closeAutoplay").addEventListener("click", () => {
-    ui.autoplayMenu.hidden = true;
-    ui.autoButton.setAttribute("aria-expanded", "false");
+    setAutoplayMenuOpen(false, { returnFocus: true });
+  });
+  ui.autoplayOverlay.addEventListener("click", (event) => {
+    if (event.target === ui.autoplayOverlay) setAutoplayMenuOpen(false, { returnFocus: true });
   });
   document.querySelectorAll("[data-auto-count]").forEach((button) => {
     button.addEventListener("click", () => startAutoplay(Number(button.dataset.autoCount)));
@@ -1811,6 +1825,11 @@ function bindEvents() {
   });
 
   window.addEventListener("keydown", (event) => {
+    if (event.code === "Escape" && !ui.autoplayOverlay.hidden) {
+      event.preventDefault();
+      setAutoplayMenuOpen(false, { returnFocus: true });
+      return;
+    }
     if (event.code !== "Space" || event.repeat) return;
     const activeTag = document.activeElement?.tagName;
     const dialogOpen = Boolean(document.querySelector("dialog[open]"));

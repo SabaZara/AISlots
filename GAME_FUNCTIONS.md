@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.19.1**
+Version reviewed: **2.19.2**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -16,7 +16,7 @@ This is the team-review checklist for the current build. “Implemented” means
 | Bet decrease / increase | Implemented | Large `−` and `+` buttons select 1, 2, 5, 10, or 20 CR. Controls lock while a result is resolving. |
 | Maximum bet | Implemented | `MAX` selects 20 CR. There is no real-money purchase or deposit path. |
 | Spin speed | Implemented | Clearly labeled Normal 1× and Fast 3× choices sit beside the main Spin control. The selection persists between visits and Fast changes reel/presentation timing only; outcome generation and RTP are unchanged. |
-| Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits or a feature presentation. |
+| Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins from a viewport-level dialog that cannot be clipped by the cabinet. It supports outside-tap and Escape close, can be stopped at any time, and stops for insufficient credits or a feature presentation. |
 | Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. The panel explains that the higher price guarantees meter progress; exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
 | Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet opens three sealed Celestial Case rolls immediately using demo credits only. Each case is stopped separately; purchase prizes remain scaled to 99.00% theoretical RTP and receive a fairness receipt. |
 | Sound | Implemented | The first game-selection tap unlocks and starts sound in a browser-compliant user gesture. The top-bar button then remains a persistent explicit mute/unmute preference. |
@@ -107,7 +107,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - The compact header shows balance, RTP, and free-play status without session-loss or elapsed-time readouts.
 - Reduced-motion media query support.
 - Keyboard operation, focus states, ARIA labels, live result status, and dialog close controls.
-- Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, Normal/Fast speed, autoplay, sound, lobby, and verification controls. Narrow phones use a smaller spin button and separate collision-free rows for core and feature actions.
+- Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, Normal/Fast speed, autoplay, sound, lobby, and verification controls. Narrow phones use a smaller spin button, a compact readable Autoplay trigger, a centered safe-area-aware Autoplay dialog, and separate collision-free rows for core and feature actions.
 - Desktop, phone, and iPad gameplay is locked to the dynamic viewport with no document scrolling. Portrait keeps the cabinet centered with the generated bonus HUD floating in the character-safe center; short landscape rotation places the HUD above the horizontal reels-and-controls cabinet.
 - Phone portrait removes the redundant in-cabinet title while retaining the game name in the top bar, preventing title text from covering character faces.
 - Safe-area insets protect controls around notches and home indicators. The lobby fits as a 2×2 portrait chooser or a four-card landscape row without page scrolling.
