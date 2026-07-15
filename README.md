@@ -58,7 +58,7 @@ The interface includes:
 - balance, last return, recent result details, and feature progression, including a persistent Astral return badge that compares credits returned with the current bet;
 - themed synthesized sound effects, win chords, collection tones, particles, bonus reveals, and big-win motion;
 - reduced-motion support and keyboard spinning;
-- viewport-locked desktop, phone, and iPad gameplay with no page scrolling, dynamic-viewport sizing, safe-area padding, compact portrait controls, and a dedicated horizontal cabinet after rotation;
+- viewport-locked desktop, phone, and iPad gameplay with no page scrolling, dynamic-viewport sizing, safe-area padding, compact portrait controls, a collision-free second row for Astral feature actions on phones and tablets, and a dedicated horizontal cabinet after rotation;
 - overflow-safe winning-symbol breakouts on phones, plus a compact portrait HUD that replaces the redundant machine title so character faces stay unobstructed;
 - a no-scroll responsive lobby that uses a 2×2 chooser in portrait and a four-card row in landscape;
 - a single compact fairness button in the top toolbar.

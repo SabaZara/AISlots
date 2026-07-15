@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.18.0**
+Version reviewed: **2.18.1**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -62,7 +62,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Astral places **Bonus demo** in the upper-right game area and gives **Autoplay** its own centered utility dock below the main controls; short landscape layouts keep the Autoplay dock visible as a compact floating control.
 - Astral winning tiles remain stationary and transparent while only the isolated symbol artwork jumps. The other three games retain their existing winner treatment.
 - Astral removes the near-miss callout and the visible narration row below the reels. Result details remain available from the compact info control and fairness receipt.
-- Astral’s graphic **Special bet** and **Buy bonus** controls are isolated to the first game and sit below the character faces; phone and iPad layouts move them into the lower control dock. Neon, Ember, and UFC retain their existing cabinets.
+- Astral’s graphic **Special bet** and **Buy bonus** controls are isolated to the first game and sit below the character faces. Phone and iPad portrait reserve a dedicated second row inside the control deck so these buttons never cover bet, spin, Normal/Fast, or Autoplay controls. Neon, Ember, and UFC retain their existing cabinets.
 
 ## Persistent meters and bonuses
 
@@ -107,7 +107,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - The compact header shows balance, RTP, and free-play status without session-loss or elapsed-time readouts.
 - Reduced-motion media query support.
 - Keyboard operation, focus states, ARIA labels, live result status, and dialog close controls.
-- Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, Normal/Fast speed, autoplay, sound, lobby, and verification controls.
+- Responsive desktop, tablet, and phone layouts, including touch-sized spin, bet, Normal/Fast speed, autoplay, sound, lobby, and verification controls. Narrow phones use a smaller spin button and separate collision-free rows for core and feature actions.
 - Desktop, phone, and iPad gameplay is locked to the dynamic viewport with no document scrolling. Portrait keeps the cabinet centered with the generated bonus HUD floating in the character-safe center; short landscape rotation places the HUD above the horizontal reels-and-controls cabinet.
 - Phone portrait removes the redundant in-cabinet title while retaining the game name in the top bar, preventing title text from covering character faces.
 - Safe-area insets protect controls around notches and home indicators. The lobby fits as a 2×2 portrait chooser or a four-card landscape row without page scrolling.
@@ -119,8 +119,8 @@ All characters are transparent foreground cutouts placed independently over envi
 | Small phone | 320×568 | Portrait | None | Header, meter, reels, bet controls, spin, and autoplay stay inside the viewport. |
 | Phone | 360×740 | Portrait | None | Full portrait cabinet and compact responsible-play footer fit. |
 | Modern phone | 390×844 | Portrait | None | Full portrait cabinet, floating feature meter, and footer fit. |
-| Small phone rotated | 667×375 | Landscape | None | Horizontal meter–reels–controls cabinet fits. |
-| Modern phone rotated | 844×390 | Landscape | None | Horizontal meter–reels–controls cabinet fits. |
+| Small phone rotated | 667×375 | Landscape | None | Horizontal meter–reels–controls cabinet fits with feature actions below the shortened reel board. |
+| Modern phone rotated | 844×390 | Landscape | None | Horizontal meter–reels–controls cabinet fits with every action fully clickable. |
 | iPad | 768×1024 | Portrait | None | Centered full cabinet, meter, controls, and footer fit. |
 | iPad rotated | 1024×768 | Landscape | None | Compact landscape cabinet, meter, controls, and footer fit. |
 | Desktop | 1440×900 and larger | Landscape | None | Header, cabinet, bonus HUD, controls, Bonus demo row, and footer remain inside the viewport. |

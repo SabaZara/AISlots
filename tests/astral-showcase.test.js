@@ -140,9 +140,16 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(css, /env\(safe-area-inset-top\)/);
   assert.match(css, /orientation: landscape/);
   assert.match(css, /grid-template-rows: 56px minmax\(0, 1fr\)/);
+  assert.match(css, /2\.18\.1 mobile portrait control collision fix/);
+  assert.match(css, /padding: 5px 6px 44px/);
+  assert.match(css, /bottom: 38px/);
+  assert.match(css, /width: 118px/);
+  assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px[\s\S]*?padding: 6px 12px 52px/);
+  assert.match(css, /height: calc\(100% - 40px\)/);
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "2.18.0");
+  assert.match(inventory, /never cover bet, spin, Normal\/Fast, or Autoplay controls/i);
+  assert.equal(JSON.parse(packageJson).version, "2.18.1");
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
