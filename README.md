@@ -1,6 +1,6 @@
 # The Lumen Collection
 
-The Lumen Collection is a dependency-free, responsive suite of four free-play slot games. It opens on a full-screen game chooser, then gives each title its own generated symbol art, reel treatment, spin action, persistent bonus rhythm, and sound palette. Every game uses a published 99.00% long-run return model, finite autoplay, shared demo credits, and a SHA-256 commit/reveal receipt.
+The Lumen Collection is a dependency-free, responsive suite of four free-play slot games. It opens on a full-screen game chooser, then gives each title its own generated symbol art, full-board sequential reel stops, spin action, persistent bonus rhythm, and sound palette. The first game-selection tap also unlocks hosted audio in a browser-compliant user gesture. Every game uses a published 99.00% long-run return model, finite autoplay, shared demo credits, and a SHA-256 commit/reveal receipt.
 
 ## Included games
 

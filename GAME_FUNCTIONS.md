@@ -1,6 +1,6 @@
 # AISlots function inventory
 
-Version reviewed: **2.18.1**
+Version reviewed: **2.19.0**
 Product state: **shareable free-play prototype; not a real-money gambling system**
 
 This is the team-review checklist for the current build. “Implemented” means the function exists in the browser prototype. It does not mean the function has completed gambling-regulator certification.
@@ -19,7 +19,7 @@ This is the team-review checklist for the current build. “Implemented” means
 | Finite autoplay | Implemented | Player can choose 10, 25, or 50 spins. It can be stopped at any time and stops for insufficient credits or a feature presentation. |
 | Astral special bets | Implemented | Standard, +1 guaranteed Bloom, and +2 guaranteed Blooms are selected from a graphic feature panel. The panel explains that the higher price guarantees meter progress; exact cost multipliers are calibrated so each mode retains 99.00% theoretical RTP. |
 | Astral buy bonus | Implemented | 25×, 50×, or 100× the selected bet opens three sealed Celestial Case rolls immediately using demo credits only. Each case is stopped separately; purchase prizes remain scaled to 99.00% theoretical RTP and receive a fairness receipt. |
-| Sound | Implemented | Sound is opt-in and can be turned on or off from the top bar. |
+| Sound | Implemented | The first game-selection tap unlocks and starts sound in a browser-compliant user gesture. The top-bar button then remains a persistent explicit mute/unmute preference. |
 | Last result | Implemented | Info button shows total returned, collector count, individual base-game payouts, and bonus payout. No paylines are drawn over the reels. |
 | Reset demo | Implemented | Resets demo credits, progress, statistics, and receipt state. |
 
@@ -50,7 +50,7 @@ All characters are transparent foreground cutouts placed independently over envi
 ## Reel and outcome presentation
 
 - Every world has its own generated raster symbol sheet and symbol names.
-- Reel start, continuous movement, anticipation, and sequential reel stops are animated.
+- Reel start, continuous movement, anticipation, and five true sequential reel stops are animated. The entire 5×4 board remains visible during every stop: each landed column reveals its sealed symbols while all later columns continue moving.
 - Reel motion changes by world: cascade, wave, slam, or strike.
 - Collector landings receive a different impact treatment from standard symbol landings.
 - Winning symbols animate and remain visually readable without a drawn payline.
@@ -75,7 +75,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Each world uses a transparent generated HUD frame with a live count and one deterministic progress light per required collector.
 - Bonus payout equals the sum of the pre-sealed prize multipliers multiplied by the spin’s total bet.
 - The Astral Celestial Case Roll presents every sealed multiplier as its own interactive horizontal capsule reel with rarity colors, a bright center marker, deceleration, impact glow, and a persistent total X.
-- Players open cases one at a time and press Stop to begin the deceleration. A global case-progress bar shows the current case and total completion; autoplay starts, stops, and closes the same sequence automatically. Stop changes reveal timing only—the sealed prize is unchanged by the animation.
+- Players open cases one at a time and press Stop to begin a fast deceleration. The capsule belt now runs at casino pace and locks in about one second after Stop; a 2.4-second fallback keeps autoplay moving. A global case-progress bar shows the current case and total completion; Stop changes reveal timing only—the sealed prize is unchanged by the animation.
 - Special-bet progress boosts participate in the same meter rollover logic as natural Blooms. The higher wager is derived from the feature’s exact expected value so all three Astral wager modes remain at 99.00% theoretical RTP.
 - Feature purchases draw the same three sealed Astral prize values, scale them for the selected 25×, 50×, or 100× demo-credit cost, and preserve 99.00% theoretical RTP at each tier.
 
@@ -86,7 +86,7 @@ All characters are transparent foreground cutouts placed independently over envi
 - Per-world spin-start, spin-bed, tick rhythm, reel-stop, anticipation, collection, win, payout-count, bonus-start, bonus-reveal, and celebration cues.
 - Stereo movement, dynamics compression, synthesized room/reverb treatment, impact noise, musical win chords, particles, reel flashes, cabinet shake, and screen-level big-win scenes.
 - Astral uses locally stored WOW Sound layers for background music, spin launch, reel ticks, regular victories, and a 13-second cinematic big-win cue. Bright casino sparkle runs, high-pass risers, stereo coin-like ticks, and upper-register fanfare chords are synthesized around the unmodified licensed recordings. The background automatically ducks during the big-win cue and returns after the cue or Collect action. Source, credit, and license records are stored in `assets/audio/LICENSES.md`.
-- Audio remains off until the player explicitly enables it.
+- Audio is unlocked and starts from the first game-selection tap so hosted Render builds produce sound without violating browser autoplay rules. A remembered explicit mute remains off until the player turns sound back on.
 
 ## Provable fairness
 

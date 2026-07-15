@@ -18,6 +18,7 @@ const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
 const INITIAL_BALANCE = 1000;
 const SPIN_SPEED_STORAGE_KEY = "aislots-spin-speed";
+const AUDIO_PREFERENCE_STORAGE_KEY = "aislots-audio-preference";
 const SPIN_SPEEDS = Object.freeze([
   Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
   Object.freeze({ id: "fast", name: "Fast", label: "3×", resultDisplayMs: 780, settleScale: 0.4, shuffleScale: 0.58, autoplayGapMs: 140 })
@@ -137,6 +138,7 @@ const state = {
   autoStopRequested: false,
   ageConfirmed: false,
   soundEnabled: false,
+  soundPreference: null,
   speedIndex: 0,
   specialBetBoost: 0,
   lastOutcome: null,
@@ -297,7 +299,14 @@ function symbolGraphic(id) {
   return symbolSvg(id);
 }
 
-function renderGrid(grid, { shuffling = false, settling = false, winnerCells = new Set() } = {}) {
+function renderGrid(grid, {
+  shuffling = false,
+  settling = false,
+  winnerCells = new Set(),
+  shufflingColumns = new Set(),
+  settlingColumn = -1,
+  settledColumns = new Set()
+} = {}) {
   const fragment = document.createDocumentFragment();
   const settleScale = currentSpinSpeed().settleScale;
   for (let row = 0; row < ROWS; row += 1) {
@@ -306,10 +315,12 @@ function renderGrid(grid, { shuffling = false, settling = false, winnerCells = n
       const id = grid[index];
       const cell = document.createElement("div");
       cell.className = "symbol-cell";
-      if (shuffling) cell.classList.add("is-shuffling");
-      if (settling) cell.classList.add("is-settling");
+      if (shuffling || shufflingColumns.has(col)) cell.classList.add("is-shuffling");
+      if (settling || settlingColumn === col) cell.classList.add("is-settling");
+      if (settledColumns.has(col)) cell.classList.add("is-reel-settled");
       if (winnerCells.has(index)) cell.classList.add("is-winner");
       if (id === "petal") cell.classList.add("is-scatter");
+      cell.dataset.index = String(index);
       cell.dataset.symbol = id;
       cell.dataset.col = String(col);
       cell.dataset.row = String(row);
@@ -319,7 +330,8 @@ function renderGrid(grid, { shuffling = false, settling = false, winnerCells = n
       cell.style.setProperty("--col", String(col));
       cell.style.setProperty("--row", String(row));
       cell.style.setProperty("--motion-delay", `${-(col * 48 + row * 24)}ms`);
-      cell.style.setProperty("--stop-delay", `${Math.round((col * currentGame().reelStopGap + row * 18) * settleScale)}ms`);
+      const stopDelay = settlingColumn >= 0 ? row * 18 : col * currentGame().reelStopGap + row * 18;
+      cell.style.setProperty("--stop-delay", `${Math.round(stopDelay * settleScale)}ms`);
       cell.style.setProperty("--symbol-glow", symbolGlow(id));
       const symbolName = currentSymbols().find((symbol) => symbol.id === id)?.name ?? id;
       cell.setAttribute("aria-label", symbolName);
@@ -329,6 +341,21 @@ function renderGrid(grid, { shuffling = false, settling = false, winnerCells = n
   }
   ui.reels.classList.toggle("has-winners", winnerCells.size > 0);
   ui.reels.replaceChildren(fragment);
+}
+
+function renderReelStopFrame(outcomeGrid, reel, shuffleTick) {
+  const cosmetic = cosmeticGrid(shuffleTick);
+  const frameGrid = outcomeGrid.map((id, index) => Math.floor(index / ROWS) <= reel ? id : cosmetic[index]);
+  const shufflingColumns = new Set(Array.from({ length: COLS - reel - 1 }, (_, index) => reel + index + 1));
+  const settledColumns = new Set(Array.from({ length: reel }, (_, index) => index));
+  renderGrid(frameGrid, { shufflingColumns, settlingColumn: reel, settledColumns });
+}
+
+function revealWinningCells(winnerCells) {
+  ui.reels.querySelectorAll(".symbol-cell").forEach((cell) => {
+    cell.classList.toggle("is-winner", winnerCells.has(Number(cell.dataset.index)));
+  });
+  ui.reels.classList.toggle("has-winners", winnerCells.size > 0);
 }
 
 function initialGrid() {
@@ -508,6 +535,7 @@ function openLobby() {
 
 function chooseLobbyGame(gameId) {
   if (!GAMES[gameId]) return;
+  enableSoundFromGesture();
   state.ageConfirmed = true;
   try { window.sessionStorage.setItem("lumen-collection-age-confirmed", "true"); } catch { /* storage may be unavailable */ }
   if (gameId !== state.gameId) switchGame(gameId);
@@ -811,23 +839,19 @@ async function settleOutcome(outcome) {
   const reelGap = Math.max(20, Math.round(game.reelStopGap * speed.settleScale));
   const settleTail = Math.max(140, Math.round(620 * speed.settleScale));
   setAnticipationUi(false);
-  audio.stopSpinLoop();
   ui.reelViewport.classList.remove("is-spinning");
   ui.reelViewport.classList.add("is-stopping");
-  if (state.gameId === "astral") {
-    ui.reels.classList.add("is-board-clearing");
-    await waitForSpinDelay(Math.max(40, Math.round(280 * speed.settleScale)));
-  }
-  renderGrid(outcome.grid, { settling: true, winnerCells: winningCells(outcome) });
-  ui.reels.classList.remove("is-board-clearing");
   if (state.gameId === "astral") ui.reels.classList.add("is-cinematic-drop");
   for (let reel = 0; reel < COLS; reel += 1) {
     if (reel > 0) await waitForSpinDelay(reelGap);
+    renderReelStopFrame(outcome.grid, reel, reel * 7 + 3);
     const collector = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).includes("petal");
     playReelStopSound(reel);
     flashReelStop(reel, { collector, final: reel === COLS - 1 });
   }
+  audio.stopSpinLoop();
   await waitForSpinDelay(settleTail);
+  revealWinningCells(winningCells(outcome));
   ui.reels.classList.remove("is-cinematic-drop");
   ui.reelViewport.classList.remove("is-stopping");
   updateUi();
@@ -1010,7 +1034,7 @@ function beginAstralCaseRoll(roundIndex, multiplier, bet, multiplierTotal, total
   const gap = Number.parseFloat(trackStyles.columnGap || trackStyles.gap) || 10;
   const step = itemWidth + gap;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const rollSpeed = reducedMotion ? 2200 : 720 + roundIndex * 55;
+  const rollSpeed = reducedMotion ? 2600 : 1480 + roundIndex * 90;
   let offset = 0;
   let lastFrame = performance.now();
   let lastTickOffset = 0;
@@ -1052,12 +1076,12 @@ function beginAstralCaseRoll(roundIndex, multiplier, bet, multiplierTotal, total
     ui.astralMultiplierDial.classList.remove("is-rolling");
     ui.astralMultiplierDial.classList.add("is-decelerating");
     const finalOffset = -(targetIndex * step + itemWidth / 2);
-    const duration = reducedMotion ? 80 : 1750;
+    const duration = reducedMotion ? 80 : 980;
     let stopTick = 0;
     const stopTicks = window.setInterval(() => {
       playTone(720 + stopTick % 4 * 110, .055, "triangle");
       stopTick += 1;
-    }, reducedMotion ? 40 : 145);
+    }, reducedMotion ? 40 : 92);
     if (typeof track.animate === "function") {
       const animation = track.animate([
         { transform: `translate3d(${offset}px,0,0)`, filter: "blur(1.2px)" },
@@ -1098,7 +1122,7 @@ function beginAstralCaseRoll(roundIndex, multiplier, bet, multiplierTotal, total
     resolveFinished();
     return finished;
   };
-  automaticStop = window.setTimeout(() => void stop(), reducedMotion ? 180 : 3600);
+  automaticStop = window.setTimeout(() => void stop(), reducedMotion ? 180 : 2400);
   return { finished, stop };
 }
 
@@ -1400,7 +1424,7 @@ async function runAstralShowcasePreview() {
   state.isSpinning = true;
   ui.astralShowcaseButton.disabled = true;
   updateUi();
-  setStatus(state.soundEnabled ? "Moonwell bonus demo · no wager · no payout" : "Moonwell bonus demo · turn sound on to hear the full mix");
+  setStatus("Moonwell bonus demo · no wager · no payout");
   try {
     await showAstralBonus([[0.5, 1, 3]], 1, { preview: true });
     setStatus("Moonwell bonus demo complete · no credits or feature progress changed");
@@ -1597,6 +1621,37 @@ function openDialog(id) {
   if (dialog && !dialog.open) dialog.showModal();
 }
 
+function updateSoundControl() {
+  ui.soundButton.setAttribute("aria-pressed", String(state.soundEnabled));
+  ui.soundButton.setAttribute("aria-label", state.soundEnabled ? "Turn sound off" : "Turn sound on");
+  ui.soundButton.dataset.audioState = state.soundEnabled ? "on" : "off";
+}
+
+function setSoundEnabled(enabled, { remember = true, cue = true } = {}) {
+  state.soundEnabled = Boolean(enabled);
+  if (remember) {
+    state.soundPreference = state.soundEnabled;
+    try { window.localStorage.setItem(AUDIO_PREFERENCE_STORAGE_KEY, state.soundEnabled ? "on" : "off"); } catch { /* local storage is optional */ }
+  }
+  audio.setEnabled(state.soundEnabled);
+  updateSoundControl();
+  if (state.soundEnabled && cue) audio.interfaceOn();
+}
+
+function restoreSoundPreference() {
+  try {
+    const stored = window.localStorage.getItem(AUDIO_PREFERENCE_STORAGE_KEY);
+    if (stored === "on") state.soundPreference = true;
+    if (stored === "off") state.soundPreference = false;
+  } catch { /* local storage is optional */ }
+  updateSoundControl();
+}
+
+function enableSoundFromGesture() {
+  if (state.soundEnabled || state.soundPreference === false) return;
+  setSoundEnabled(true, { remember: true, cue: true });
+}
+
 function bindEvents() {
   $("brandLink").addEventListener("click", (event) => {
     event.preventDefault();
@@ -1659,11 +1714,7 @@ function bindEvents() {
     button.addEventListener("click", () => switchGame(button.dataset.gameId));
   });
   ui.soundButton.addEventListener("click", () => {
-    state.soundEnabled = !state.soundEnabled;
-    audio.setEnabled(state.soundEnabled);
-    ui.soundButton.setAttribute("aria-pressed", String(state.soundEnabled));
-    ui.soundButton.setAttribute("aria-label", state.soundEnabled ? "Turn sound off" : "Turn sound on");
-    if (state.soundEnabled) audio.interfaceOn();
+    setSoundEnabled(!state.soundEnabled, { remember: true, cue: true });
   });
 
   $("rulesButton").addEventListener("click", () => openDialog("rulesDialog"));
@@ -1727,6 +1778,7 @@ function bindEvents() {
 
 async function init() {
   restoreSpinSpeed();
+  restoreSoundPreference();
   applyGameTheme({ resetGrid: true });
   buildLobby();
   ui.clientSeedInput.value = state.clientSeed;

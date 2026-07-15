@@ -149,7 +149,40 @@ test("phone rotation and iPad viewport-fit rules remain documented", async () =>
   assert.match(readme, /viewport-locked desktop, phone, and iPad gameplay/i);
   assert.match(inventory, /no document scrolling/i);
   assert.match(inventory, /never cover bet, spin, Normal\/Fast, or Autoplay controls/i);
-  assert.equal(JSON.parse(packageJson).version, "2.18.1");
+  assert.equal(JSON.parse(packageJson).version, "2.19.0");
+});
+
+test("the complete reel board stays visible through five real stop phases", async () => {
+  const [app, css] = await Promise.all([
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("styles.css", root), "utf8")
+  ]);
+  assert.match(app, /function renderReelStopFrame/);
+  assert.match(app, /Math\.floor\(index \/ ROWS\) <= reel \? id : cosmetic\[index\]/);
+  assert.match(app, /for \(let reel = 0; reel < COLS; reel \+= 1\)[\s\S]*?renderReelStopFrame/);
+  assert.match(app, /revealWinningCells\(winningCells\(outcome\)\)/);
+  assert.doesNotMatch(app, /is-board-clearing/);
+  assert.match(css, /symbol-cell\.is-reel-settled/);
+  assert.doesNotMatch(css, /astralBoardClear/);
+});
+
+test("case rolls use fast presentation timing without changing the sealed target", async () => {
+  const app = await readFile(new URL("app.js", root), "utf8");
+  assert.match(app, /rollSpeed = reducedMotion \? 2600 : 1480 \+ roundIndex \* 90/);
+  assert.match(app, /duration = reducedMotion \? 80 : 980/);
+  assert.match(app, /reducedMotion \? 180 : 2400/);
+  assert.match(app, /finalOffset = -\(targetIndex \* step \+ itemWidth \/ 2\)/);
+});
+
+test("hosted audio unlocks from game selection and keeps an explicit preference", async () => {
+  const [app, html] = await Promise.all([
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("index.html", root), "utf8")
+  ]);
+  assert.match(app, /function chooseLobbyGame\(gameId\)[\s\S]*?enableSoundFromGesture\(\)/);
+  assert.match(app, /AUDIO_PREFERENCE_STORAGE_KEY/);
+  assert.match(app, /audio\.setEnabled\(state\.soundEnabled\)/);
+  assert.match(html, /data-audio-state="off"/);
 });
 
 test("generated bonus HUDs and unclipped winner state are wired for every world", async () => {
