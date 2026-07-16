@@ -1,9 +1,9 @@
 {
   "name": "aislots",
-  "version": "2.19.2",
+  "version": "3.0.0",
   "private": true,
   "type": "module",
-  "description": "AISlots — four visually distinct free-play slot games with generated artwork and exact published RTP.",
+  "description": "AISlots World Forge — one provably fair 99% RTP slot with 4,320 generated visual combinations.",
   "scripts": {
     "dev": "python3 -m http.server 4173",
     "test": "node --test",

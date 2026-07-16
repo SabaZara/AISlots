@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { cellIndex, GAMES, PAYLINES } from "../game-model.js";
+import { ANIMATION_STYLES } from "../asset-catalog.js";
 import { emptyGameStats, naturalNearMissFor, outcomeClassFor, recordGameResult, winTierFor } from "../presentation.js";
 
 test("win presentation tiers follow bet multipliers", () => {
@@ -25,17 +26,14 @@ test("per-game result statistics accumulate wins and preserve the best result", 
   });
 });
 
-test("every slot has a unique meter and reel-motion presentation", () => {
-  const games = Object.values(GAMES);
-  assert.equal(new Set(games.map((game) => game.meterMode)).size, games.length);
-  assert.equal(new Set(games.map((game) => game.reelMotion)).size, games.length);
-  assert.equal(new Set(games.map((game) => game.bonusMode)).size, games.length);
-  games.forEach((game) => {
-    assert.ok(game.meterCarryCopy.length > 0);
-    assert.ok(game.winLabels.big && game.winLabels.mega && game.winLabels.epic);
-    assert.ok(game.reelStopGap > 0 && game.spinInterval > 0);
-    assert.ok(game.bonusMechanicName && game.bonusMechanicCopy && game.bonusStartLabel);
-  });
+test("the single slot exposes five distinct reel-motion presentations", () => {
+  assert.deepEqual(Object.keys(GAMES), ["astral"]);
+  assert.equal(new Set(ANIMATION_STYLES.map((style) => style.id)).size, 5);
+  assert.equal(new Set(ANIMATION_STYLES.map((style) => `${style.reelStopGap}:${style.spinInterval}`)).size, 5);
+  const game = GAMES.astral;
+  assert.ok(game.meterCarryCopy.length > 0);
+  assert.ok(game.winLabels.big && game.winLabels.mega && game.winLabels.epic);
+  assert.ok(game.bonusMechanicName && game.bonusMechanicCopy && game.bonusStartLabel);
 });
 
 test("partial returns are not classified as wins", () => {

@@ -1,5 +1,5 @@
 export const AUDIO_PROFILES = Object.freeze({
-  astral: Object.freeze({
+  epic: Object.freeze({
     wave: "triangle",
     spinBase: 246.94,
     spinFilter: 3200,
@@ -20,7 +20,7 @@ export const AUDIO_PROFILES = Object.freeze({
       percussion: "moonpulse"
     })
   }),
-  neon: Object.freeze({
+  mystic: Object.freeze({
     wave: "sine",
     spinBase: 132,
     spinFilter: 880,
@@ -41,7 +41,7 @@ export const AUDIO_PROFILES = Object.freeze({
       percussion: "bubble"
     })
   }),
-  ember: Object.freeze({
+  dark: Object.freeze({
     wave: "sawtooth",
     spinBase: 68,
     spinFilter: 520,
@@ -62,7 +62,7 @@ export const AUDIO_PROFILES = Object.freeze({
       percussion: "forge"
     })
   }),
-  ufc: Object.freeze({
+  playful: Object.freeze({
     wave: "square",
     spinBase: 108,
     spinFilter: 1120,
@@ -86,7 +86,7 @@ export const AUDIO_PROFILES = Object.freeze({
 });
 
 export function audioProfileFor(gameId) {
-  return AUDIO_PROFILES[gameId] ?? AUDIO_PROFILES.astral;
+  return AUDIO_PROFILES[gameId] ?? AUDIO_PROFILES.epic;
 }
 
 export const ASTRAL_SAMPLE_LIBRARY = Object.freeze({
@@ -98,8 +98,9 @@ export const ASTRAL_SAMPLE_LIBRARY = Object.freeze({
 });
 
 export class SlotAudioEngine {
-  constructor(getGameId) {
-    this.getGameId = getGameId;
+  constructor(getMoodId) {
+    this.getMoodId = getMoodId;
+    this.getGameId = () => ({ epic: "astral", mystic: "neon", playful: "ufc", dark: "ember" })[this.getMoodId()] ?? "astral";
     this.enabled = false;
     this.context = null;
     this.graph = null;
@@ -115,7 +116,7 @@ export class SlotAudioEngine {
   }
 
   profile() {
-    return audioProfileFor(this.getGameId());
+    return audioProfileFor(this.getMoodId());
   }
 
   setEnabled(enabled) {

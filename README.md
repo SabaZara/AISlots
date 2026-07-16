@@ -1,148 +1,87 @@
-# The Lumen Collection
+# AISlots World Forge
 
-The Lumen Collection is a dependency-free, responsive suite of four free-play slot games. It opens on a full-screen game chooser, then gives each title its own generated symbol art, full-board sequential reel stops, spin action, persistent bonus rhythm, and sound palette. Astral's multiplier cases decelerate continuously from their current position, with result-paced quick, medium, and dramatic stops. The first game-selection tap also unlocks hosted audio in a browser-compliant user gesture. Every game uses a published 99.00% long-run return model, finite autoplay, shared demo credits, and a SHA-256 commit/reveal receipt.
+AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player combines a generated background, one companion, a mood, a symbol family, and a reel-motion style.
 
-## Included games
+`6 themes × 6 companions × 4 moods × 6 symbol sets × 5 motion styles = 4,320 configurations`
 
-| Game | Persistent feature | Trigger | Reveals | Theoretical RTP |
-| --- | --- | ---: | ---: | ---: |
-| Astral Bloom | Moonwell Bloom | 12 Blooms | 3 | 99.00% |
-| Neon Tides | Pearl Current | 10 Pearl Keys | 4 | 99.00% |
-| Ember Crown | Crown Forge | 15 Crown Runes | 2 | 99.00% |
-| UFC Octagon Gold | Fight Card Frenzy | 10 Fight Tokens | 3 | 99.00% |
+Every configuration uses the same deterministic outcome model, exact **99.00% theoretical RTP**, and SHA-256 commit/reveal receipt. Visual choices, sound choices, balance, and play history never change outcome probabilities.
 
-All four use a 5×4 grid and 20 fixed left-to-right paylines. Their feature pacing and prize tables differ, and `theoreticalRtp(gameId)` derives the exact base/feature split for each title.
+## World Forge catalog
 
-## Run and test
+| Layer | Choices |
+|---|---|
+| Themes | Fire, Ice, Nature, Void, Storm, Abyss |
+| Companions | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, Titan |
+| Moods | Epic, Mystic, Playful, Dark |
+| Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
+| Motion | Cascade, Wave, Impact, Strike, Vortex |
+
+Only one companion is displayed in a game. The generated theme, mood treatment, companion, and seven-symbol sheet are independent layers, so the full catalog does not require thousands of duplicate images. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+
+## Play features
+
+- five reels, four rows, and 20 fixed left-to-right paylines;
+- sequential reel stops with a complete visible spin and Normal 1× or Fast 3× presentation speed;
+- every positive return is shown, including returns smaller than the wager;
+- finite 10, 25, or 50-spin autoplay with an always-accessible Stop control;
+- persistent 12-symbol Relic Vault meter;
+- graphic Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
+- 25×, 50×, and 100× demo-credit Buy Bonus choices calibrated to the same 99.00% return;
+- three horizontal multiplier cases per bonus; Stop changes reveal timing only, then the roller decelerates continuously onto its pre-sealed result;
+- visible running multiplier total and round progress;
+- animated win tiers, symbol-only winner breakout, particles, cabinet reactions, and large-win cinematics;
+- four distinct procedural music/event-sound profiles, with a local high-energy sample layer for Epic;
+- persistent demo balance, bonus progress, visual configuration, audio preference, and spin-speed preference;
+- game rules, paytable, last-win detail, and a compact top-bar fairness verifier;
+- no payline overlay, near-miss copy, loss display, session timer, or reality-check dialog.
+
+## 99.00% return model
+
+The exact analytical split is:
+
+- base line pays: **75.400%**;
+- persistent Relic Vault feature: **23.600%**;
+- combined theoretical RTP: **99.000%**.
+
+The 99% figure is a long-run mathematical expectation, not a promise for a session. `npm test` asserts the exact value for ordinary spins, both Special Bet modes, and all Buy Bonus prices. `npm run audit:rtp` provides a reproducible simulation audit.
+
+## Provably fair receipts
+
+Before each spin, the client displays `SHA-256(serverSeed)`. The receipt then reveals:
+
+- server seed;
+- player-editable client seed;
+- nonce;
+- wager and prior meter state;
+- selected visual configuration;
+- complete deterministic outcome.
+
+The built-in verifier recomputes the commitment and outcome. Changing presentation layers does not alter the seeded math.
+
+## Responsive layout
+
+Gameplay is viewport-locked with no document scrolling on desktop, phone, or iPad. It includes dynamic-viewport units, safe-area padding, dedicated portrait controls, a horizontal phone cabinet after rotation, and tablet-specific sizing. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Winning symbols are allowed to break out visually without clipping the rest of the interface.
+
+## Run locally
 
 ```bash
-npm test
-npm run check
-npm run audit:rtp
 npm run dev
 ```
 
-Open `http://localhost:4173`.
+Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
-The interface includes:
+Verification commands:
 
-- a first-entry four-game lobby that also performs the 18+ free-play confirmation;
-- a four-game lobby reachable from the top-left brand, with progress retained per game;
-- four generated bonus HUDs with real progress lights: Astral moonstone constellation, Neon pearl-and-coral current, Ember black-steel forge, and UFC red/gold arena frame;
-- four distinct reel-motion systems: celestial cascade, underwater wave, heavy forge slam, and left-to-right fight strike;
-- permanent per-game ledgers showing total credits won, spins played, and each title's biggest win;
-- reel-stop anticipation for strong collector results and feature triggers;
-- animated win count-ups, highlighted winning symbols, collection bursts, and themed bonus reveals;
-- tiered Nice, Big, Mega, and Epic win presentation, including full-screen celebrations from 10× bet;
-- themed reel-start, reel-stop, anticipation, collection, payout, bonus, and celebration sound cues;
-- four sealed bonus presentations: Celestial Case Roll, Pearl Cluster Cascade, Crown Multiplier Forge, and Championship Hold & Win;
-- a clean balance, RTP, and free-play header without session-loss or elapsed-time readouts;
-- every positive payout receives a large animated credit count-up; returns below the bet remain honestly labeled as a payout rather than a profit win;
-- high-contrast generated reel symbols with distinct silhouettes and per-symbol color coding;
-- winning-symbol animation without drawn payline overlays;
-- larger spin, autoplay, bet, navigation, and win-presentation controls on desktop and mobile;
-- clear Normal 1× and Fast 3× reel-speed choices beside the main Spin control; the selected speed is remembered and Fast changes presentation timing only;
-- four distinct continuous spin-tick patterns plus themed reel-stop cues instead of one shared generic tick;
-- opt-in high-energy WOW Sound cinematic music for Astral, plus original synthesized underwater, forge, and arena motifs for the other three worlds;
-- a layered Web Audio production engine with stereo reel motion, compression, synthesized room reverb, continuous spin beds, themed impact landings, anticipation risers, payout cues, payout-count notes, and bonus reveal hits;
-- synchronized premium motion staging: speed-stream overlays, per-reel impact flashes, machine shake, collector highlights, dancing winning symbols, staged bonus reveals, and multi-phase big-win scenes;
-- an Astral Bloom cinematic showcase with an original generated Moonwell guardian followed by a generated celestial case vault: multiplier capsules roll horizontally, the player presses Stop, and the pre-sealed X lands under the center marker before joining the persistent total-X readout;
-- Astral-only **Special bet** modes that guarantee +1 or +2 meter Blooms per spin at mathematically calibrated wager multipliers while preserving 99.00% theoretical RTP;
-- Astral-only 25×, 50×, and 100× **Buy bonus** options using demo credits only; each deterministic purchase preserves 99.00% theoretical RTP and produces a commit/reveal receipt;
-- a graphic Moonwell feature market with concise Special Bet and Buy Bonus explanations, plus a generated case-opening bonus with three interactive horizontal rolls and overall round progress;
-- an image-led Astral cabinet with two original animated world characters, a low-text interface, a larger icon-only spin control, jumping result typography, explicit Normal/Fast speed choices, and visibly dancing winning symbols;
-- licensed WOW Sound Astral background, reel-start, reel-tick, victory, and cinematic big-win layers, reinforced with bright casino sparkles, high-frequency risers, crisp stops, and upper-register fanfares; source and license records are in `assets/audio/LICENSES.md`;
-- bet controls and a maximum-bet shortcut;
-- an Astral-only Autoplay dock below the main controls while the other games retain their original inline Autoplay placement;
-- finite 10, 25, or 50-spin autoplay with an always-visible stop control;
-- balance, last return, recent result details, and feature progression, including a persistent Astral return badge that compares credits returned with the current bet;
-- themed synthesized sound effects, win chords, collection tones, particles, bonus reveals, and big-win motion;
-- reduced-motion support and keyboard spinning;
-- viewport-locked desktop, phone, and iPad gameplay with no page scrolling, dynamic-viewport sizing, safe-area padding, compact portrait controls, a collision-free second row for Astral feature actions on phones and tablets, and a dedicated horizontal cabinet after rotation;
-- overflow-safe winning-symbol breakouts on phones, plus a compact portrait HUD that replaces the redundant machine title so character faces stay unobstructed;
-- a no-scroll responsive lobby that uses a 2×2 chooser in portrait and a four-card row in landscape;
-- a single compact fairness button in the top toolbar.
-
-Responsive QA covers 320×568, 360×740, and 390×844 phone portraits; 667×375 and 844×390 phone landscapes; 768×1024 iPad portrait; 1024×768 iPad landscape; and desktop cabinets. The document remains exactly viewport-sized at each breakpoint.
-
-Autoplay is present only for this no-value free-play prototype. Real-money rules differ by jurisdiction, and some markets prohibit online-slot autoplay entirely.
-
-The game does not engineer near-misses, amplify losses disguised as wins, fabricate winner feeds, accept money, send re-engagement notifications, or change demo odds. Special bets and feature buys use free-play credits only, keep 99.00% theoretical RTP, and seal every result in a fairness receipt before animation starts.
-
-## Published 99% return
-
-Every game has a combined long-run theoretical RTP of exactly `0.99`:
-
-- Astral Bloom: 75.400% base + 23.600% Moonwell
-- Neon Tides: 78.280% base + 20.720% Pearl Current
-- Ember Crown: 76.280% base + 22.720% Crown Forge
-- UFC Octagon Gold: 69.060% base + 29.940% Fight Card Frenzy
-
-The exact calculation is asserted for all four games in `tests/game-model.test.js`. `npm run audit:rtp` runs a reproducible simulation across every title. Sampling results naturally vary around the exact mathematical value.
-
-RTP is a long-run average, not a promise for a player, spin, autoplay session, or short test sample.
-
-## Fairness receipt
-
-Before each spin, the game commits to `SHA-256(serverSeed)`. The deterministic outcome stream is:
-
-```text
-SHA-256(serverSeed:clientSeed:nonce:counter)
+```bash
+npm run check
+npm test
+npm run audit:rtp
 ```
-
-The player can change the client seed. After a spin, the secret is revealed and the verifier recreates the selected game, all 20 symbols, base-game wins, persistent progress, and feature prizes. Four-byte values use rejection sampling before weighted mapping to avoid modulo bias.
-
-This static demo holds the unrevealed seed in browser memory. A real-money implementation must move seeds, nonce control, account state, balance updates, and signed receipts to audited server infrastructure.
-
-## Original artwork
-
-The project-bound world art was generated with the built-in OpenAI image-generation tool. Each world now uses a transparent character plate independently layered over its environment:
-
-- `assets/astral-characters-cutout-v1.png` — an original moon-garden oracle and crystal-antler sentinel.
-- `assets/neon-characters-cutout-v1.png` — an original pearl-current navigator and deep-sea guardian.
-- `assets/ember-characters-cutout-v1.png` — an original forge queen and obsidian furnace warden.
-- `assets/ufc-characters-cutout-v1.png` — two original fictional MMA champions with no real-fighter likenesses or sponsor marks.
-
-Astral also includes six feature presentation assets:
-
-- `assets/astral-bonus-chamber-v1.png` — a three-portal Moonwell bonus chamber.
-- `assets/astral-guardian-cinematic-v1.png` — the full-screen Moonwell awakening guardian.
-- `assets/astral-multiplier-gate-v1.png` — the original lunar apparatus retained behind the feature market.
-- `assets/astral-case-machine-v1.png` — the generated celestial vault and wide multiplier roller chamber.
-- `assets/astral-case-capsule-blue-v1.png` — the transparent generated blue reward capsule used for common through epic multipliers.
-- `assets/astral-case-capsule-legendary-v1.png` — the transparent generated gold-and-violet capsule used for legendary multipliers.
-
-The four original background plates remain available as optimized 1672×941 JPEG assets:
-
-- `assets/astral-bloom-bg.jpg` — an enchanted celestial greenhouse with a calm central play area.
-- `assets/neon-tides-bg.jpg` — a bioluminescent underwater pearl treasury with shell architecture.
-- `assets/ember-crown-bg.jpg` — a monumental obsidian sky forge with molten channels and a crown furnace.
-- `assets/ufc-octagon-bg.jpg` — a cinematic logo-free mixed-martial-arts arena with an illuminated octagonal cage.
-
-Each game also has a dedicated 1774×887 raster symbol sheet generated with the same built-in image tool:
-
-- `assets/symbols-astral-transparent-v5.png` — transparent-background high-contrast moonflower, orbit crystal, crown gem, comet lantern, dewdrop, leaf shield, and petal rosette icons; only the icon artwork moves on Astral wins.
-- `assets/symbols-neon-v2.png` — pearl, tide ring, starfish gem, coral spear, shell, and Pearl Key.
-- `assets/symbols-ember-v2.png` — sunsteel seal, forge ring, star anvil, ember spear, scale, and Crown Rune.
-- `assets/symbols-ufc-v2.png` — logo-free championship belt, octagon, event star, strike, clock, glove, and Fight Token.
-
-Each persistent collection meter now uses a dedicated transparent generated HUD plate with a live HTML count and deterministic progress lights layered over it:
-
-- `assets/astral-bonusbar-frame-v1.png` — silver moonstone and constellation frame.
-- `assets/neon-bonusbar-frame-v1.png` — pearl shell, coral, and sapphire current frame.
-- `assets/ember-bonusbar-frame-v1.png` — blackened steel, bronze, and molten rune frame.
-- `assets/ufc-bonusbar-frame-v1.png` — original logo-free red, black, and gold combat-arena frame.
-
-The background prompts required environment-only compositions, a low-detail center for readable reels, no text or logos, and no recognizable characters or copied game imagery. The symbol prompts required seven isolated glossy 3D game icons on a removable chroma background. Any final UFC trademarks, logos, approved typography, fighter likenesses, event names, or sponsor material should come from the license holder's approved brand pack and legal review.
-
-See `GAME_FUNCTIONS.md` for the team-review inventory of controls, math, bonuses, presentation, audio, fairness, accessibility, and remaining production gates.
 
 ## Render deployment
 
-`render.yaml` defines the `aislots` Render Static Site. Connect the repository through **New → Blueprint** in Render, select the repository, and apply the Blueprint. No environment variables or build dependencies are required.
+The root [`render.yaml`](./render.yaml) defines a Render static site. Connect the GitHub repository in Render, select the branch containing `render.yaml`, leave Blueprint Path blank or set it to `render.yaml`, and apply the Blueprint. The static publish path is the repository root.
 
-## Real-money production gate
+## Production gate
 
-This is a public-shareable free-play prototype, not a licensed cash gambling product. A real-money release still requires jurisdiction-specific licensing, independent RNG/game-math/security certification, audited server-side outcomes, identity and age verification, secure wallet and ledger services, responsible-gambling controls, accessibility and privacy review, monitoring, incident response, and market-specific limits and disclosures.
-
-Do not modify game weights or payouts in a live certified version. Treat every math change as a new version requiring recalculation, regression tests, and certification review.
+This build is an **18+ free-play prototype** with no deposits, cash value, or prizes. A regulated real-money launch still requires jurisdiction-specific licensing, independent math/RNG certification, backend-controlled balances and seeds, secure identity/account services, responsible-gambling controls, approved wallet/payment systems, accessibility review, asset and audio rights review, privacy/security review, telemetry, and operational monitoring.

@@ -25,44 +25,44 @@ function symbolsFor(names, leafThreePayout) {
   }));
 }
 
-export const GAMES = {
+const GAME_TEMPLATES = {
   astral: {
     id: "astral",
-    name: "Astral Bloom",
-    shortName: "Astral",
-    subtitle: "Moonwell edition",
-    intro: "Enter the moonlit conservatory",
-    accent: "#6be4ff",
-    secondary: "#a77cff",
-    background: "./assets/astral-bloom-bg.jpg",
-    characterLayer: "./assets/astral-characters-cutout-v1.png",
-    symbolSheet: "./assets/symbols-astral-transparent-v5.png",
-    bonusBarArt: "./assets/astral-bonusbar-frame-v1.png",
-    actionLabel: "Bloom",
-    lobbyTag: "Celestial collector",
+    name: "Fire Dragon",
+    shortName: "Fire",
+    subtitle: "Epic · Inferno Relics",
+    intro: "Build a world, then ignite the reels",
+    accent: "#ff8a32",
+    secondary: "#ff3d57",
+    background: "./assets/factory/theme-fire-v1.jpg",
+    characterLayer: "./assets/factory/companion-dragon-v1.jpg",
+    symbolSheet: "./assets/factory/symbols-inferno-v1.jpg",
+    bonusBarArt: "./assets/factory/mood-epic-v1.jpg",
+    actionLabel: "Ignite",
+    lobbyTag: "4,320 world combinations",
     volatility: "Balanced",
-    lobbyCopy: "A serene moon garden where every Bloom stays in your Moonwell until three constellation prizes open.",
+    lobbyCopy: "One independently configurable slot with six themes, six companions, four moods, six symbol sets, and five reel-motion styles.",
     meterMode: "constellation",
     meterGlyph: "✦",
     meterColumns: 4,
-    meterCarryCopy: "Each Bloom lights a permanent star",
+    meterCarryCopy: "Every collector stays in your persistent vault",
     reelMotion: "cascade",
     reelStopGap: 90,
     spinInterval: 165,
-    anticipationCopy: "The constellation is aligning…",
-    winLabels: { big: "Starfall Win", mega: "Cosmic Win", epic: "Celestial Fortune" },
-    featureName: "Moonwell Bloom",
-    featureEyebrow: "Persistent feature",
-    featureCopy: "Every Bloom symbol is yours to keep. Collect 12 to open the constellation bonus.",
-    collectionName: "Bloom",
-    collectionPlural: "Blooms",
+    anticipationCopy: "The relic vault is aligning…",
+    winLabels: { big: "Power Win", mega: "Mythic Win", epic: "World Fortune" },
+    featureName: "Relic Vault",
+    featureEyebrow: "Persistent collector",
+    featureCopy: "Every collector symbol stays in your vault. Collect 12 to open three sealed multiplier cases.",
+    collectionName: "Flame Crown",
+    collectionPlural: "Flame Crowns",
     threshold: 12,
     featureSteps: [4, 8, 12],
-    featureStepLabels: ["Moonwell stirs", "Starlight rises", "Bonus opens"],
-    bonusTitle: "The case vault awakens.",
+    featureStepLabels: ["Vault stirs", "Power rises", "Cases open"],
+    bonusTitle: "The relic vault awakens.",
     bonusCopy: "Three multiplier capsules are sealed into your receipt. Start each horizontal roll and press Stop to reveal its predetermined X.",
     bonusMode: "case-roll",
-    bonusMechanicName: "Celestial Case Roll",
+    bonusMechanicName: "Relic Case Roll",
     bonusCardLabel: "Case",
     bonusStartLabel: "Open 3 cases",
     bonusProgressLabel: "Cases locked",
@@ -78,8 +78,8 @@ export const GAMES = {
       { multiplier: 10, weight: 100 }
     ],
     symbols: symbolsFor({
-      luma: "Luma", orbit: "Orbit", nova: "Nova", comet: "Comet",
-      dew: "Dewdrop", leaf: "Moonleaf", petal: "Bloom"
+      luma: "Sunsteel Coin", orbit: "Horned Ring", nova: "Flame Crystal", comet: "Ember Blade",
+      dew: "Magma Drop", leaf: "Dragon Scale", petal: "Flame Crown"
     }, 14.889152028213422)
   },
   neon: {
@@ -251,6 +251,8 @@ export const GAMES = {
     }, 8.121858337273801)
   }
 };
+
+export const GAMES = Object.freeze({ astral: GAME_TEMPLATES.astral });
 
 export const PAYLINES = [
   [0, 0, 0, 0, 0], [1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [3, 3, 3, 3, 3],

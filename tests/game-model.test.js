@@ -14,7 +14,8 @@ test("SHA-256 commitment matches a public test vector", async () => {
   );
 });
 
-test("all four published game models return exactly 99.00%", () => {
+test("the published configurable game model returns exactly 99.00%", () => {
+  assert.deepEqual(Object.keys(model.GAMES), ["astral"]);
   for (const gameId of Object.keys(model.GAMES)) {
     const result = model.theoreticalRtp(gameId);
     assert.ok(Math.abs(result.totalRtp - 0.99) < 1e-12, `${gameId} RTP drifted`);

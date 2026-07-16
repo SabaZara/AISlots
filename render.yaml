@@ -3,7 +3,7 @@ services:
     name: aislots
     runtime: static
     staticPublishPath: .
-    buildCommand: echo "Static Lumen Collection ready"
+    buildCommand: echo "AISlots World Forge ready"
     headers:
       - path: /*
         name: X-Content-Type-Options

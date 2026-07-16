@@ -13,12 +13,24 @@ import {
   simulateSpin
 } from "./game-model.js";
 import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
+import {
+  ANIMATION_STYLES,
+  COMPANIONS,
+  DEFAULT_VISUAL_CONFIG,
+  MOODS,
+  SYMBOL_SETS,
+  THEMES,
+  VISUAL_COMBINATION_COUNT,
+  resolveVisualConfig,
+  visualConfigLabel
+} from "./asset-catalog.js";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
 const INITIAL_BALANCE = 1000;
 const SPIN_SPEED_STORAGE_KEY = "aislots-spin-speed";
 const AUDIO_PREFERENCE_STORAGE_KEY = "aislots-audio-preference";
+const VISUAL_CONFIG_STORAGE_KEY = "aislots-visual-config";
 const SPIN_SPEEDS = Object.freeze([
   Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
   Object.freeze({ id: "fast", name: "Fast", label: "3×", resultDisplayMs: 780, settleScale: 0.4, shuffleScale: 0.58, autoplayGapMs: 140 })
@@ -142,14 +154,23 @@ const state = {
   soundPreference: null,
   speedIndex: 0,
   specialBetBoost: 0,
+  visualConfig: { ...DEFAULT_VISUAL_CONFIG },
   lastOutcome: null,
   lastReceipt: null
 };
 
-const audio = new SlotAudioEngine(() => state.gameId);
+const audio = new SlotAudioEngine(() => state.visualConfig.mood);
 
 function currentGame() {
   return getGame(state.gameId);
+}
+
+function currentVisuals() {
+  return resolveVisualConfig(state.visualConfig);
+}
+
+function currentAnimation() {
+  return currentVisuals().animation;
 }
 
 function currentSymbols() {
@@ -177,7 +198,10 @@ function currentSpinWager() {
 
 function updateAstralFeatureUi(controlsLocked = false) {
   const multiplier = specialBetCostMultiplier("astral", state.specialBetBoost);
-  const boostLabel = state.specialBetBoost > 0 ? `+${state.specialBetBoost} Bloom${state.specialBetBoost === 1 ? "" : "s"}` : "Standard";
+  const game = currentGame();
+  const boostLabel = state.specialBetBoost > 0
+    ? `+${state.specialBetBoost} ${state.specialBetBoost === 1 ? game.collectionName : game.collectionPlural}`
+    : "Standard";
   ui.specialBetState.textContent = `${boostLabel} · ${multiplier.toFixed(2)}×`;
   ui.specialBetButton.classList.toggle("is-active", state.specialBetBoost > 0);
   ui.specialBetButton.setAttribute("aria-pressed", String(state.specialBetBoost > 0));
@@ -196,7 +220,7 @@ function updateAstralFeatureUi(controlsLocked = false) {
     const price = button.querySelector(`[data-buy-price="${costMultiplier}"]`);
     if (price) price.textContent = `${formatCredits(cost)} CR`;
     button.disabled = controlsLocked || state.balance < cost;
-    button.setAttribute("aria-label", `Buy ${costMultiplier} times bet Moonwell bonus for ${formatCredits(cost)} demo credits`);
+    button.setAttribute("aria-label", `Buy ${costMultiplier} times bet ${game.featureName} bonus for ${formatCredits(cost)} demo credits`);
   });
 }
 
@@ -331,7 +355,7 @@ function renderGrid(grid, {
       cell.style.setProperty("--col", String(col));
       cell.style.setProperty("--row", String(row));
       cell.style.setProperty("--motion-delay", `${-(col * 48 + row * 24)}ms`);
-      const stopDelay = settlingColumn >= 0 ? row * 18 : col * currentGame().reelStopGap + row * 18;
+      const stopDelay = settlingColumn >= 0 ? row * 18 : col * currentAnimation().reelStopGap + row * 18;
       cell.style.setProperty("--stop-delay", `${Math.round(stopDelay * settleScale)}ms`);
       cell.style.setProperty("--symbol-glow", symbolGlow(id));
       const symbolName = currentSymbols().find((symbol) => symbol.id === id)?.name ?? id;
@@ -503,26 +527,98 @@ function buildRules() {
 }
 
 function buildLobby() {
-  const fragment = document.createDocumentFragment();
-  Object.values(GAMES).forEach((game) => {
-    const button = document.createElement("button");
-    button.className = `lobby-game lobby-game-${game.id}`;
-    button.type = "button";
-    button.dataset.lobbyGameId = game.id;
-    button.style.setProperty("--lobby-accent", game.accent);
-    button.innerHTML = `
-      <span class="lobby-game-art" aria-hidden="true"><img class="lobby-game-image" src="${game.background}" alt="" ${game.id === "astral" ? "fetchpriority=\"high\"" : "loading=\"lazy\""}></span>
-      <span class="lobby-game-shade" aria-hidden="true"></span>
-      <span class="lobby-game-content">
-        <span class="lobby-game-kicker">${game.lobbyTag}</span>
-        <strong>${game.name}</strong>
-        <span class="lobby-game-meta"><b>99%</b><i>${game.bonusDraws}× bonus</i></span>
-        <span class="lobby-game-won" data-lobby-won="${game.id}">0.00 CR</span>
-        <span class="lobby-game-action"><span>Play</span><b>→</b></span>
-      </span>`;
-    fragment.append(button);
+  const group = (label, key, items, { art = false } = {}) => `
+    <section class="factory-group factory-group-${key}" aria-labelledby="factory-${key}-label">
+      <div class="factory-group-head"><strong id="factory-${key}-label">${label}</strong><span>${items.length}</span></div>
+      <div class="factory-options" style="--option-count:${items.length}" role="group" aria-label="Choose ${label.toLowerCase()}">
+        ${items.map((item) => `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}">${art ? `<img src="${item.asset}" alt="" loading="lazy">` : `<i aria-hidden="true"></i>`}<span>${item.name}</span></button>`).join("")}
+      </div>
+    </section>`;
+
+  ui.lobbyGames.className = "factory-builder";
+  ui.lobbyGames.setAttribute("aria-label", "Build a slot world");
+  ui.lobbyGames.innerHTML = `
+    <section class="factory-preview" id="factoryPreview" aria-label="Selected world preview">
+      <div class="factory-preview-world" id="factoryPreviewWorld"></div>
+      <div class="factory-preview-mood" id="factoryPreviewMood"></div>
+      <img class="factory-preview-companion" id="factoryPreviewCompanion" alt="">
+      <div class="factory-preview-copy">
+        <span>${VISUAL_COMBINATION_COUNT.toLocaleString()} combinations · 99% RTP</span>
+        <strong id="factoryPreviewName"></strong>
+        <small id="factoryPreviewMeta"></small>
+      </div>
+    </section>
+    <div class="factory-controls">
+      ${group("Theme", "theme", THEMES, { art: true })}
+      ${group("Companion", "companion", COMPANIONS, { art: true })}
+      ${group("Mood", "mood", MOODS)}
+      ${group("Symbols", "symbols", SYMBOL_SETS, { art: true })}
+      ${group("Animation", "animation", ANIMATION_STYLES)}
+      <div class="factory-actions">
+        <button class="secondary-button" type="button" data-randomize-world>Surprise me</button>
+        <button class="primary-button" type="button" data-build-play>Play this world</button>
+      </div>
+    </div>`;
+  updateLobbyPreview();
+}
+
+function updateLobbyPreview() {
+  const visuals = currentVisuals();
+  const preview = $("factoryPreview");
+  if (!preview) return;
+  preview.dataset.mood = visuals.mood.id;
+  $("factoryPreviewWorld").style.backgroundImage = `url("${visuals.theme.asset}")`;
+  $("factoryPreviewMood").style.backgroundImage = `url("${visuals.mood.asset}")`;
+  $("factoryPreviewCompanion").src = visuals.companion.asset;
+  $("factoryPreviewCompanion").alt = `${visuals.companion.name} companion`;
+  $("factoryPreviewName").textContent = visualConfigLabel(state.visualConfig);
+  $("factoryPreviewMeta").textContent = `${visuals.symbols.name} · ${visuals.animation.name} motion`;
+  ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
+    const selected = state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
   });
-  ui.lobbyGames.replaceChildren(fragment);
+  const play = ui.lobbyGames.querySelector("[data-build-play]");
+  if (play) play.textContent = `Play ${visuals.theme.name} ${visuals.companion.name}`;
+}
+
+function setVisualConfigChoice(group, id) {
+  const catalogs = { theme: THEMES, companion: COMPANIONS, mood: MOODS, symbols: SYMBOL_SETS, animation: ANIMATION_STYLES };
+  if (!catalogs[group]?.some((item) => item.id === id)) return;
+  state.visualConfig[group] = id;
+  updateLobbyPreview();
+}
+
+function randomizeVisualConfig() {
+  const pick = (items) => items[Math.floor(Math.random() * items.length)].id;
+  state.visualConfig = {
+    theme: pick(THEMES),
+    companion: pick(COMPANIONS),
+    mood: pick(MOODS),
+    symbols: pick(SYMBOL_SETS),
+    animation: pick(ANIMATION_STYLES)
+  };
+  updateLobbyPreview();
+}
+
+function saveVisualConfig() {
+  try { window.localStorage.setItem(VISUAL_CONFIG_STORAGE_KEY, JSON.stringify(state.visualConfig)); } catch { /* local storage is optional */ }
+}
+
+function restoreVisualConfig() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(VISUAL_CONFIG_STORAGE_KEY) || "null");
+    if (stored && typeof stored === "object") {
+      const resolved = resolveVisualConfig(stored);
+      state.visualConfig = {
+        theme: resolved.theme.id,
+        companion: resolved.companion.id,
+        mood: resolved.mood.id,
+        symbols: resolved.symbols.id,
+        animation: resolved.animation.id
+      };
+    }
+  } catch { /* local storage is optional */ }
 }
 
 function openLobby() {
@@ -531,15 +627,18 @@ function openLobby() {
   ui.lobbyOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;
   document.body.classList.add("is-lobby-open");
-  window.requestAnimationFrame(() => ui.lobbyGames.querySelector("button")?.focus());
+  updateLobbyPreview();
+  window.requestAnimationFrame(() => ui.lobbyGames.querySelector("[data-config-group]")?.focus());
 }
 
-function chooseLobbyGame(gameId) {
-  if (!GAMES[gameId]) return;
+function chooseLobbyGame() {
   enableSoundFromGesture();
   state.ageConfirmed = true;
   try { window.sessionStorage.setItem("lumen-collection-age-confirmed", "true"); } catch { /* storage may be unavailable */ }
-  if (gameId !== state.gameId) switchGame(gameId);
+  saveVisualConfig();
+  applyGameTheme({ resetGrid: true });
+  updateUi();
+  if (state.soundEnabled) audio.startMusic();
   ui.lobbyOverlay.hidden = true;
   ui.lobbyOverlay.setAttribute("aria-hidden", "true");
   $("appShell").inert = false;
@@ -549,10 +648,39 @@ function chooseLobbyGame(gameId) {
 
 function applyGameTheme({ resetGrid = false } = {}) {
   const game = currentGame();
+  const visuals = currentVisuals();
+  game.name = `${visuals.theme.name} ${visuals.companion.name}`;
+  game.shortName = visuals.theme.name;
+  game.subtitle = `${visuals.mood.name} · ${visuals.symbols.name}`;
+  game.intro = `${visuals.animation.name} motion · ${visuals.companion.name} companion`;
+  game.accent = visuals.theme.accent;
+  game.secondary = visuals.theme.secondary;
+  game.background = visuals.theme.asset;
+  game.characterLayer = visuals.companion.asset;
+  game.symbolSheet = visuals.symbols.asset;
+  game.bonusBarArt = visuals.mood.asset;
+  game.actionLabel = visuals.theme.action;
+  game.reelMotion = visuals.animation.id;
+  game.reelStopGap = visuals.animation.reelStopGap;
+  game.spinInterval = visuals.animation.spinInterval;
+  game.collectionName = visuals.symbols.collector;
+  game.collectionPlural = `${visuals.symbols.collector}s`;
+  game.featureName = `${visuals.theme.name} Relic Vault`;
+  game.featureEyebrow = "Persistent collector";
+  game.featureCopy = `Every ${game.collectionName} stays in your vault. Collect ${game.threshold} to open ${game.bonusDraws} sealed multiplier cases.`;
+  game.meterCarryCopy = `Every ${game.collectionName} stays between spins`;
+  game.anticipationCopy = `${visuals.theme.name} energy is charging the final reel…`;
+  game.bonusTitle = `${visuals.theme.name} vault awakened.`;
+  game.bonusCopy = `${game.bonusDraws} multiplier cases are sealed into your fairness receipt. Stop changes reveal timing only.`;
+  game.bonusMechanicName = `${visuals.theme.name} Relic Case Roll`;
+  game.symbols.forEach((symbol) => { symbol.name = visuals.symbols.names[symbol.id]; });
   const titleParts = game.name.split(" ");
   const firstWord = titleParts.shift();
   const gameStage = $("game");
   gameStage.dataset.game = game.id;
+  gameStage.dataset.theme = visuals.theme.id;
+  gameStage.dataset.mood = visuals.mood.id;
+  gameStage.dataset.animation = visuals.animation.id;
   const autoplayHome = game.id === "astral" ? ui.showcaseRow : ui.spinOptions;
   if (ui.autoButton.parentElement !== autoplayHome) autoplayHome.append(ui.autoButton);
   setAutoplayMenuOpen(false);
@@ -562,11 +690,14 @@ function applyGameTheme({ resetGrid = false } = {}) {
   gameStage.style.setProperty("--game-bg", `url("${game.background}")`);
   gameStage.style.setProperty("--game-characters", `url("${game.characterLayer}")`);
   gameStage.style.setProperty("--bonus-bar-art", `url("${game.bonusBarArt}")`);
+  gameStage.style.setProperty("--mood-overlay", `url("${visuals.mood.asset}")`);
   gameStage.style.setProperty("--game-accent", game.accent);
   gameStage.style.setProperty("--game-secondary", game.secondary);
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--game-accent", game.accent);
-  document.title = `${game.name} · Lumen Collection`;
+  ui.bonusOverlay.style.setProperty("--bonus-bg", `url("${visuals.theme.asset}")`);
+  ui.cinematicOverlay.style.setProperty("--cinematic-companion", `url("${visuals.companion.asset}")`);
+  document.title = `${visualConfigLabel(state.visualConfig)} · AISlots`;
   $("brandName").textContent = game.name;
   $("brandSubtitle").textContent = game.subtitle;
   $("featureEyebrow").textContent = game.featureEyebrow;
@@ -582,6 +713,14 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.bonusEyebrow.textContent = `${game.featureName} feature`;
   $("bonusTitle").textContent = game.bonusTitle;
   ui.bonusCopy.textContent = game.bonusCopy;
+
+  const featureHeading = $("featureMarketTitle");
+  if (featureHeading) featureHeading.textContent = `${visuals.theme.name} vault features`;
+  document.querySelectorAll("[data-progress-boost]").forEach((button) => {
+    const boost = Number(button.dataset.progressBoost);
+    const small = button.querySelector("small");
+    if (small && boost > 0) small.textContent = `+${boost} ${boost === 1 ? game.collectionName : game.collectionPlural} every spin`;
+  });
 
   const stepFragment = document.createDocumentFragment();
   game.featureSteps.forEach((value, index) => {
@@ -960,9 +1099,10 @@ function cinematicDelay(milliseconds) {
 }
 
 async function runAstralCinematicTransition({ preview = false, multiplierCount = 3 } = {}) {
+  const game = currentGame();
   ui.cinematicOverlay.dataset.phase = "sleeping";
   ui.cinematicTitle.textContent = preview ? "Demo" : "Awaken";
-  ui.cinematicCopy.textContent = preview ? "No wager" : "Case vault opening";
+  ui.cinematicCopy.textContent = preview ? "No wager" : `${game.featureName} opening`;
   ui.cinematicAward.textContent = `${multiplierCount} CASES`;
   ui.cinematicOverlay.hidden = false;
   ui.cinematicOverlay.setAttribute("aria-hidden", "false");
@@ -972,7 +1112,7 @@ async function runAstralCinematicTransition({ preview = false, multiplierCount =
   ui.cinematicOverlay.dataset.phase = "emerging";
   await cinematicDelay(1050);
   ui.cinematicOverlay.dataset.phase = "awakened";
-  ui.cinematicTitle.textContent = "Case Vault";
+  ui.cinematicTitle.textContent = game.featureName;
   ui.cinematicCopy.textContent = preview ? "No payout" : "Sealed multiplier rolls";
   ui.cinematicAward.textContent = `${multiplierCount} CASES`;
   jumpText(ui.cinematicTitle);
@@ -1172,16 +1312,17 @@ function beginAstralCaseRoll(roundIndex, multiplier, bet, multiplierTotal, total
 }
 
 async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview = false, purchased = false } = {}) {
+  const game = currentGame();
   const picks = bonusRounds.flat();
   await runAstralCinematicTransition({ preview, multiplierCount: picks.length });
   return new Promise((resolve) => {
     ui.bonusOverlay.dataset.mode = "astral-case-roll";
     ui.bonusEyebrow.textContent = preview ? "Demo" : purchased ? "Feature buy" : "Bonus";
-    $("bonusTitle").textContent = "Case Vault";
+    $("bonusTitle").textContent = game.featureName;
     ui.bonusCopy.textContent = preview ? "No wager · no payout" : `${picks.length} sealed multiplier cases`;
     ui.bonusTotalLabel.textContent = preview ? "Demo" : "Win";
     ui.bonusTotal.textContent = "0.00 CR";
-    ui.bonusMechanicName.textContent = "Celestial Case Roll";
+    ui.bonusMechanicName.textContent = game.bonusMechanicName;
     ui.bonusMechanicProgress.textContent = `0 / ${picks.length}`;
     ui.bonusMechanicBar.style.width = "0%";
     ui.astralBonusStage.hidden = false;
@@ -1451,6 +1592,7 @@ async function buyAstralFeature(costMultiplier) {
     wager: purchaseCost,
     costMultiplier,
     gameId: "astral",
+    visualConfig: { ...state.visualConfig },
     progressBefore,
     outcome
   };
@@ -1469,10 +1611,10 @@ async function runAstralShowcasePreview() {
   state.isSpinning = true;
   ui.astralShowcaseButton.disabled = true;
   updateUi();
-  setStatus("Moonwell bonus demo · no wager · no payout");
+  setStatus(`${currentGame().featureName} demo · no wager · no payout`);
   try {
     await showAstralBonus([[0.5, 1, 3]], 1, { preview: true });
-    setStatus("Moonwell bonus demo complete · no credits or feature progress changed");
+    setStatus(`${currentGame().featureName} demo complete · no credits or feature progress changed`);
   } finally {
     state.isSpinning = false;
     ui.astralShowcaseButton.disabled = false;
@@ -1528,7 +1670,7 @@ async function spin({ fromAuto = false } = {}) {
     shuffleTick += 1;
     renderGrid(cosmeticGrid(shuffleTick), { shuffling: true });
     playSpinTick(shuffleTick);
-  }, Math.max(45, Math.round(game.spinInterval * currentSpinSpeed().shuffleScale)));
+  }, Math.max(45, Math.round(currentAnimation().spinInterval * currentSpinSpeed().shuffleScale)));
 
   const outcome = await outcomePromise;
   const resultDisplayMs = currentSpinSpeed().resultDisplayMs;
@@ -1604,6 +1746,7 @@ async function spin({ fromAuto = false } = {}) {
     bet,
     wager,
     gameId: state.gameId,
+    visualConfig: { ...state.visualConfig },
     progressBefore,
     progressBoost: outcome.progressBoost,
     petalsBefore: progressBefore,
@@ -1715,8 +1858,19 @@ function bindEvents() {
     event.preventDefault();
     openLobby();
   });
-  document.querySelectorAll("[data-lobby-game-id]").forEach((button) => {
-    button.addEventListener("click", () => chooseLobbyGame(button.dataset.lobbyGameId));
+  ui.lobbyGames.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-config-group]");
+    if (option) {
+      setVisualConfigChoice(option.dataset.configGroup, option.dataset.configId);
+      playTone(520 + [...option.parentElement.children].indexOf(option) * 55, .08, "triangle");
+      return;
+    }
+    if (event.target.closest("[data-randomize-world]")) {
+      randomizeVisualConfig();
+      playTone(880, .14, "triangle");
+      return;
+    }
+    if (event.target.closest("[data-build-play]")) chooseLobbyGame();
   });
   ui.betDown.addEventListener("click", () => {
     if (state.betIndex > 0) state.betIndex -= 1;
@@ -1742,7 +1896,10 @@ function bindEvents() {
     button.addEventListener("click", () => {
       state.specialBetBoost = Number(button.dataset.progressBoost);
       updateUi();
-      setStatus(state.specialBetBoost ? `Special bet active · +${state.specialBetBoost} guaranteed Bloom${state.specialBetBoost === 1 ? "" : "s"}` : "Standard bet active");
+      const game = currentGame();
+      setStatus(state.specialBetBoost
+        ? `Special bet active · +${state.specialBetBoost} guaranteed ${state.specialBetBoost === 1 ? game.collectionName : game.collectionPlural}`
+        : "Standard bet active");
       playTone(state.specialBetBoost ? 880 + state.specialBetBoost * 160 : 520, .18, "triangle");
     });
   });
@@ -1768,9 +1925,6 @@ function bindEvents() {
   });
   document.querySelectorAll("[data-auto-count]").forEach((button) => {
     button.addEventListener("click", () => startAutoplay(Number(button.dataset.autoCount)));
-  });
-  document.querySelectorAll(".game-choice").forEach((button) => {
-    button.addEventListener("click", () => switchGame(button.dataset.gameId));
   });
   ui.soundButton.addEventListener("click", () => {
     setSoundEnabled(!state.soundEnabled, { remember: true, cue: true });
@@ -1843,6 +1997,7 @@ function bindEvents() {
 async function init() {
   restoreSpinSpeed();
   restoreSoundPreference();
+  restoreVisualConfig();
   applyGameTheme({ resetGrid: true });
   buildLobby();
   ui.clientSeedInput.value = state.clientSeed;

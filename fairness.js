@@ -3,7 +3,7 @@ const UINT32_RANGE = 0x100000000;
 
 function cryptoApi() {
   if (!globalThis.crypto?.subtle || !globalThis.crypto?.getRandomValues) {
-    throw new Error("Web Crypto is required to run Astral Bloom securely.");
+    throw new Error("Web Crypto is required to run AISlots securely.");
   }
   return globalThis.crypto;
 }
