@@ -7574,3 +7574,480 @@ body {
   .companion-stage img,
   .game-stage[data-game="astral"] .feature-card::before { animation: none; }
 }
+
+/* 3.2 — square symbol art, collector-only breakout, and themed Sky Runner flights. */
+.game-stage[data-game="astral"] .symbol-cell {
+  container-type: size;
+}
+
+.game-stage[data-game="astral"] .generated-symbol {
+  width: 82%;
+  height: 82%;
+  width: min(88cqw, 88cqh);
+  height: min(88cqw, 88cqh);
+  max-width: 92%;
+  max-height: 92%;
+  aspect-ratio: 1;
+  margin: 0;
+  mix-blend-mode: screen;
+}
+
+.reels.has-winners,
+.reels.has-winners .symbol-cell.is-winner {
+  overflow: hidden;
+}
+
+.game-stage[data-game="astral"] .reels.has-winners .symbol-cell.is-winner {
+  z-index: 3;
+}
+
+.game-stage[data-game="astral"] .reels.has-winners .symbol-cell.is-winner .generated-symbol {
+  animation: containedWinnerPulse 620ms cubic-bezier(.2,.82,.25,1) infinite alternate !important;
+}
+
+.game-stage[data-game="astral"] .symbol-cell.is-special-hit {
+  z-index: 18;
+  overflow: visible;
+}
+
+.game-stage[data-game="astral"] .symbol-cell.is-special-hit .generated-symbol {
+  z-index: 20;
+  animation: collectorBreakout 1080ms cubic-bezier(.16,.86,.22,1) both !important;
+}
+
+@keyframes containedWinnerPulse {
+  from { transform: scale(.98); filter: brightness(1.04) drop-shadow(0 0 8px var(--symbol-glow)); }
+  to { transform: scale(1.08); filter: brightness(1.48) drop-shadow(0 0 22px var(--symbol-glow)); }
+}
+
+@keyframes collectorBreakout {
+  0% { transform: translateY(0) scale(1); filter: brightness(1); }
+  28% { transform: translateY(-22%) scale(1.32) rotate(-4deg); filter: brightness(1.8) drop-shadow(0 0 26px var(--game-accent)); }
+  58% { transform: translateY(-13%) scale(1.2) rotate(3deg); filter: brightness(1.45) drop-shadow(0 12px 18px rgba(0,0,0,.58)); }
+  100% { transform: translateY(0) scale(1); filter: none; }
+}
+
+.bonus-overlay[data-mode="astral-aviator"] {
+  padding: 8px;
+  overflow: hidden;
+  background: #02050e;
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-scene {
+  position: relative;
+  isolation: isolate;
+  width: min(1180px, calc(100vw - 16px));
+  height: min(680px, calc(100dvh - 16px));
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--game-accent) 70%, #fff 18%);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(2,7,19,.2), rgba(2,5,18,.18) 48%, rgba(1,3,12,.76)),
+    radial-gradient(circle at 76% 22%, color-mix(in srgb, var(--game-accent) 35%, transparent), transparent 34%),
+    var(--bonus-bg) center / cover no-repeat;
+  box-shadow:
+    0 34px 120px rgba(0,0,0,.88),
+    inset 0 0 100px rgba(0,0,0,.3),
+    0 0 72px color-mix(in srgb, var(--game-accent) 32%, transparent);
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-scene::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(2,4,14,.68), transparent 28% 72%, rgba(2,4,14,.58)),
+    linear-gradient(0deg, rgba(2,4,15,.78), transparent 31%);
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-scene::after,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-rays,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-scene > .eyebrow,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-scene > h2,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-scene > p,
+.bonus-overlay[data-mode="astral-aviator"] .constellation-picks {
+  display: none;
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic {
+  position: absolute;
+  z-index: 30;
+  top: 3%;
+  left: 2.3%;
+  width: clamp(150px, 18%, 210px);
+  margin: 0;
+  padding: 9px 11px;
+  border-color: color-mix(in srgb, var(--game-accent) 64%, #fff 15%);
+  border-radius: 12px 4px 12px 4px;
+  background: linear-gradient(145deg, rgba(7,13,35,.9), rgba(2,6,20,.86));
+  box-shadow: inset 0 1px rgba(255,255,255,.14), 0 10px 28px rgba(0,0,0,.45), 0 0 26px color-mix(in srgb, var(--game-accent) 22%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic > span,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic > strong { font-size: 8px; }
+.bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic > small { color: #b8c8dc; }
+
+.bonus-overlay[data-mode="astral-aviator"] .astral-bonus-stage {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers {
+  position: absolute;
+  z-index: 31;
+  top: 3%;
+  right: 2.3%;
+  display: flex;
+  gap: 7px;
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers span {
+  width: clamp(48px, 5.8vw, 68px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 52%, #fff 12%);
+  border-radius: 50% 50% 45% 45%;
+  color: rgba(232,242,255,.6);
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--game-accent) 20%, transparent), rgba(3,7,24,.9) 70%);
+  box-shadow: inset 0 0 18px rgba(255,255,255,.07), 0 8px 24px rgba(0,0,0,.45);
+  font: 700 clamp(12px, 1.5vw, 18px)/1 var(--serif);
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers span.is-locked {
+  color: #fff7c0;
+  border-color: color-mix(in srgb, var(--game-accent) 72%, #fff 24%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--game-accent) 58%, #fff 8%), rgba(8,13,36,.94) 72%);
+  box-shadow: inset 0 0 18px rgba(255,255,255,.15), 0 0 26px color-mix(in srgb, var(--game-accent) 52%, transparent);
+  animation: astralCaseLock 620ms cubic-bezier(.16,1.25,.28,1) both;
+}
+
+.astral-flight-machine {
+  position: absolute;
+  inset: 0;
+}
+
+.astral-flight-round {
+  position: absolute;
+  z-index: 19;
+  top: 16%;
+  left: 50%;
+  min-width: 190px;
+  padding: 7px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 62%, #fff 14%);
+  border-radius: 999px;
+  color: #f5fbff;
+  background: rgba(2,7,23,.8);
+  box-shadow: inset 0 1px rgba(255,255,255,.13), 0 0 25px color-mix(in srgb, var(--game-accent) 22%, transparent);
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+.astral-flight-round span { font-size: 9px; font-weight: 950; letter-spacing: .12em; }
+.astral-flight-round small { color: color-mix(in srgb, var(--game-accent) 62%, white); font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+
+.astral-flight-world {
+  --flight-progress: 4%;
+  position: absolute;
+  z-index: 7;
+  top: 21%;
+  left: 4%;
+  right: 4%;
+  height: 49%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 62%, #fff 12%);
+  border-radius: 28px 8px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--game-accent) 16%, rgba(4,10,27,.24)), rgba(2,5,17,.3) 58%, rgba(2,5,15,.74)),
+    var(--bonus-bg) center / cover no-repeat;
+  box-shadow: inset 0 0 50px rgba(0,0,0,.54), inset 0 1px rgba(255,255,255,.18), 0 0 30px color-mix(in srgb, var(--game-accent) 18%, transparent);
+}
+
+.astral-flight-world::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 72% 24%, color-mix(in srgb, var(--game-accent) 30%, transparent), transparent 34%),
+    linear-gradient(0deg, rgba(2,4,13,.72), transparent 33%);
+  pointer-events: none;
+}
+
+.astral-flight-world::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  bottom: 0;
+  width: var(--flight-progress);
+  height: 4px;
+  background: linear-gradient(90deg, var(--game-secondary), var(--game-accent), #fff3a6);
+  box-shadow: 0 0 16px var(--game-accent);
+  transition: width 100ms linear;
+}
+
+.astral-flight-clouds i {
+  position: absolute;
+  z-index: 2;
+  width: clamp(90px, 15vw, 180px);
+  height: clamp(26px, 5vw, 58px);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(240,249,255,.34), rgba(180,215,255,.1) 52%, transparent 72%);
+  filter: blur(2px);
+  animation: flightCloudDrift 8s linear infinite;
+}
+.astral-flight-clouds i:nth-child(1) { top: 14%; left: 8%; animation-delay: -6s; }
+.astral-flight-clouds i:nth-child(2) { top: 33%; left: 45%; animation-delay: -2s; transform: scale(.72); }
+.astral-flight-clouds i:nth-child(3) { top: 64%; left: 68%; animation-delay: -4s; transform: scale(1.2); }
+.astral-flight-clouds i:nth-child(4) { top: 6%; left: 82%; animation-delay: -1s; transform: scale(.58); }
+
+.astral-flight-path {
+  position: absolute;
+  z-index: 3;
+  inset: 12% 8% 15%;
+  border-top: 2px dashed color-mix(in srgb, var(--game-accent) 48%, transparent);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+  opacity: .75;
+}
+.astral-flight-path i {
+  position: absolute;
+  top: -5px;
+  width: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff4aa;
+  box-shadow: 0 0 12px var(--game-accent);
+}
+.astral-flight-path i:nth-child(1) { left: 18%; }
+.astral-flight-path i:nth-child(2) { left: 52%; }
+.astral-flight-path i:nth-child(3) { left: 84%; }
+
+.astral-flight-plane {
+  --flight-x: -8%;
+  --flight-y: 69%;
+  --flight-tilt: -8deg;
+  position: absolute;
+  z-index: 12;
+  left: var(--flight-x);
+  top: var(--flight-y);
+  width: clamp(170px, 27vw, 380px);
+  aspect-ratio: 3 / 2;
+  transform: translate(-50%, -50%) rotate(var(--flight-tilt));
+  transform-origin: 50% 54%;
+  will-change: left, top, transform;
+}
+
+.astral-flight-plane img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 16px rgba(0,0,0,.62)) drop-shadow(0 0 12px rgba(255,52,61,.4));
+}
+
+.astral-plane-exhaust {
+  position: absolute;
+  z-index: -1;
+  left: 2%;
+  top: 52%;
+  width: 44%;
+  height: 16%;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--game-accent) 45%, white), #fff6af);
+  filter: blur(6px);
+  transform: translateX(-70%);
+  opacity: 0;
+}
+.astral-flight-machine.is-flying .astral-plane-exhaust,
+.astral-flight-machine.is-landing .astral-plane-exhaust { opacity: .9; animation: flightExhaust 180ms ease-in-out infinite alternate; }
+.astral-flight-machine.is-flying .astral-flight-plane { animation: flightTurbulence 420ms ease-in-out infinite alternate; }
+.astral-flight-machine.is-landed .astral-flight-plane img { animation: flightLandedFlash 700ms cubic-bezier(.16,1.2,.25,1) both; }
+
+.astral-flight-altitude {
+  position: absolute;
+  z-index: 10;
+  right: 12px;
+  top: 12%;
+  bottom: 12%;
+  width: 34px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  align-items: end;
+  border-right: 2px solid color-mix(in srgb, var(--game-accent) 55%, #fff 12%);
+}
+.astral-flight-altitude i { width: 14px; height: 1px; background: rgba(255,255,255,.58); }
+
+.astral-flight-award {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  top: 65.5%;
+  min-width: 190px;
+  padding: 8px 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 65%, #fff 18%);
+  border-radius: 999px;
+  background: rgba(3,8,25,.86);
+  box-shadow: inset 0 1px rgba(255,255,255,.15), 0 10px 28px rgba(0,0,0,.45), 0 0 28px color-mix(in srgb, var(--game-accent) 30%, transparent);
+  transform: translateX(-50%);
+  backdrop-filter: blur(9px);
+}
+.astral-flight-award small { color: #b8c9df; font-size: 7px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.astral-flight-award strong { color: #fff1a5; font: 700 clamp(28px, 4vw, 48px)/.95 var(--serif); text-shadow: 0 0 20px color-mix(in srgb, var(--game-accent) 52%, transparent); }
+
+.astral-flight-progress {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  bottom: 15%;
+  width: min(48%, 510px);
+  display: grid;
+  gap: 5px;
+  transform: translateX(-50%);
+}
+.astral-flight-progress > span { color: #edf6ff; font-size: 8px; font-weight: 900; letter-spacing: .09em; text-align: center; text-transform: uppercase; text-shadow: 0 2px 5px #000; }
+.astral-flight-progress > i { height: 7px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--game-accent) 58%, #fff 12%); border-radius: 999px; background: rgba(2,4,20,.74); }
+.astral-flight-progress > i > b { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--game-secondary), var(--game-accent), #ffe171); box-shadow: 0 0 13px var(--game-accent); transition: width 420ms ease; }
+
+.bonus-overlay[data-mode="astral-aviator"] .astral-total-multiplier,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-total {
+  position: absolute;
+  z-index: 30;
+  bottom: 3%;
+  min-width: 150px;
+  margin: 0;
+  padding: 7px 15px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 52%, #fff 12%);
+  border-radius: 12px 4px;
+  background: rgba(3,8,25,.84);
+  box-shadow: inset 0 1px rgba(255,255,255,.12), 0 9px 25px rgba(0,0,0,.44);
+  backdrop-filter: blur(8px);
+}
+.bonus-overlay[data-mode="astral-aviator"] .astral-total-multiplier { left: 2.3%; }
+.bonus-overlay[data-mode="astral-aviator"] .bonus-total { right: 2.3%; }
+.bonus-overlay[data-mode="astral-aviator"] .astral-total-multiplier span,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-total span { color: #b4c7dd; font-size: 7px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.bonus-overlay[data-mode="astral-aviator"] .astral-total-multiplier strong,
+.bonus-overlay[data-mode="astral-aviator"] .bonus-total strong { color: #fff1a5; font: 700 clamp(18px, 2.2vw, 28px)/1 var(--serif); }
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-action {
+  position: absolute;
+  z-index: 40;
+  left: 50%;
+  bottom: 2.2%;
+  width: min(34%, 360px);
+  min-width: 220px;
+  min-height: 56px;
+  border: 2px solid #ffd96b;
+  border-radius: 15px 5px;
+  color: #fff;
+  background: radial-gradient(circle at 50% 0, rgba(255,255,255,.28), transparent 48%), linear-gradient(180deg, #e33e48, #8b1223);
+  box-shadow: inset 0 1px rgba(255,255,255,.3), 0 12px 32px rgba(0,0,0,.55), 0 0 30px rgba(255,52,66,.38);
+  font: 950 clamp(12px, 1.5vw, 18px)/1 var(--sans);
+  letter-spacing: .1em;
+  transform: translateX(-50%);
+  text-transform: uppercase;
+  pointer-events: auto;
+}
+.bonus-overlay[data-mode="astral-aviator"] .bonus-action:hover:not(:disabled) { filter: brightness(1.18); transform: translateX(-50%) translateY(-2px); }
+.bonus-overlay[data-mode="astral-aviator"] .bonus-action.is-stop { animation: skyRunnerLandPulse 430ms ease-in-out infinite alternate; }
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-exit {
+  position: absolute;
+  z-index: 41;
+  left: 50%;
+  bottom: 11%;
+  min-width: 150px;
+  min-height: 38px;
+  border-color: color-mix(in srgb, var(--game-accent) 62%, white 12%);
+  background: rgba(3,8,25,.84);
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+.bonus-overlay[data-mode="astral-aviator"] .bonus-exit[hidden] { display: none; }
+
+.cinematic-overlay[data-mode="sky-runner"] .cinematic-guardian {
+  background-image: var(--cinematic-plane);
+  background-size: contain;
+  background-position: center;
+  mix-blend-mode: normal;
+  filter: drop-shadow(0 22px 22px rgba(0,0,0,.72)) drop-shadow(0 0 18px rgba(255,59,67,.5));
+}
+
+@keyframes flightCloudDrift { from { translate: -15vw 0; } to { translate: 30vw 0; } }
+@keyframes flightExhaust { to { transform: translateX(-80%) scaleX(1.3); opacity: .55; } }
+@keyframes flightTurbulence { to { margin-top: -3px; } }
+@keyframes flightLandedFlash { 0% { filter: brightness(1) drop-shadow(0 18px 16px rgba(0,0,0,.62)); } 45% { filter: brightness(1.85) drop-shadow(0 0 28px var(--game-accent)); transform: scale(1.08); } 100% { filter: brightness(1.08) drop-shadow(0 18px 16px rgba(0,0,0,.62)); } }
+@keyframes skyRunnerLandPulse { to { filter: brightness(1.22); box-shadow: inset 0 1px rgba(255,255,255,.36), 0 12px 38px rgba(0,0,0,.55), 0 0 48px rgba(255,65,76,.68); } }
+
+@media (max-width: 620px) and (orientation: portrait) {
+  .bonus-overlay[data-mode="astral-aviator"] { padding: 4px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-scene { width: calc(100vw - 8px); height: calc(100dvh - 8px); border-radius: 14px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic { top: 1.5%; left: 2%; width: 142px; padding: 6px 8px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic > small { display: none; }
+  .bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers { top: 1.5%; right: 2%; gap: 4px; }
+  .bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers span { width: min(13vw, 48px); }
+  .astral-flight-round { top: 14%; min-width: 160px; }
+  .astral-flight-world { top: 20%; left: 2%; right: 2%; height: 47%; border-radius: 18px 6px; }
+  .astral-flight-plane { width: clamp(140px, 48vw, 230px); }
+  .astral-flight-award { top: 64%; min-width: 150px; padding: 6px 15px; }
+  .astral-flight-progress { bottom: 19%; width: 74%; }
+  .bonus-overlay[data-mode="astral-aviator"] .astral-total-multiplier,
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-total { bottom: 10.2%; min-width: 105px; padding: 5px 8px; }
+  .bonus-overlay[data-mode="astral-aviator"] .astral-total-multiplier { left: 2%; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-total { right: 2%; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-action { bottom: 1.6%; width: 62%; min-width: 190px; min-height: 48px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-exit { bottom: 17%; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .bonus-overlay[data-mode="astral-aviator"] { padding: 4px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-scene { width: calc(100vw - 8px); height: calc(100dvh - 8px); border-radius: 12px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic { top: 1.5%; left: 1.5%; width: 150px; padding: 5px 7px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-mechanic > small { display: none; }
+  .bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers { top: 1.5%; right: 1.5%; }
+  .bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers span { width: 45px; }
+  .astral-flight-round { top: 14%; padding-block: 4px; }
+  .astral-flight-world { top: 20%; left: 12%; right: 12%; height: 47%; }
+  .astral-flight-plane { width: clamp(150px, 27vw, 280px); }
+  .astral-flight-award { top: 63%; min-width: 145px; padding-block: 4px; }
+  .astral-flight-progress { bottom: 13.5%; width: 42%; }
+  .bonus-overlay[data-mode="astral-aviator"] .astral-total-multiplier,
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-total { bottom: 2%; min-width: 125px; padding-block: 4px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-action { bottom: 1.2%; min-height: 42px; }
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-exit { bottom: 13%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astral-flight-clouds i,
+  .astral-flight-plane,
+  .astral-plane-exhaust,
+  .bonus-overlay[data-mode="astral-aviator"] .bonus-action { animation: none !important; }
+}

@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.1.0**
+Version reviewed: **3.2.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -30,7 +30,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Autoplay | Implemented | Finite 10, 25, or 50 spins. Stop remains accessible and autoplay stops on insufficient demo balance. |
 | Positive-return display | Implemented | Every positive payout receives an animated numeric result, even when it is smaller than the wager. |
 | Win celebrations | Implemented | Win, Nice, Big, Mega, and Epic tiers scale the banner, particles, cabinet reaction, audio, and cinematic treatment. |
-| Winner breakout | Implemented | Only winning symbol art jumps; the whole tile does not. |
+| Winner animation | Implemented | Normal winners pulse inside their cells. Only the special collector art jumps beyond its cell; the tile never moves. |
 | Result history | Implemented | Total won, spins, best win, and last-win details are available without showing session loss. |
 
 ## Persistent feature and bonus
@@ -42,17 +42,19 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Special Bet | Implemented | Standard, guaranteed +1 collector, or guaranteed +2 collectors. Costs are mathematically calibrated to preserve 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | 25×, 50×, or 100× demo-credit purchases with separately calibrated prize tables at 99.00% theoretical RTP. |
 | Bonus demo | Implemented | Top-of-machine no-wager preview. It does not spend credits, change progress, or create a fairness receipt. |
-| Horizontal case roll | Implemented | Three multiplier cases roll beneath a fixed marker. The player presses Stop; the animation slows naturally from its current position and lands on the sealed multiplier. |
-| Stop integrity | Implemented | Stop affects reveal timing only. It cannot reroll, improve, or worsen the precomputed result. |
-| Round clarity | Implemented | Current case, locked multipliers, total X, and final credit award stay visible. |
+| Sky Runner flights | Implemented | Three aviation rounds use an original red-and-gold plane. The plane takes off, climbs continuously, and eases to the sealed multiplier when the player presses Land. |
+| Land integrity | Implemented | Land affects reveal timing only. It cannot reroll, improve, or worsen the precomputed result. Flight duration and destination reflect the sealed result. |
+| Theme matching | Implemented | The selected environment artwork, accent, and secondary color also style the bonus sky, trail, frame, route, and multiplier locks. |
+| Round clarity | Implemented | Current flight, live X, landed multipliers, total X, flight progress, and final credit award stay visible. |
+| Preview replay | Implemented | The no-wager Bonus Demo ends with Play Again and Back to game controls. |
 
 ## Visual and sound systems
 
-- 22 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, and six symbol sheets.
+- 23 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, and one transparent red Sky Runner plane.
 - Backgrounds keep the central reel area low-detail; companion PNGs use true alpha transparency; symbol sheets use a fixed 4×2 atlas with the last cell empty.
 - One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
-- Reel roll, reel stop, button, meter collection, case roll, case lock, victory, and big-win events have separate sound roles.
+- Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
 - Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.
 
 ## Fairness and return
@@ -74,7 +76,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - Spin, bet, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain clickable.
 - Autoplay opens as a viewport-level dialog that cannot be clipped by the cabinet.
 - The 6×5 board and transparent companion are resized/repositioned on narrow screens without covering interactive controls.
-- Winner art can animate outside its cell without being cut off; interactive controls remain inside their safe regions.
+- Regular winner art remains square and contained. Only the special collector can animate outside its cell; interactive controls remain inside their safe regions.
 - Reduced-motion preferences shorten or remove nonessential movement without changing game timing integrity.
 
 ## Deliberately absent

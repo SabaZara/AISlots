@@ -12,7 +12,8 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   ]);
 
   for (const id of [
-    "astralShowcaseButton", "cinematicOverlay", "astralBonusStage", "astralCaseTrack",
+    "astralShowcaseButton", "cinematicOverlay", "astralBonusStage", "astralFlightWorld",
+    "astralFlightPlane", "bonusExit",
     "specialBetButton", "buyFeatureButton", "featureMarketOverlay", "autoplayOverlay",
     "reels", "spinButton", "fairnessButton", "companionStage", "companionPortrait"
   ]) {
@@ -62,23 +63,40 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(css, /naturalReelRoll/);
 });
 
-test("multiplier case Stop decelerates continuously onto the sealed result", async () => {
-  const [app, model, html] = await Promise.all([
+test("Sky Runner Land continuously follows the sealed flight result", async () => {
+  const [app, model, html, css] = await Promise.all([
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("game-model.js", root), "utf8"),
-    readFile(new URL("index.html", root), "utf8")
+    readFile(new URL("index.html", root), "utf8"),
+    readFile(new URL("styles.css", root), "utf8")
   ]);
-  assert.match(app, /function astralCaseStopProfile\(multiplier\)/);
-  assert.match(app, /markerIndex = Math\.max\(0, Math\.ceil\(\(-offset - itemWidth \/ 2\) \/ step\)\)/);
-  assert.match(app, /landingIndex = Math\.min\(items\.length - 3, markerIndex \+ stepsAhead\)/);
-  assert.match(app, /setAstralCaseItemValue\(target, multiplier, \{ target: true \}\)/);
-  assert.match(app, /function animateAstralCaseBrake/);
-  assert.match(app, /position = from \+ distance \* progress/);
-  assert.match(app, /track\.dataset\.stopFrom = offset\.toFixed\(3\)/);
-  assert.doesNotMatch(app, /targetIndex = 45/);
-  assert.match(app, /ui\.bonusAction\.textContent = "STOP"/);
-  assert.match(model, /Stop controls reveal timing only/);
-  assert.match(html, /Horizontal multiplier case roller/);
+  assert.match(app, /function astralFlightProfile\(multiplier\)/);
+  assert.match(app, /function animateAstralFlightLanding/);
+  assert.match(app, /const progress = fromProgress \+ \(toProgress - fromProgress\) \* eased/);
+  assert.match(app, /setAstralFlightPosition\(progress, \{ landing: time > \.82 \}\)/);
+  assert.match(app, /activeRound = beginAstralFlight/);
+  assert.match(app, /ui\.bonusAction\.textContent = "LAND NOW"/);
+  assert.match(app, /ui\.bonusOverlay\.dataset\.mode = "astral-aviator"/);
+  assert.match(app, /ui\.bonusAction\.textContent = preview \? "Play again"/);
+  assert.match(model, /Land controls reveal timing only/);
+  assert.match(html, /Themed aviation multiplier flight/);
+  assert.match(html, /sky-runner-plane-cutout-v1\.png/);
+  assert.match(css, /var\(--bonus-bg\) center \/ cover no-repeat/);
+  assert.match(css, /\.astral-flight-plane img[\s\S]*?object-fit: contain/);
+});
+
+test("normal wins stay contained while only collector art breaks out", async () => {
+  const [app, css] = await Promise.all([
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("styles.css", root), "utf8")
+  ]);
+  assert.match(app, /function revealSpecialCollectors\(collectorCount\)/);
+  assert.match(app, /revealSpecialCollectors\(outcome\.collectorCount\)/);
+  assert.match(css, /\.reels\.has-winners,[\s\S]*?overflow: hidden/);
+  assert.match(css, /containedWinnerPulse/);
+  assert.match(css, /\.symbol-cell\.is-special-hit \.generated-symbol/);
+  assert.match(css, /collectorBreakout/);
+  assert.match(css, /width: min\(88cqw, 88cqh\)/);
 });
 
 test("autoplay, Normal/Fast spin, and every positive payout remain visible", async () => {
@@ -113,7 +131,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.1.0");
+  assert.equal(JSON.parse(packageJson).version, "3.2.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

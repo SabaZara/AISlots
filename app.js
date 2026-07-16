@@ -131,10 +131,11 @@ const ui = {
   astralCascadeLabel: $("astralCascadeLabel"),
   astralRoundAward: $("astralRoundAward"),
   astralTotalMultiplier: $("astralTotalMultiplier"),
-  astralCaseTrack: $("astralCaseTrack"),
-  astralCaseMarker: $("astralCaseMarker"),
+  astralFlightWorld: $("astralFlightWorld"),
+  astralFlightPlane: $("astralFlightPlane"),
   astralChoiceProgress: $("astralChoiceProgress"),
-  astralChoiceBar: $("astralChoiceBar")
+  astralChoiceBar: $("astralChoiceBar"),
+  bonusExit: $("bonusExit")
 };
 
 const state = {
@@ -383,6 +384,14 @@ function revealWinningCells(winnerCells) {
     cell.classList.toggle("is-winner", winnerCells.has(Number(cell.dataset.index)));
   });
   ui.reels.classList.toggle("has-winners", winnerCells.size > 0);
+}
+
+function revealSpecialCollectors(collectorCount) {
+  if (collectorCount <= 0) return;
+  ui.reels.querySelectorAll('.symbol-cell[data-symbol="petal"]').forEach((cell) => {
+    cell.classList.add("is-special-hit");
+    window.setTimeout(() => cell.classList.remove("is-special-hit"), 1180);
+  });
 }
 
 function initialGrid() {
@@ -669,12 +678,12 @@ function applyGameTheme({ resetGrid = false } = {}) {
   game.collectionPlural = `${visuals.symbols.collector}s`;
   game.featureName = `${visuals.theme.name} Relic Vault`;
   game.featureEyebrow = "Persistent collector";
-  game.featureCopy = `Every ${game.collectionName} stays in your vault. Collect ${game.threshold} to open ${game.bonusDraws} sealed multiplier cases.`;
+  game.featureCopy = `Every ${game.collectionName} stays in your vault. Collect ${game.threshold} to launch ${game.bonusDraws} sealed multiplier flights.`;
   game.meterCarryCopy = `Every ${game.collectionName} stays between spins`;
   game.anticipationCopy = `${visuals.theme.name} energy is charging the final reel…`;
   game.bonusTitle = `${visuals.theme.name} vault awakened.`;
-  game.bonusCopy = `${game.bonusDraws} multiplier cases are sealed into your fairness receipt. Stop changes reveal timing only.`;
-  game.bonusMechanicName = `${visuals.theme.name} Relic Case Roll`;
+  game.bonusCopy = `${game.bonusDraws} flight multipliers are sealed into your fairness receipt. Landing changes reveal timing only.`;
+  game.bonusMechanicName = `${visuals.theme.name} Sky Runner`;
   game.symbols.forEach((symbol) => { symbol.name = visuals.symbols.names[symbol.id]; });
   const titleParts = game.name.split(" ");
   const firstWord = titleParts.shift();
@@ -697,8 +706,12 @@ function applyGameTheme({ resetGrid = false } = {}) {
   gameStage.style.setProperty("--game-secondary", game.secondary);
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--game-accent", game.accent);
+  ui.bonusOverlay.style.setProperty("--game-secondary", game.secondary);
   ui.bonusOverlay.style.setProperty("--bonus-bg", `url("${visuals.theme.asset}")`);
+  ui.bonusOverlay.dataset.theme = visuals.theme.id;
+  ui.bonusOverlay.dataset.mood = visuals.mood.id;
   ui.cinematicOverlay.style.setProperty("--cinematic-companion", `url("${visuals.companion.asset}")`);
+  ui.cinematicOverlay.style.setProperty("--cinematic-plane", "url(\"./assets/sky-runner-plane-cutout-v1.png\")");
   ui.companionPortrait.src = visuals.companion.asset;
   document.title = `${visualConfigLabel(state.visualConfig)} · AISlots`;
   $("brandName").textContent = game.name;
@@ -994,6 +1007,7 @@ async function settleOutcome(outcome) {
   audio.stopSpinLoop();
   await waitForSpinDelay(settleTail);
   revealWinningCells(winningCells(outcome));
+  revealSpecialCollectors(outcome.collectorCount);
   ui.reels.classList.remove("is-cinematic-drop");
   ui.reelViewport.classList.remove("is-stopping");
   updateUi();
@@ -1103,10 +1117,11 @@ function cinematicDelay(milliseconds) {
 
 async function runAstralCinematicTransition({ preview = false, multiplierCount = 3 } = {}) {
   const game = currentGame();
+  ui.cinematicOverlay.dataset.mode = "sky-runner";
   ui.cinematicOverlay.dataset.phase = "sleeping";
-  ui.cinematicTitle.textContent = preview ? "Demo" : "Awaken";
-  ui.cinematicCopy.textContent = preview ? "No wager" : `${game.featureName} opening`;
-  ui.cinematicAward.textContent = `${multiplierCount} CASES`;
+  ui.cinematicTitle.textContent = preview ? "Flight Demo" : "Clear for takeoff";
+  ui.cinematicCopy.textContent = preview ? "No wager" : `${game.featureName} flight deck opening`;
+  ui.cinematicAward.textContent = `${multiplierCount} FLIGHTS`;
   ui.cinematicOverlay.hidden = false;
   ui.cinematicOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;
@@ -1116,8 +1131,8 @@ async function runAstralCinematicTransition({ preview = false, multiplierCount =
   await cinematicDelay(1050);
   ui.cinematicOverlay.dataset.phase = "awakened";
   ui.cinematicTitle.textContent = game.featureName;
-  ui.cinematicCopy.textContent = preview ? "No payout" : "Sealed multiplier rolls";
-  ui.cinematicAward.textContent = `${multiplierCount} CASES`;
+  ui.cinematicCopy.textContent = preview ? "No payout" : "Sealed multiplier flights";
+  ui.cinematicAward.textContent = `${multiplierCount} FLIGHTS`;
   jumpText(ui.cinematicTitle);
   jumpText(ui.cinematicAward);
   burstParticles(70, 1.65);
@@ -1134,9 +1149,7 @@ function formatMultiplier(value) {
   return `${Number(value).toFixed(2)}×`;
 }
 
-const ASTRAL_CASE_VALUES = Object.freeze([0.25, 0.5, 1, 2, 3, 5, 10]);
-
-function astralCaseRarity(multiplier) {
+function astralFlightRarity(multiplier) {
   if (multiplier >= 10) return "jackpot";
   if (multiplier >= 5) return "legendary";
   if (multiplier >= 2) return "epic";
@@ -1144,174 +1157,129 @@ function astralCaseRarity(multiplier) {
   return "common";
 }
 
-function setAstralCaseItemValue(item, multiplier, { target = false } = {}) {
-  const rarity = astralCaseRarity(multiplier);
-  item.className = `astral-case-item rarity-${rarity}${target ? " is-target" : ""}`;
-  item.dataset.multiplier = String(multiplier);
-  item.innerHTML = `<img src="./assets/${multiplier >= 5 ? "astral-case-capsule-legendary-v1.png" : "astral-case-capsule-blue-v1.png"}" alt=""><strong>${formatMultiplier(multiplier)}</strong><small>${rarity}</small>`;
+function astralFlightProfile(multiplier) {
+  if (multiplier >= 10) return { duration: 1550, progress: .94 };
+  if (multiplier >= 5) return { duration: 1320, progress: .88 };
+  if (multiplier >= 2) return { duration: 1100, progress: .80 };
+  if (multiplier >= 1) return { duration: 900, progress: .72 };
+  if (multiplier >= .5) return { duration: 760, progress: .64 };
+  return { duration: 650, progress: .56 };
 }
 
-function buildAstralCaseTrack(roundIndex) {
-  const itemCount = 72;
-  const fragment = document.createDocumentFragment();
-  const items = [];
-  for (let index = 0; index < itemCount; index += 1) {
-    const cosmeticValue = ASTRAL_CASE_VALUES[(index * 3 + roundIndex * 2 + Math.floor(index / 5)) % ASTRAL_CASE_VALUES.length];
-    const item = document.createElement("span");
-    setAstralCaseItemValue(item, cosmeticValue);
-    items.push(item);
-    fragment.append(item);
-  }
-  ui.astralCaseTrack.replaceChildren(fragment);
-  return items;
+function setAstralFlightPosition(progress, { landing = false } = {}) {
+  const clamped = Math.max(0, Math.min(1, progress));
+  const x = 27 + clamped * 46;
+  const arc = Math.sin(clamped * Math.PI) * 9;
+  const y = 73 - clamped * 47 - arc;
+  const tilt = landing ? -2 : -9 + clamped * 8;
+  ui.astralFlightPlane.style.setProperty("--flight-x", x.toFixed(2) + "%");
+  ui.astralFlightPlane.style.setProperty("--flight-y", y.toFixed(2) + "%");
+  ui.astralFlightPlane.style.setProperty("--flight-tilt", tilt.toFixed(2) + "deg");
+  ui.astralFlightWorld.style.setProperty("--flight-progress", (clamped * 100).toFixed(2) + "%");
 }
 
-function astralCaseStopProfile(multiplier) {
-  if (multiplier >= 10) return { duration: 1550, minimumSteps: 12 };
-  if (multiplier >= 5) return { duration: 1250, minimumSteps: 10 };
-  if (multiplier >= 2) return { duration: 980, minimumSteps: 8 };
-  if (multiplier >= 1) return { duration: 760, minimumSteps: 6 };
-  return { duration: 620, minimumSteps: 5 };
-}
-
-function astralBrakeProgress(time, initialVelocityRatio) {
-  const t = Math.max(0, Math.min(1, time));
-  const velocity = Math.max(.2, Math.min(2.6, initialVelocityRatio));
-  return (-2 + velocity) * t ** 3 + (3 - 2 * velocity) * t ** 2 + velocity * t;
-}
-
-function animateAstralCaseBrake(track, { from, to, duration, rollSpeed, reducedMotion }) {
-  track.style.transform = `translate3d(${from}px,0,0)`;
+function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, toMultiplier, duration, reducedMotion }) {
   if (reducedMotion) {
-    track.style.transform = `translate3d(${to}px,0,0)`;
-    return delay(duration);
+    setAstralFlightPosition(toProgress, { landing: true });
+    ui.astralRoundAward.textContent = formatMultiplier(toMultiplier);
+    return delay(80);
   }
-  const distance = to - from;
-  const velocityRatio = Math.abs(distance) > 0 ? rollSpeed * duration / 1000 / Math.abs(distance) : 1;
-  track.dataset.brakeVelocityRatio = velocityRatio.toFixed(3);
   return new Promise((resolve) => {
     let startedAt = null;
-    let drewFirstFrame = false;
     const draw = (now) => {
       if (startedAt === null) startedAt = now;
       const time = Math.min(1, (now - startedAt) / duration);
-      const progress = astralBrakeProgress(time, velocityRatio);
-      const position = from + distance * progress;
-      track.style.transform = `translate3d(${position}px,0,0)`;
-      track.dataset.brakeProgress = time.toFixed(3);
-      if (!drewFirstFrame) {
-        drewFirstFrame = true;
-        track.dataset.firstBrakePosition = position.toFixed(3);
-        track.dataset.firstBrakeElapsed = (now - startedAt).toFixed(3);
-      }
-      if (time < 1) {
-        window.requestAnimationFrame(draw);
-      } else {
-        resolve();
-      }
+      const eased = 1 - Math.pow(1 - time, 3);
+      const progress = fromProgress + (toProgress - fromProgress) * eased;
+      const displayedMultiplier = fromMultiplier + (toMultiplier - fromMultiplier) * eased;
+      setAstralFlightPosition(progress, { landing: time > .82 });
+      ui.astralRoundAward.textContent = formatMultiplier(displayedMultiplier);
+      ui.astralFlightWorld.dataset.flightProgress = progress.toFixed(3);
+      if (time < 1) window.requestAnimationFrame(draw);
+      else resolve();
     };
     window.requestAnimationFrame(draw);
   });
 }
 
-function beginAstralCaseRoll(roundIndex, multiplier, bet, multiplierTotal, totalRounds) {
-  const items = buildAstralCaseTrack(roundIndex);
-  const track = ui.astralCaseTrack;
-  const firstItem = track.firstElementChild;
-  const itemWidth = firstItem?.getBoundingClientRect().width || 120;
-  const trackStyles = window.getComputedStyle(track);
-  const gap = Number.parseFloat(trackStyles.columnGap || trackStyles.gap) || 10;
-  const step = itemWidth + gap;
+function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRounds) {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const rollSpeed = reducedMotion ? 2600 : 1480 + roundIndex * 90;
-  let offset = 0;
-  let lastFrame = performance.now();
-  let lastTickOffset = 0;
+  const profile = astralFlightProfile(multiplier);
+  const cruiseCeiling = Math.min(profile.progress - .08, .32 + roundIndex * .035);
+  const liveMultiplierCeiling = Math.max(.03, multiplier * .58);
+  let currentProgress = .04;
+  let currentMultiplier = .01;
+  let startedAt = null;
   let frame = 0;
-  let stopRequested = false;
+  let landRequested = false;
   let resolveFinished;
   const finished = new Promise((resolve) => { resolveFinished = resolve; });
 
-  ui.astralMultiplierDial.classList.remove("is-decelerating", "is-locked");
-  ui.astralMultiplierDial.classList.add("is-rolling");
-  ui.astralCaseMarker.classList.remove("is-locked");
-  ui.astralFreeSpinLabel.textContent = `Case ${roundIndex + 1} / ${totalRounds}`;
-  ui.astralCascadeLabel.textContent = "Rolling";
-  ui.astralRoundAward.textContent = "?×";
-  ui.astralChoiceProgress.textContent = `Case ${roundIndex + 1} of ${totalRounds} · press stop`;
-  track.style.transform = "translate3d(0,0,0)";
+  ui.astralMultiplierDial.classList.remove("is-landing", "is-landed");
+  ui.astralMultiplierDial.classList.add("is-flying");
+  ui.astralFreeSpinLabel.textContent = "Flight " + (roundIndex + 1) + " / " + totalRounds;
+  ui.astralCascadeLabel.textContent = "Climbing";
+  ui.astralRoundAward.textContent = "0.01×";
+  ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · land when ready";
+  ui.astralFlightWorld.dataset.rarity = astralFlightRarity(multiplier);
+  setAstralFlightPosition(currentProgress);
 
-  const roll = (now) => {
-    const elapsed = Math.min(40, now - lastFrame);
-    lastFrame = now;
-    offset -= rollSpeed * elapsed / 1000;
-    track.style.transform = `translate3d(${offset}px,0,0)`;
-    if (Math.abs(offset - lastTickOffset) >= step) {
-      lastTickOffset = offset;
-      playTone(980 + Math.abs(Math.round(offset / step)) % 5 * 115, .045, "triangle");
-    }
-    frame = window.requestAnimationFrame(roll);
+  const fly = (now) => {
+    if (startedAt === null) startedAt = now;
+    const elapsed = now - startedAt;
+    const cruiseProgress = 1 - Math.exp(-elapsed / 1050);
+    currentProgress = .04 + (cruiseCeiling - .04) * cruiseProgress;
+    currentMultiplier = .01 + (liveMultiplierCeiling - .01) * cruiseProgress;
+    setAstralFlightPosition(currentProgress);
+    ui.astralRoundAward.textContent = formatMultiplier(currentMultiplier);
+    ui.astralFlightWorld.dataset.flightProgress = currentProgress.toFixed(3);
+    frame = window.requestAnimationFrame(fly);
   };
-  frame = window.requestAnimationFrame(roll);
+  frame = window.requestAnimationFrame(fly);
 
-  let automaticStop = 0;
-  const stop = async () => {
-    if (stopRequested) return finished;
-    stopRequested = true;
-    window.clearTimeout(automaticStop);
+  let automaticLand = 0;
+  const land = async () => {
+    if (landRequested) return finished;
+    landRequested = true;
+    window.clearTimeout(automaticLand);
     window.cancelAnimationFrame(frame);
     ui.bonusAction.disabled = true;
-    ui.astralCascadeLabel.textContent = "Slowing";
-    ui.astralMultiplierDial.classList.remove("is-rolling");
-    ui.astralMultiplierDial.classList.add("is-decelerating");
-    const profile = astralCaseStopProfile(multiplier);
-    const duration = reducedMotion ? 80 : profile.duration;
-    const markerIndex = Math.max(0, Math.ceil((-offset - itemWidth / 2) / step));
-    const naturalTravel = rollSpeed * duration / 1000 / 1.5;
-    const stepsAhead = Math.max(profile.minimumSteps, Math.round(naturalTravel / step));
-    const landingIndex = Math.min(items.length - 3, markerIndex + stepsAhead);
-    const target = items[landingIndex];
-    setAstralCaseItemValue(target, multiplier, { target: true });
-    const finalOffset = -(landingIndex * step + itemWidth / 2);
-    track.dataset.stopFrom = offset.toFixed(3);
-    track.dataset.stopTo = finalOffset.toFixed(3);
-    track.dataset.stopDuration = String(duration);
-    track.dataset.landingIndex = String(landingIndex);
-    let stopTick = 0;
-    const stopTicks = window.setInterval(() => {
-      playTone(720 + stopTick % 4 * 110, .055, "triangle");
-      stopTick += 1;
-    }, reducedMotion ? 40 : Math.max(76, Math.round(duration / (stepsAhead + 2))));
-    await animateAstralCaseBrake(track, { from: offset, to: finalOffset, duration, rollSpeed, reducedMotion });
-    window.clearInterval(stopTicks);
-    track.style.transform = `translate3d(${finalOffset}px,0,0)`;
-    ui.astralMultiplierDial.classList.remove("is-decelerating");
-    ui.astralMultiplierDial.classList.add("is-locked");
-    ui.astralCaseMarker.classList.add("is-locked");
-    target?.classList.add("is-winning");
-    ui.astralCascadeLabel.textContent = "Locked";
+    ui.astralCascadeLabel.textContent = multiplier >= 5 ? "Afterburner" : "Landing";
+    ui.astralMultiplierDial.classList.remove("is-flying");
+    ui.astralMultiplierDial.classList.add("is-landing");
+    await animateAstralFlightLanding({
+      fromProgress: currentProgress,
+      toProgress: profile.progress,
+      fromMultiplier: currentMultiplier,
+      toMultiplier: multiplier,
+      duration: profile.duration,
+      reducedMotion
+    });
+    ui.astralMultiplierDial.classList.remove("is-landing");
+    ui.astralMultiplierDial.classList.add("is-landed");
+    ui.astralCascadeLabel.textContent = "Landed";
     ui.astralRoundAward.textContent = formatMultiplier(multiplier);
-    ui.astralChoiceProgress.textContent = `Case ${roundIndex + 1} of ${totalRounds} · locked`;
-    ui.astralChoiceBar.style.width = `${(roundIndex + 1) / totalRounds * 100}%`;
+    ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · landed";
+    ui.astralChoiceBar.style.width = (roundIndex + 1) / totalRounds * 100 + "%";
     const lock = ui.astralLockedMultipliers.children[roundIndex];
     if (lock) {
       lock.textContent = formatMultiplier(multiplier);
-      lock.classList.add("is-locked", `rarity-${astralCaseRarity(multiplier)}`);
+      lock.classList.add("is-locked", "rarity-" + astralFlightRarity(multiplier));
     }
     ui.astralTotalMultiplier.textContent = formatMultiplier(multiplierTotal);
     jumpText(ui.astralRoundAward);
     jumpText(ui.astralTotalMultiplier);
     audio.bonusReveal(roundIndex, multiplier);
     burstParticles(multiplier >= 5 ? 58 : 32, multiplier >= 5 ? 1.42 : .9);
-    ui.bonusMechanicProgress.textContent = `${roundIndex + 1} / ${totalRounds}`;
-    ui.bonusMechanicBar.style.width = `${(roundIndex + 1) / totalRounds * 100}%`;
+    ui.bonusMechanicProgress.textContent = (roundIndex + 1) + " / " + totalRounds;
+    ui.bonusMechanicBar.style.width = (roundIndex + 1) / totalRounds * 100 + "%";
     await animateCreditValue(ui.bonusTotal, multiplierTotal * bet, 620, { sound: true, tierId: multiplier >= 5 ? "big" : "nice" });
     await cinematicDelay(420);
     resolveFinished();
     return finished;
   };
-  automaticStop = window.setTimeout(() => void stop(), reducedMotion ? 180 : 2400);
-  return { finished, stop };
+  automaticLand = window.setTimeout(() => void land(), reducedMotion ? 180 : 2600);
+  return { finished, land };
 }
 
 async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview = false, purchased = false } = {}) {
@@ -1319,14 +1287,14 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
   const picks = bonusRounds.flat();
   await runAstralCinematicTransition({ preview, multiplierCount: picks.length });
   return new Promise((resolve) => {
-    ui.bonusOverlay.dataset.mode = "astral-case-roll";
+    ui.bonusOverlay.dataset.mode = "astral-aviator";
     ui.bonusEyebrow.textContent = preview ? "Demo" : purchased ? "Feature buy" : "Bonus";
     $("bonusTitle").textContent = game.featureName;
-    ui.bonusCopy.textContent = preview ? "No wager · no payout" : `${picks.length} sealed multiplier cases`;
+    ui.bonusCopy.textContent = preview ? "No wager · no payout" : picks.length + " sealed multiplier flights";
     ui.bonusTotalLabel.textContent = preview ? "Demo" : "Win";
     ui.bonusTotal.textContent = "0.00 CR";
     ui.bonusMechanicName.textContent = game.bonusMechanicName;
-    ui.bonusMechanicProgress.textContent = `0 / ${picks.length}`;
+    ui.bonusMechanicProgress.textContent = "0 / " + picks.length;
     ui.bonusMechanicBar.style.width = "0%";
     ui.astralBonusStage.hidden = false;
     ui.astralLockedMultipliers.replaceChildren(...picks.map(() => {
@@ -1337,15 +1305,15 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     ui.astralRoundAward.textContent = "0.00×";
     ui.astralTotalMultiplier.textContent = "0.00×";
     ui.astralCascadeLabel.textContent = "Ready";
-    ui.astralMultiplierDial.classList.remove("is-rolling", "is-decelerating", "is-locked");
-    ui.astralCaseMarker.classList.remove("is-locked");
-    ui.astralCaseTrack.replaceChildren();
-    ui.astralChoiceProgress.textContent = `Case 1 of ${picks.length}`;
+    ui.astralMultiplierDial.classList.remove("is-flying", "is-landing", "is-landed");
+    ui.astralChoiceProgress.textContent = "Flight 1 of " + picks.length;
     ui.astralChoiceBar.style.width = "0%";
+    setAstralFlightPosition(.04);
     ui.constellationPicks.hidden = true;
     ui.constellationPicks.replaceChildren();
-    ui.bonusAction.textContent = preview ? "Open demo case" : `Open case 1 / ${picks.length}`;
+    ui.bonusAction.textContent = preview ? "Take off" : "Take off · flight 1 / " + picks.length;
     ui.bonusAction.disabled = false;
+    ui.bonusExit.hidden = true;
     ui.bonusOverlay.hidden = false;
     ui.bonusOverlay.setAttribute("aria-hidden", "false");
     ui.bonusOverlay.classList.remove("is-playing", "is-resolved");
@@ -1365,28 +1333,62 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.astralBonusStage.hidden = true;
       ui.constellationPicks.hidden = false;
       ui.bonusAction.classList.remove("is-stop");
+      ui.bonusExit.hidden = true;
       $("appShell").inert = false;
       resolve();
     };
 
+    const resetFlights = () => {
+      completed = false;
+      animating = false;
+      roundIndex = 0;
+      multiplierTotal = 0;
+      activeRound = null;
+      ui.astralLockedMultipliers.replaceChildren(...picks.map(() => {
+        const lock = document.createElement("span");
+        lock.textContent = "—";
+        return lock;
+      }));
+      ui.astralRoundAward.textContent = "0.00×";
+      ui.astralTotalMultiplier.textContent = "0.00×";
+      ui.bonusTotal.textContent = "0.00 CR";
+      ui.bonusMechanicProgress.textContent = "0 / " + picks.length;
+      ui.bonusMechanicBar.style.width = "0%";
+      ui.astralChoiceBar.style.width = "0%";
+      ui.astralChoiceProgress.textContent = "Flight 1 of " + picks.length;
+      ui.astralFreeSpinLabel.textContent = "Flight 1 / " + picks.length;
+      ui.astralCascadeLabel.textContent = "Ready";
+      ui.astralMultiplierDial.classList.remove("is-flying", "is-landing", "is-landed");
+      ui.bonusOverlay.classList.remove("is-playing", "is-resolved");
+      ui.bonusOverlay.classList.add("is-entering");
+      ui.bonusAction.textContent = "Take off";
+      ui.bonusAction.disabled = false;
+      ui.bonusExit.hidden = true;
+      setAstralFlightPosition(.04);
+    };
+
+    ui.bonusExit.onclick = close;
     ui.bonusAction.onclick = async () => {
       if (completed) {
-        close();
+        if (preview) {
+          resetFlights();
+          ui.bonusAction.focus();
+        } else close();
         return;
       }
       if (animating && activeRound) {
-        await activeRound.stop();
+        await activeRound.land();
         return;
       }
       if (animating) return;
       animating = true;
       ui.bonusOverlay.classList.remove("is-entering");
       ui.bonusOverlay.classList.add("is-playing");
-      ui.bonusAction.textContent = "STOP";
+      ui.bonusAction.textContent = "LAND NOW";
       ui.bonusAction.classList.add("is-stop");
       ui.bonusAction.disabled = false;
       const nextTotal = multiplierTotal + picks[roundIndex];
-      activeRound = beginAstralCaseRoll(roundIndex, picks[roundIndex], bet, nextTotal, picks.length);
+      activeRound = beginAstralFlight(roundIndex, picks[roundIndex], bet, nextTotal, picks.length);
       await activeRound.finished;
       activeRound = null;
       multiplierTotal = nextTotal;
@@ -1395,10 +1397,10 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.bonusAction.classList.remove("is-stop");
       if (roundIndex < picks.length) {
         ui.bonusOverlay.classList.remove("is-playing");
-        ui.astralFreeSpinLabel.textContent = `Case ${roundIndex + 1} / ${picks.length}`;
+        ui.astralFreeSpinLabel.textContent = "Flight " + (roundIndex + 1) + " / " + picks.length;
         ui.astralCascadeLabel.textContent = "Ready";
-        ui.astralChoiceProgress.textContent = `Case ${roundIndex + 1} of ${picks.length}`;
-        ui.bonusAction.textContent = `Open case ${roundIndex + 1} / ${picks.length}`;
+        ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + picks.length;
+        ui.bonusAction.textContent = "Take off · flight " + (roundIndex + 1) + " / " + picks.length;
         ui.bonusAction.disabled = false;
         ui.bonusAction.focus();
         return;
@@ -1407,12 +1409,13 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.bonusOverlay.classList.remove("is-playing");
       ui.bonusOverlay.classList.add("is-resolved");
       ui.astralCascadeLabel.textContent = preview ? "Done" : "Complete";
-      ui.astralChoiceProgress.textContent = `${picks.length} cases locked`;
+      ui.astralChoiceProgress.textContent = picks.length + " flights landed";
       ui.astralChoiceBar.style.width = "100%";
       jumpText(ui.astralCascadeLabel);
       playWinChord();
       burstParticles(54, 1.45);
-      ui.bonusAction.textContent = preview ? "Close" : `Collect ${formatCredits(multiplierTotal * bet)} CR`;
+      ui.bonusAction.textContent = preview ? "Play again" : "Collect " + formatCredits(multiplierTotal * bet) + " CR";
+      ui.bonusExit.hidden = !preview;
       ui.bonusAction.disabled = false;
       ui.bonusAction.focus();
     };
@@ -1423,7 +1426,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
         while (!completed) {
           ui.bonusAction.click();
           await cinematicDelay(820);
-          if (activeRound) await activeRound.stop();
+          if (activeRound) await activeRound.land();
           while (animating) await cinematicDelay(40);
           await cinematicDelay(260);
         }

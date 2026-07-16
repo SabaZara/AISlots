@@ -67,3 +67,20 @@ Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the f
 - mapping and combination logic: `asset-catalog.js`.
 
 The mood modifier can be appended to any future background or companion prompt immediately before the shared art direction. Companion masters are generated against a single flat chroma field, then converted to edge-cleaned RGBA PNG cutouts so no black or square canvas appears in the builder, cabinet, or cinematic layer. Runtime mood overlays avoid duplicating the six backgrounds and six companions, which keeps all 144 theme × companion × mood combinations available from only 16 conceptual layer assets.
+
+## Sky Runner bonus plane
+
+The bonus aircraft is an original, unbranded fantasy-casino biplane. It does not reproduce a real operator logo, aircraft livery, or protected game UI.
+
+Generation prompt:
+
+> Create one original heroic fantasy casino biplane as a clean isolated game asset, dramatic front-left three-quarter view, nose pointing toward the upper right, wings level and fully visible, vivid glossy casino red fuselage and wings with intricate polished gold filigree trim, bright brass radial engine, red tail fins, small warm engine glow and restrained magical sparks, premium modern slot-game key-art finish, readable silhouette at small size, crisp hard-surface materials, no pilot visible, no text, no letters, no numbers, no logo, no UI, no watermark, no border. Center the entire aircraft with generous breathing room on a perfectly uniform flat chroma green background (#00FF00), with no green reflections or spill on the aircraft.
+
+Workflow:
+
+- generated master: \`tmp/imagegen/sky-runner-plane-red-v1-chroma.png\` during production;
+- chroma removed with the image-generation skill’s edge-cleaned chroma-key helper;
+- runtime output: \`assets/sky-runner-plane-cutout-v1.png\`;
+- export: 1536 × 1024 RGBA PNG with true transparency;
+- CSS always uses \`object-fit: contain\` and a fixed 3:2 plane stage, so the artwork is never stretched;
+- the selected World Forge environment remains a separate layer behind the plane and supplies all bonus-scene accent colors.
