@@ -48,7 +48,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
   assert.match(html, /4,320 combinations/);
-  assert.match(html, /app\.js\?v=3\.7\.0/);
+  assert.match(html, /app\.js\?v=3\.8\.0/);
 });
 
 test("runtime contains no payline, near-miss, or reality-check UI", async () => {
@@ -86,9 +86,17 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
     readFile(new URL("styles.css", root), "utf8")
   ]);
   assert.match(app, /function astralFlightProfile\(multiplier\)/);
+  assert.match(app, /multiplier >= 10\) return \{ progress: \.96 \}/);
+  assert.match(app, /multiplier >= 5\) return \{ progress: \.84 \}/);
+  assert.match(app, /multiplier >= 2\) return \{ progress: \.68 \}/);
+  assert.match(app, /multiplier >= 1\) return \{ progress: \.53 \}/);
+  assert.match(app, /multiplier >= \.5\) return \{ progress: \.38 \}/);
+  assert.match(app, /return \{ progress: \.22 \}/);
+  assert.match(app, /showAstralBonus\(\[\[0\.25, 1, 10\]\]/);
   assert.match(app, /function animateAstralFlightLanding/);
   assert.match(app, /const progress = fromProgress \+ \(toProgress - fromProgress\) \* time/);
   assert.match(app, /remainingDistance \/ ASTRAL_FLIGHT_PROGRESS_PER_MS/);
+  assert.match(app, /automaticLandDelay = Math\.max\(160, \(cruiseCeiling - \.04\) \/ ASTRAL_FLIGHT_PROGRESS_PER_MS\)/);
   assert.doesNotMatch(app, /Math\.pow\(1 - time, 3\)/);
   assert.match(app, /setAstralFlightPosition\(progress\)/);
   assert.match(app, /activeRound = beginAstralFlight/);
@@ -164,7 +172,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.7.0");
+  assert.equal(JSON.parse(packageJson).version, "3.8.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

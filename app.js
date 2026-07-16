@@ -646,6 +646,9 @@ function updateLobbyPreview() {
   if (!preview) return;
   ui.lobbyGames.style.setProperty("--builder-accent", visuals.theme.accent);
   ui.lobbyGames.style.setProperty("--builder-secondary", visuals.theme.secondary);
+  ui.lobbyOverlay.style.setProperty("--builder-accent", visuals.theme.accent);
+  ui.lobbyOverlay.style.setProperty("--builder-secondary", visuals.theme.secondary);
+  ui.lobbyOverlay.style.setProperty("--builder-world-art", `url("${visuals.theme.asset}")`);
   preview.dataset.mood = visuals.mood.id;
   $("factoryPreviewWorld").style.backgroundImage = `url("${visuals.theme.asset}")`;
   $("factoryPreviewMood").style.backgroundImage = `url("${visuals.mood.asset}")`;
@@ -1265,17 +1268,17 @@ function astralFlightRarity(multiplier) {
 }
 
 function astralFlightProfile(multiplier) {
-  if (multiplier >= 10) return { progress: .94 };
-  if (multiplier >= 5) return { progress: .88 };
-  if (multiplier >= 2) return { progress: .80 };
-  if (multiplier >= 1) return { progress: .72 };
-  if (multiplier >= .5) return { progress: .64 };
-  return { progress: .56 };
+  if (multiplier >= 10) return { progress: .96 };
+  if (multiplier >= 5) return { progress: .84 };
+  if (multiplier >= 2) return { progress: .68 };
+  if (multiplier >= 1) return { progress: .53 };
+  if (multiplier >= .5) return { progress: .38 };
+  return { progress: .22 };
 }
 
 function setAstralFlightPosition(progress) {
   const clamped = Math.max(0, Math.min(1, progress));
-  const x = 27 + clamped * 46;
+  const x = 18 + clamped * 68;
   const arc = Math.sin(clamped * Math.PI) * 9;
   const y = 73 - clamped * 47 - arc;
   const tilt = -9 + clamped * 8;
@@ -1337,7 +1340,7 @@ function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, 
 function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRounds) {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const profile = astralFlightProfile(multiplier);
-  const cruiseCeiling = Math.min(profile.progress - .12, .32);
+  const cruiseCeiling = Math.min(profile.progress - .08, .32);
   const liveMultiplierCeiling = Math.max(.03, multiplier * .58);
   let currentProgress = .04;
   let currentMultiplier = .01;
@@ -1354,6 +1357,7 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
   ui.astralRoundAward.textContent = "0.01×";
   ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · land when ready";
   ui.astralFlightWorld.dataset.rarity = astralFlightRarity(multiplier);
+  ui.astralFlightWorld.dataset.flightTarget = profile.progress.toFixed(2);
   setAstralFlightPosition(currentProgress);
   updateAstralFlightHud(currentProgress, 0);
 
@@ -1413,7 +1417,8 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     resolveFinished();
     return finished;
   };
-  automaticLand = window.setTimeout(() => void land(), reducedMotion ? 180 : 700);
+  const automaticLandDelay = Math.max(160, (cruiseCeiling - .04) / ASTRAL_FLIGHT_PROGRESS_PER_MS);
+  automaticLand = window.setTimeout(() => void land(), reducedMotion ? 180 : automaticLandDelay);
   return { finished, land };
 }
 
@@ -1748,7 +1753,7 @@ async function runAstralShowcasePreview() {
   updateUi();
   setStatus(`${currentGame().featureName} demo · no wager · no payout`);
   try {
-    await showAstralBonus([[0.5, 1, 3]], 1, { preview: true });
+    await showAstralBonus([[0.25, 1, 10]], 1, { preview: true });
     setStatus(`${currentGame().featureName} demo complete · no credits or feature progress changed`);
   } finally {
     state.isSpinning = false;

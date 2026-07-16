@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.7.0**
+Version reviewed: **3.8.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -8,7 +8,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| First-screen game creator | Implemented | The site opens on a true edge-to-edge, viewport-filling guided creator. One horizontal choice row appears at a time and a large live foreground preview stays below. The cabinet remains hidden until play starts. |
+| First-screen game creator | Implemented | The site opens on a true edge-to-edge guided creator. One graphical horizontal choice row appears at a time and a compact cinematic 16:9 preview stays centered below. The cabinet remains hidden until play starts. |
 | Explicit layer choices | Implemented | World, Character, Mood, Relics, and Motion are five ordered steps. Selecting an option automatically opens the next step; Back revisits the previous step. |
 | Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
 | One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one transparent standalone cutout is displayed. |
@@ -44,7 +44,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Buy Bonus | Implemented | The selected launch scene and plane art theme both the cabinet control and market panel. 25×, 50×, or 100× demo-credit purchases use separately calibrated 99.00% prize tables. |
 | Bonus demo | Implemented | Top-of-machine no-wager preview. It does not spend credits, change progress, or create a fairness receipt. |
 | World-connected opening | Implemented | Fire, Ice, Nature, Void, Storm, and Abyss each use a separately generated launch-gate loading scene; the selected companion remains layered independently in front. The opening runs once. |
-| Sky Runner flights | Implemented | Each world uses its own transparent plane livery. The plane follows a linear, constant-speed route to the sealed destination, with duration determined by route distance and no last-frame acceleration, scale flash, or position jump. |
+| Sky Runner flights | Implemented | Each world uses its own transparent plane livery. Multiplier determines destination distance: 0.25× lands just beyond takeoff, then 0.5×, 1×, 2×, 5×, and 10× stop at increasingly distant route points. The aircraft keeps one linear speed with no pause or last-frame jump. |
 | Flight depth | Implemented | Generated launch scenery, far haze, midground motes, near silhouettes, speed streaks, aircraft scale, and three parallax rates create visible foreground/midground/background separation. |
 | Land integrity | Implemented | Land affects reveal timing only. It cannot reroll, improve, or worsen the precomputed result. Flight duration and destination reflect the sealed result. |
 | Theme matching | Implemented | The selected environment artwork, accent, and secondary color also style the bonus sky, trail, frame, route, and multiplier locks. |
