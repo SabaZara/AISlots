@@ -173,6 +173,7 @@ const state = {
   speedIndex: 0,
   specialBetBoost: 0,
   lobbyStep: 0,
+  lobbyChoices: Object.fromEntries(FACTORY_STEPS.map((step) => [step.key, false])),
   visualConfig: { ...DEFAULT_VISUAL_CONFIG },
   lastOutcome: null,
   lastReceipt: null
@@ -641,25 +642,67 @@ function updateLobbyStep() {
 }
 
 function updateLobbyPreview() {
-  const visuals = currentVisuals();
   const preview = $("factoryPreview");
   if (!preview) return;
+  const hasTheme = state.lobbyChoices.theme;
+  ui.lobbyGames.classList.toggle("is-awaiting-theme", !hasTheme);
+
+  if (!hasTheme) {
+    ui.lobbyGames.style.setProperty("--builder-accent", "#8fa7c7");
+    ui.lobbyGames.style.setProperty("--builder-secondary", "#526781");
+    ui.lobbyOverlay.style.setProperty("--builder-accent", "#8fa7c7");
+    ui.lobbyOverlay.style.setProperty("--builder-secondary", "#526781");
+    ui.lobbyOverlay.style.setProperty("--builder-world-art", "none");
+    preview.removeAttribute("data-mood");
+    $("factoryPreviewWorld").style.backgroundImage = "none";
+    $("factoryPreviewMood").style.backgroundImage = "none";
+    $("factoryPreviewCompanion").removeAttribute("src");
+    $("factoryPreviewCompanion").alt = "";
+    $("factoryPreviewName").textContent = "Choose your world";
+    $("factoryPreviewMeta").textContent = "Nothing is selected yet";
+    const reviewName = $("factoryReviewName");
+    if (reviewName) reviewName.textContent = "Choose a world first";
+    ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
+      button.classList.remove("is-selected");
+      button.setAttribute("aria-pressed", "false");
+    });
+    const play = ui.lobbyGames.querySelector("[data-build-play]");
+    if (play) play.textContent = "Choose a world first";
+    return;
+  }
+
+  const visuals = currentVisuals();
   ui.lobbyGames.style.setProperty("--builder-accent", visuals.theme.accent);
   ui.lobbyGames.style.setProperty("--builder-secondary", visuals.theme.secondary);
   ui.lobbyOverlay.style.setProperty("--builder-accent", visuals.theme.accent);
   ui.lobbyOverlay.style.setProperty("--builder-secondary", visuals.theme.secondary);
   ui.lobbyOverlay.style.setProperty("--builder-world-art", `url("${visuals.theme.asset}")`);
-  preview.dataset.mood = visuals.mood.id;
+  if (state.lobbyChoices.mood) preview.dataset.mood = visuals.mood.id;
+  else preview.removeAttribute("data-mood");
   $("factoryPreviewWorld").style.backgroundImage = `url("${visuals.theme.asset}")`;
-  $("factoryPreviewMood").style.backgroundImage = `url("${visuals.mood.asset}")`;
-  $("factoryPreviewCompanion").src = visuals.companion.asset;
-  $("factoryPreviewCompanion").alt = `${visuals.companion.name} companion`;
-  $("factoryPreviewName").textContent = visualConfigLabel(state.visualConfig);
-  $("factoryPreviewMeta").textContent = `${visuals.symbols.name} · ${visuals.animation.name} motion`;
+  $("factoryPreviewMood").style.backgroundImage = state.lobbyChoices.mood ? `url("${visuals.mood.asset}")` : "none";
+  if (state.lobbyChoices.companion) {
+    $("factoryPreviewCompanion").src = visuals.companion.asset;
+    $("factoryPreviewCompanion").alt = `${visuals.companion.name} companion`;
+  } else {
+    $("factoryPreviewCompanion").removeAttribute("src");
+    $("factoryPreviewCompanion").alt = "";
+  }
+  const chosenName = [
+    state.lobbyChoices.mood ? visuals.mood.name : "",
+    visuals.theme.name,
+    state.lobbyChoices.companion ? visuals.companion.name : ""
+  ].filter(Boolean).join(" ");
+  const nextUnchosen = FACTORY_STEPS.find((step) => !state.lobbyChoices[step.key]);
+  $("factoryPreviewName").textContent = chosenName;
+  $("factoryPreviewMeta").textContent = nextUnchosen
+    ? `Next · ${nextUnchosen.label}`
+    : `${visuals.symbols.name} · ${visuals.animation.name} motion`;
   const reviewName = $("factoryReviewName");
-  if (reviewName) reviewName.textContent = visualConfigLabel(state.visualConfig);
+  if (reviewName) reviewName.textContent = chosenName;
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
-    const selected = state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
+    const selected = state.lobbyChoices[button.dataset.configGroup]
+      && state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
     button.classList.toggle("is-selected", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
@@ -671,6 +714,7 @@ function setVisualConfigChoice(group, id) {
   const catalogs = { theme: THEMES, companion: COMPANIONS, mood: MOODS, symbols: SYMBOL_SETS, animation: ANIMATION_STYLES };
   if (!catalogs[group]?.some((item) => item.id === id)) return;
   state.visualConfig[group] = id;
+  state.lobbyChoices[group] = true;
   updateLobbyPreview();
 }
 
@@ -683,6 +727,7 @@ function randomizeVisualConfig() {
     symbols: pick(SYMBOL_SETS),
     animation: pick(ANIMATION_STYLES)
   };
+  Object.keys(state.lobbyChoices).forEach((group) => { state.lobbyChoices[group] = true; });
   updateLobbyPreview();
   state.lobbyStep = FACTORY_STEPS.length;
   updateLobbyStep();
@@ -715,11 +760,18 @@ function openLobby() {
   $("appShell").inert = true;
   document.body.classList.add("is-lobby-open");
   state.lobbyStep = 0;
+  Object.keys(state.lobbyChoices).forEach((group) => { state.lobbyChoices[group] = false; });
   updateLobbyPreview();
   updateLobbyStep();
 }
 
 function chooseLobbyGame() {
+  const missingStep = FACTORY_STEPS.findIndex((step) => !state.lobbyChoices[step.key]);
+  if (missingStep >= 0) {
+    state.lobbyStep = missingStep;
+    updateLobbyStep();
+    return;
+  }
   enableSoundFromGesture();
   state.ageConfirmed = true;
   try { window.sessionStorage.setItem("lumen-collection-age-confirmed", "true"); } catch { /* storage may be unavailable */ }
@@ -809,10 +861,6 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.cinematicOverlay.style.setProperty("--cinematic-loading", `url("${game.bonusLoadingArt}")`);
   ui.cinematicOverlay.style.setProperty("--cinematic-accent", visuals.theme.accent);
   ui.astralFlightPlaneImage.src = game.planeAsset;
-  [game.bonusLoadingArt, game.planeAsset].forEach((src) => {
-    const preload = new Image();
-    preload.src = src;
-  });
   ui.companionPortrait.src = visuals.companion.asset;
   document.title = `${visualConfigLabel(state.visualConfig)} · AISlots`;
   $("brandName").textContent = game.name;
@@ -2148,7 +2196,6 @@ async function init() {
   restoreSpinSpeed();
   restoreSoundPreference();
   restoreVisualConfig();
-  applyGameTheme({ resetGrid: true });
   buildLobby();
   ui.clientSeedInput.value = state.clientSeed;
   bindEvents();

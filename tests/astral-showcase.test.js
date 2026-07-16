@@ -173,7 +173,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.9.0");
+  assert.equal(JSON.parse(packageJson).version, "4.0.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

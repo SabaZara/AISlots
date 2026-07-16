@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.9.0**
+Version reviewed: **4.0.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -76,6 +76,9 @@ This file is the team-review checklist for the current free-play build. Runtime 
 ## Responsive and usability review
 
 - No document scrolling during gameplay on desktop, mobile portrait, rotated phone landscape, or iPad/tablet layouts.
+- World Forge starts neutral on every visit: no environment is selected or applied until the player chooses a theme.
+- Phone World Forge uses larger horizontal swipe cards and a portrait preview instead of shrinking the desktop selector.
+- Phone Spin, bet, win, and feature controls use larger responsive gaps to reduce accidental taps.
 - `100dvh` sizing and safe-area insets account for mobile browser chrome and notches.
 - Mobile controls are rearranged rather than reduced into overlapping desktop positions.
 - Spin, bet, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain clickable.
