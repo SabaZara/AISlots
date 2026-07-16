@@ -8914,11 +8914,10 @@ body {
 /* 3.6 — theme-specific bonus launch art, parallax depth, and constant-speed flight. */
 .cinematic-overlay[data-mode="world-awakening"] .cinematic-guardian {
   background-image:
-    var(--cinematic-companion),
     linear-gradient(90deg, rgba(2,5,16,.86), rgba(2,5,16,.1) 42% 68%, rgba(2,5,16,.54)),
     var(--cinematic-loading);
-  background-size: 42% 84%, cover, cover;
-  background-position: 79% center, center, center;
+  background-size: cover, cover;
+  background-position: center, center;
 }
 
 .bonus-overlay[data-mode="astral-aviator"] .bonus-scene {
@@ -9051,8 +9050,8 @@ body {
 
 @media (max-width: 820px) and (orientation: portrait) {
   .cinematic-overlay[data-mode="world-awakening"] .cinematic-guardian {
-    background-size: 70% 72%, cover, cover;
-    background-position: 70% 42%, center, center;
+    background-size: cover, cover;
+    background-position: center, center;
   }
   .astral-flight-depth.is-near { opacity: .65; }
   .astral-flight-speed-lines i { width: clamp(42px, 20vw, 86px); }

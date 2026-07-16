@@ -805,7 +805,6 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.bonusOverlay.style.setProperty("--bonus-bg", `url("${game.bonusLoadingArt}")`);
   ui.bonusOverlay.dataset.theme = visuals.theme.id;
   ui.bonusOverlay.dataset.mood = visuals.mood.id;
-  ui.cinematicOverlay.style.setProperty("--cinematic-companion", `url("${visuals.companion.asset}")`);
   ui.cinematicOverlay.style.setProperty("--cinematic-world", `url("${visuals.theme.asset}")`);
   ui.cinematicOverlay.style.setProperty("--cinematic-loading", `url("${game.bonusLoadingArt}")`);
   ui.cinematicOverlay.style.setProperty("--cinematic-accent", visuals.theme.accent);
