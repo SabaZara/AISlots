@@ -60,10 +60,10 @@ Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the f
 ## Export map
 
 - backgrounds: 1672 × 941 JPG;
-- companions: 1254 × 1254 JPG;
+- companions: 1254 × 1254 transparent RGBA PNG cutouts;
 - mood overlays: 1672 × 941 JPG;
 - symbol atlases: 1774 × 887 JPG;
 - runtime location: `assets/factory/`;
 - mapping and combination logic: `asset-catalog.js`.
 
-The mood modifier can be appended to any future background or companion prompt immediately before the shared art direction. Runtime mood overlays currently avoid duplicating the six backgrounds and six companions, which keeps all 144 theme × companion × mood combinations available from only 16 layer assets.
+The mood modifier can be appended to any future background or companion prompt immediately before the shared art direction. Companion masters are generated against a single flat chroma field, then converted to edge-cleaned RGBA PNG cutouts so no black or square canvas appears in the builder, cabinet, or cinematic layer. Runtime mood overlays avoid duplicating the six backgrounds and six companions, which keeps all 144 theme × companion × mood combinations available from only 16 conceptual layer assets.

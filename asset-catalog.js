@@ -8,12 +8,12 @@ export const THEMES = Object.freeze([
 ]);
 
 export const COMPANIONS = Object.freeze([
-  Object.freeze({ id: "dragon", name: "Dragon", asset: "./assets/factory/companion-dragon-v1.jpg" }),
-  Object.freeze({ id: "valkyrie", name: "Valkyrie", asset: "./assets/factory/companion-valkyrie-v1.jpg" }),
-  Object.freeze({ id: "kraken", name: "Kraken", asset: "./assets/factory/companion-kraken-v1.jpg" }),
-  Object.freeze({ id: "phoenix", name: "Phoenix", asset: "./assets/factory/companion-phoenix-v1.jpg" }),
-  Object.freeze({ id: "direwolf", name: "Direwolf", asset: "./assets/factory/companion-direwolf-v1.jpg" }),
-  Object.freeze({ id: "titan", name: "Titan", asset: "./assets/factory/companion-titan-v1.jpg" })
+  Object.freeze({ id: "dragon", name: "Dragon", asset: "./assets/factory/companion-dragon-cutout-v2.png" }),
+  Object.freeze({ id: "valkyrie", name: "Valkyrie", asset: "./assets/factory/companion-valkyrie-cutout-v2.png" }),
+  Object.freeze({ id: "kraken", name: "Kraken", asset: "./assets/factory/companion-kraken-cutout-v2.png" }),
+  Object.freeze({ id: "phoenix", name: "Phoenix", asset: "./assets/factory/companion-phoenix-cutout-v2.png" }),
+  Object.freeze({ id: "direwolf", name: "Direwolf", asset: "./assets/factory/companion-direwolf-cutout-v2.png" }),
+  Object.freeze({ id: "titan", name: "Titan", asset: "./assets/factory/companion-titan-cutout-v2.png" })
 ]);
 
 export const MOODS = Object.freeze([

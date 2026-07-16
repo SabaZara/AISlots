@@ -16,15 +16,15 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 | Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
 | Motion | Cascade, Wave, Impact, Strike, Vortex |
 
-Only one companion is displayed in a game. The generated theme, mood treatment, companion, and seven-symbol sheet are independent layers, so the full catalog does not require thousands of duplicate images. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol sheet remain independent layers. The opening builder gives the selected companion a larger dedicated preview. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
 ## Play features
 
-- five reels, four rows, and 20 fixed left-to-right paylines;
-- sequential reel stops with a complete visible spin and Normal 1× or Fast 3× presentation speed;
+- six reels, five rows, and 25 fixed left-to-right paylines;
+- continuous downward reel travel followed by six sequential stops, with Normal 1× or Fast 3× presentation speed;
 - every positive return is shown, including returns smaller than the wager;
 - finite 10, 25, or 50-spin autoplay with an always-accessible Stop control;
-- persistent 12-symbol Relic Vault meter;
+- persistent 18-symbol Relic Vault meter drawn as a transparent floating gauge with no bitmap background;
 - graphic Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
 - 25×, 50×, and 100× demo-credit Buy Bonus choices calibrated to the same 99.00% return;
 - three horizontal multiplier cases per bonus; Stop changes reveal timing only, then the roller decelerates continuously onto its pre-sealed result;
@@ -60,7 +60,7 @@ The built-in verifier recomputes the commitment and outcome. Changing presentati
 
 ## Responsive layout
 
-Gameplay is viewport-locked with no document scrolling on desktop, phone, or iPad. It includes dynamic-viewport units, safe-area padding, dedicated portrait controls, a horizontal phone cabinet after rotation, and tablet-specific sizing. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Winning symbols are allowed to break out visually without clipping the rest of the interface.
+Gameplay is viewport-locked with no document scrolling on desktop, phone, or iPad. It includes dynamic-viewport units, safe-area padding, dedicated portrait controls, a horizontal phone cabinet after rotation, and tablet-specific sizing. The 6×5 board, transparent meter, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Winning symbols are allowed to break out visually without clipping the rest of the interface.
 
 ## Run locally
 

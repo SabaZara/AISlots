@@ -70,7 +70,10 @@ test("line evaluation pays identical symbols from the leftmost reel only", () =>
   const allLuma = Array.from({ length: model.COLS * model.ROWS }, () => "luma");
   const wins = model.evaluateLines(allLuma, 20, "astral");
   assert.equal(wins.length, model.PAYLINES.length);
-  assert.equal(wins.every((win) => win.count === 5), true);
+  assert.equal(model.COLS, 6);
+  assert.equal(model.ROWS, 5);
+  assert.equal(model.PAYLINES.every((line) => line.length === model.COLS), true);
+  assert.equal(wins.every((win) => win.count === 6), true);
   assert.equal(wins.reduce((total, win) => total + win.amount, 0), 7200);
 
   const firstReelBreak = allLuma.slice();

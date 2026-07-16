@@ -29,9 +29,14 @@ test("each generated raster asset is local and production-sized", async () => {
   const items = [...THEMES, ...COMPANIONS, ...MOODS, ...SYMBOL_SETS];
   assert.equal(new Set(items.map((item) => item.asset)).size, 22);
   for (const item of items) {
-    assert.match(item.asset, /^\.\/assets\/factory\/.+\.jpg$/);
+    assert.match(item.asset, /^\.\/assets\/factory\/.+\.(?:jpg|png)$/);
     const image = await readFile(new URL(item.asset.slice(2), root));
-    assert.deepEqual(Array.from(image.subarray(0, 3)), [255, 216, 255]);
+    if (item.asset.endsWith(".png")) {
+      assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+      assert.match(item.asset, /companion-.+-cutout-v2\.png$/);
+    } else {
+      assert.deepEqual(Array.from(image.subarray(0, 3)), [255, 216, 255]);
+    }
     assert.ok(image.length > 75_000, `${item.asset} should retain production detail`);
   }
 });

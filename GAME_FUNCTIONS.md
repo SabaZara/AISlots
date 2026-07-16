@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.0.0**
+Version reviewed: **3.1.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -8,9 +8,9 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| First-screen game builder | Implemented | The site opens on World Forge before gameplay. |
+| First-screen game builder | Implemented | The site opens on World Forge before gameplay, with a larger foreground preview of the selected companion. |
 | Theme selection | Implemented | Fire, Ice, Nature, Void, Storm, or Abyss changes the 16:9 environment. |
-| One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one is displayed. |
+| One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one transparent standalone cutout is displayed. |
 | Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. |
 | Symbol selection | Implemented | Six generated seven-symbol families with distinct collector icons and names. |
 | Motion selection | Implemented | Cascade, Wave, Impact, Strike, or Vortex changes spin presentation timing/animation only. |
@@ -22,10 +22,10 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| Reel grid | Implemented | Five reels × four rows remain visible throughout a spin. |
-| Paylines | Implemented | 20 fixed lines; three or more identical paying symbols connect from reel one. Lines are calculated but not drawn over the art. |
+| Reel grid | Implemented | Six reels × five rows remain visible throughout a spin. |
+| Paylines | Implemented | 25 fixed lines; three or more identical paying symbols connect from reel one. Lines are calculated but not drawn over the art. |
 | Bet controls | Implemented | Minus, plus, and Max with balance-aware limits. |
-| Spin | Implemented | Wager is sealed before the presentation begins; reels settle in five visible phases. |
+| Spin | Implemented | Wager is sealed before the presentation begins; symbols travel downward continuously and reels settle in six visible phases. |
 | Normal/Fast | Implemented | Separate 1× and 3× presentation choices next to Spin; neither changes the result. |
 | Autoplay | Implemented | Finite 10, 25, or 50 spins. Stop remains accessible and autoplay stops on insufficient demo balance. |
 | Positive-return display | Implemented | Every positive payout receives an animated numeric result, even when it is smaller than the wager. |
@@ -37,7 +37,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| Relic Vault meter | Implemented | Every collector symbol anywhere on the board advances a persistent 12-step meter. Overflow carries into the next meter. |
+| Relic Vault meter | Implemented | Every collector symbol anywhere on the board advances a persistent 18-step meter. Overflow carries into the next meter. The gauge is CSS-rendered without a rectangular background image. |
 | Dynamic collector art | Implemented | The collector name and art come from the selected symbol family. |
 | Special Bet | Implemented | Standard, guaranteed +1 collector, or guaranteed +2 collectors. Costs are mathematically calibrated to preserve 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | 25×, 50×, or 100× demo-credit purchases with separately calibrated prize tables at 99.00% theoretical RTP. |
@@ -48,9 +48,9 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 ## Visual and sound systems
 
-- 22 project-local generated raster assets: six backgrounds, six companions, four mood overlays, and six symbol sheets.
-- Backgrounds keep the central reel area low-detail; companion portraits have plain dark extraction fields; symbol sheets use a fixed 4×2 atlas with the last cell empty.
-- One companion is layered independently from the selected background and remains clear of the reel grid on desktop and compact phone layouts.
+- 22 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, and six symbol sheets.
+- Backgrounds keep the central reel area low-detail; companion PNGs use true alpha transparency; symbol sheets use a fixed 4×2 atlas with the last cell empty.
+- One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, case roll, case lock, victory, and big-win events have separate sound roles.
 - Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.
@@ -73,7 +73,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - Mobile controls are rearranged rather than reduced into overlapping desktop positions.
 - Spin, bet, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain clickable.
 - Autoplay opens as a viewport-level dialog that cannot be clipped by the cabinet.
-- Companion faces and top titles are repositioned on narrow screens.
+- The 6×5 board and transparent companion are resized/repositioned on narrow screens without covering interactive controls.
 - Winner art can animate outside its cell without being cut off; interactive controls remain inside their safe regions.
 - Reduced-motion preferences shorten or remove nonessential movement without changing game timing integrity.
 

@@ -7,13 +7,13 @@
     <meta name="description" content="AISlots World Forge — 4,320 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
     <link rel="preload" href="./assets/factory/theme-fire-v1.jpg" as="image" />
-    <link rel="preload" href="./assets/factory/companion-dragon-v1.jpg" as="image" />
+    <link rel="preload" href="./assets/factory/companion-dragon-cutout-v2.png" as="image" />
     <link rel="preload" href="./assets/factory/symbols-inferno-v1.jpg" as="image" />
     <link rel="preload" href="./assets/factory/mood-epic-v1.jpg" as="image" />
     <link rel="preload" href="./assets/astral-multiplier-gate-v1.png" as="image" />
     <link rel="preload" href="./assets/astral-case-machine-v1.png" as="image" />
     <link rel="preload" href="./assets/astral-case-capsule-blue-v1.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=3.0.0" />
+    <link rel="stylesheet" href="./styles.css?v=3.1.0" />
     <title>AISlots World Forge · 4,320 combinations</title>
   </head>
   <body>
@@ -57,18 +57,18 @@
           <aside class="feature-card glass-panel" id="featureCard" data-game="astral" aria-labelledby="moonwellTitle">
             <div class="eyebrow"><span class="eyebrow-dot"></span><span id="featureEyebrow">Persistent feature</span></div>
             <h2 id="moonwellTitle">Fire Relic Vault</h2>
-            <p class="feature-copy" id="featureCopy">Every Flame Crown stays in your vault. Collect 12 to open three sealed multiplier cases.</p>
+            <p class="feature-copy" id="featureCopy">Every Flame Crown stays in your vault. Collect 18 to open three sealed multiplier cases.</p>
 
             <div class="moonwell-visual" id="featureVisual" data-meter="constellation" aria-hidden="true">
               <div class="moon-orbit moon-orbit-one"></div>
               <div class="moon-orbit moon-orbit-two"></div>
               <div class="meter-energy meter-energy-one"></div>
               <div class="meter-energy meter-energy-two"></div>
-              <div class="moon-core"><span id="petalCountLarge">0</span><small id="meterThreshold">/12</small></div>
+              <div class="moon-core"><span id="petalCountLarge">0</span><small id="meterThreshold">/18</small></div>
             </div>
 
-            <div class="petal-meter" id="petalMeter" role="progressbar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" aria-label="Collector symbols stored"></div>
-            <p class="meter-message" id="meterMessage"><strong>12 Flame Crowns to go</strong><span>Progress carries between spins</span></p>
+            <div class="petal-meter" id="petalMeter" role="progressbar" aria-valuemin="0" aria-valuemax="18" aria-valuenow="0" aria-label="Collector symbols stored"></div>
+            <p class="meter-message" id="meterMessage"><strong>18 Flame Crowns to go</strong><span>Progress carries between spins</span></p>
 
             <div class="feature-steps" id="featureSteps" aria-label="Bonus journey"></div>
             <div class="game-performance" aria-label="Current game results">
@@ -79,6 +79,7 @@
           </aside>
 
           <section class="machine" aria-labelledby="gameTitle">
+            <div class="companion-stage" id="companionStage" aria-hidden="true"><img id="companionPortrait" src="./assets/factory/companion-dragon-cutout-v2.png" alt=""></div>
             <div class="machine-top-actions" id="machineTopActions">
               <button class="showcase-button" id="astralShowcaseButton" type="button" aria-label="Play the no-wager relic vault bonus demo" title="Shows the bonus animation without spending credits or changing progress."><span>✦</span> Bonus demo</button>
             </div>
@@ -102,8 +103,8 @@
             <div class="reel-frame">
               <div class="reel-meta"><span id="reelCommitment">RTP 99%</span></div>
               <div class="reel-viewport">
-                <div class="reels" id="reels" aria-label="Five reels and four rows" aria-live="off"></div>
-                <div class="reel-speed-layer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="reels" id="reels" aria-label="Six reels and five rows" aria-live="off"></div>
+                <div class="reel-speed-layer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
                 <div class="reel-impact-layer" id="reelImpactLayer" aria-hidden="true"></div>
                 <div class="anticipation-callout" id="anticipationCallout" hidden aria-hidden="true">
                   <span>Bonus</span>
@@ -392,6 +393,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=3.0.0"></script>
+    <script type="module" src="./app.js?v=3.1.0"></script>
   </body>
 </html>

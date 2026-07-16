@@ -60,6 +60,8 @@ const ui = {
   returnAmount: $("returnAmount"),
   returnComparison: $("returnComparison"),
   featureCard: $("featureCard"),
+  companionStage: $("companionStage"),
+  companionPortrait: $("companionPortrait"),
   featureVisual: $("featureVisual"),
   petalMeter: $("petalMeter"),
   petalCountLarge: $("petalCountLarge"),
@@ -385,7 +387,7 @@ function revealWinningCells(winnerCells) {
 
 function initialGrid() {
   const ids = currentSymbols().map((symbol) => symbol.id).reverse();
-  return Array.from({ length: COLS * ROWS }, (_, index) => ids[(index * 3 + Math.floor(index / 4)) % ids.length]);
+  return Array.from({ length: COLS * ROWS }, (_, index) => ids[(index * 3 + Math.floor(index / ROWS)) % ids.length]);
 }
 
 function renderPetalMeter() {
@@ -658,7 +660,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   game.background = visuals.theme.asset;
   game.characterLayer = visuals.companion.asset;
   game.symbolSheet = visuals.symbols.asset;
-  game.bonusBarArt = visuals.mood.asset;
+  game.bonusBarArt = "none";
   game.actionLabel = visuals.theme.action;
   game.reelMotion = visuals.animation.id;
   game.reelStopGap = visuals.animation.reelStopGap;
@@ -689,7 +691,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.reels.dataset.motion = game.reelMotion;
   gameStage.style.setProperty("--game-bg", `url("${game.background}")`);
   gameStage.style.setProperty("--game-characters", `url("${game.characterLayer}")`);
-  gameStage.style.setProperty("--bonus-bar-art", `url("${game.bonusBarArt}")`);
+  gameStage.style.setProperty("--bonus-bar-art", "none");
   gameStage.style.setProperty("--mood-overlay", `url("${visuals.mood.asset}")`);
   gameStage.style.setProperty("--game-accent", game.accent);
   gameStage.style.setProperty("--game-secondary", game.secondary);
@@ -697,6 +699,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.bonusOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--bonus-bg", `url("${visuals.theme.asset}")`);
   ui.cinematicOverlay.style.setProperty("--cinematic-companion", `url("${visuals.companion.asset}")`);
+  ui.companionPortrait.src = visuals.companion.asset;
   document.title = `${visualConfigLabel(state.visualConfig)} · AISlots`;
   $("brandName").textContent = game.name;
   $("brandSubtitle").textContent = game.subtitle;
@@ -1670,7 +1673,7 @@ async function spin({ fromAuto = false } = {}) {
     shuffleTick += 1;
     renderGrid(cosmeticGrid(shuffleTick), { shuffling: true });
     playSpinTick(shuffleTick);
-  }, Math.max(45, Math.round(currentAnimation().spinInterval * currentSpinSpeed().shuffleScale)));
+  }, Math.max(58, Math.round(currentAnimation().spinInterval * currentSpinSpeed().shuffleScale * .72)));
 
   const outcome = await outcomePromise;
   const resultDisplayMs = currentSpinSpeed().resultDisplayMs;

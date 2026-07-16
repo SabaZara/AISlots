@@ -14,7 +14,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   for (const id of [
     "astralShowcaseButton", "cinematicOverlay", "astralBonusStage", "astralCaseTrack",
     "specialBetButton", "buyFeatureButton", "featureMarketOverlay", "autoplayOverlay",
-    "reels", "spinButton", "fairnessButton"
+    "reels", "spinButton", "fairnessButton", "companionStage", "companionPortrait"
   ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`));
     assert.match(app, new RegExp(`\\$\\(["']${id}["']\\)`));
@@ -27,9 +27,9 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /--game-characters/);
   assert.match(app, /--symbol-sheet/);
   assert.match(app, /dataset\.motion/);
-  assert.match(css, /\.machine::before/);
-  assert.match(css, /\.machine::after\s*\{\s*display:\s*none/);
-  assert.match(css, /singleCompanionFloat/);
+  assert.match(app, /ui\.companionPortrait\.src = visuals\.companion\.asset/);
+  assert.match(css, /\.companion-stage img/);
+  assert.match(css, /transparentCompanionBreath/);
   assert.match(css, /\.factory-builder/);
   assert.match(css, /\.factory-preview-companion/);
   assert.match(html, /4,320 combinations/);
@@ -47,7 +47,7 @@ test("runtime contains no payline, near-miss, or reality-check UI", async () => 
   assert.doesNotMatch(css, /\.payline-overlay|\.reality-check-modal|\.reality-stats/);
 });
 
-test("the complete reel board stays visible through five real stop phases", async () => {
+test("the complete 6×5 reel board stays visible through six real stop phases", async () => {
   const [app, css] = await Promise.all([
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("styles.css", root), "utf8")
@@ -57,6 +57,9 @@ test("the complete reel board stays visible through five real stop phases", asyn
   assert.match(app, /for \(let reel = 0; reel < COLS; reel \+= 1\)[\s\S]*?renderReelStopFrame/);
   assert.match(app, /revealWinningCells\(winningCells\(outcome\)\)/);
   assert.match(css, /symbol-cell\.is-reel-settled/);
+  assert.match(css, /grid-template-columns: repeat\(6/);
+  assert.match(css, /grid-template-rows: repeat\(5/);
+  assert.match(css, /naturalReelRoll/);
 });
 
 test("multiplier case Stop decelerates continuously onto the sealed result", async () => {
@@ -110,7 +113,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.0.0");
+  assert.equal(JSON.parse(packageJson).version, "3.1.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

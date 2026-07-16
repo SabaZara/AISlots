@@ -1,17 +1,17 @@
 import { createFairRng } from "./fairness.js";
 
-export const COLS = 5;
-export const ROWS = 4;
+export const COLS = 6;
+export const ROWS = 5;
 export const DEFAULT_GAME_ID = "astral";
 export const TARGET_RTP = 0.99;
 
 const BASE_SYMBOLS = [
-  { id: "luma", weight: 1200, payouts: { 3: 36, 4: 108, 5: 360 } },
-  { id: "orbit", weight: 1300, payouts: { 3: 30, 4: 84, 5: 270 } },
-  { id: "nova", weight: 1400, payouts: { 3: 24, 4: 72, 5: 216 } },
-  { id: "comet", weight: 1600, payouts: { 3: 18, 4: 54, 5: 168 } },
-  { id: "dew", weight: 1800, payouts: { 3: 15, 4: 42, 5: 120 } },
-  { id: "leaf", weight: 2300, payouts: { 3: 12, 4: 30, 5: 72 } },
+  { id: "luma", weight: 1200, payouts: { 3: 36, 4: 108, 5: 360, 6: 360 } },
+  { id: "orbit", weight: 1300, payouts: { 3: 30, 4: 84, 5: 270, 6: 270 } },
+  { id: "nova", weight: 1400, payouts: { 3: 24, 4: 72, 5: 216, 6: 216 } },
+  { id: "comet", weight: 1600, payouts: { 3: 18, 4: 54, 5: 168, 6: 168 } },
+  { id: "dew", weight: 1800, payouts: { 3: 15, 4: 42, 5: 120, 6: 120 } },
+  { id: "leaf", weight: 2300, payouts: { 3: 12, 4: 30, 5: 72, 6: 72 } },
   { id: "petal", weight: 400, payouts: {} }
 ];
 
@@ -35,7 +35,7 @@ const GAME_TEMPLATES = {
     accent: "#ff8a32",
     secondary: "#ff3d57",
     background: "./assets/factory/theme-fire-v1.jpg",
-    characterLayer: "./assets/factory/companion-dragon-v1.jpg",
+    characterLayer: "./assets/factory/companion-dragon-cutout-v2.png",
     symbolSheet: "./assets/factory/symbols-inferno-v1.jpg",
     bonusBarArt: "./assets/factory/mood-epic-v1.jpg",
     actionLabel: "Ignite",
@@ -53,11 +53,11 @@ const GAME_TEMPLATES = {
     winLabels: { big: "Power Win", mega: "Mythic Win", epic: "World Fortune" },
     featureName: "Relic Vault",
     featureEyebrow: "Persistent collector",
-    featureCopy: "Every collector symbol stays in your vault. Collect 12 to open three sealed multiplier cases.",
+    featureCopy: "Every collector symbol stays in your vault. Collect 18 to open three sealed multiplier cases.",
     collectionName: "Flame Crown",
     collectionPlural: "Flame Crowns",
-    threshold: 12,
-    featureSteps: [4, 8, 12],
+    threshold: 18,
+    featureSteps: [6, 12, 18],
     featureStepLabels: ["Vault stirs", "Power rises", "Cases open"],
     bonusTitle: "The relic vault awakens.",
     bonusCopy: "Three multiplier capsules are sealed into your receipt. Start each horizontal roll and press Stop to reveal its predetermined X.",
@@ -255,11 +255,15 @@ const GAME_TEMPLATES = {
 export const GAMES = Object.freeze({ astral: GAME_TEMPLATES.astral });
 
 export const PAYLINES = [
-  [0, 0, 0, 0, 0], [1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [3, 3, 3, 3, 3],
-  [0, 1, 2, 3, 2], [3, 2, 1, 0, 1], [0, 1, 0, 1, 0], [1, 0, 1, 0, 1],
-  [2, 3, 2, 3, 2], [3, 2, 3, 2, 3], [0, 1, 2, 1, 0], [3, 2, 1, 2, 3],
-  [1, 2, 3, 2, 1], [2, 1, 0, 1, 2], [0, 0, 1, 0, 0], [3, 3, 2, 3, 3],
-  [1, 1, 0, 1, 1], [2, 2, 3, 2, 2], [0, 2, 0, 2, 0], [3, 1, 3, 1, 3]
+  [0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2],
+  [3, 3, 3, 3, 3, 3], [4, 4, 4, 4, 4, 4],
+  [0, 1, 2, 3, 4, 3], [4, 3, 2, 1, 0, 1], [0, 1, 0, 1, 0, 1],
+  [1, 0, 1, 0, 1, 0], [3, 4, 3, 4, 3, 4], [4, 3, 4, 3, 4, 3],
+  [0, 1, 2, 1, 0, 1], [4, 3, 2, 3, 4, 3], [1, 2, 3, 2, 1, 2],
+  [3, 2, 1, 2, 3, 2], [0, 0, 1, 0, 0, 1], [4, 4, 3, 4, 4, 3],
+  [1, 1, 0, 1, 1, 0], [3, 3, 4, 3, 3, 4], [0, 2, 0, 2, 0, 2],
+  [4, 2, 4, 2, 4, 2], [0, 2, 4, 2, 0, 2], [4, 2, 0, 2, 4, 2],
+  [1, 2, 1, 2, 1, 2], [3, 2, 3, 2, 3, 2]
 ];
 
 export function getGame(gameId = DEFAULT_GAME_ID) {
@@ -475,10 +479,12 @@ export function theoreticalRtp(gameId = DEFAULT_GAME_ID) {
   const payingSymbols = game.symbols.filter((symbol) => symbol.id !== "petal");
   const baseRtp = payingSymbols.reduce((total, symbol) => {
     const probability = symbol.weight / totalSymbolWeight;
-    return total
-      + probability ** 3 * (1 - probability) * symbol.payouts[3]
-      + probability ** 4 * (1 - probability) * symbol.payouts[4]
-      + probability ** 5 * symbol.payouts[5];
+    const symbolReturn = Array.from({ length: COLS - 2 }, (_, index) => index + 3)
+      .reduce((returnTotal, count) => {
+        const exactMatchProbability = probability ** count * (count === COLS ? 1 : 1 - probability);
+        return returnTotal + exactMatchProbability * symbol.payouts[count];
+      }, 0);
+    return total + symbolReturn;
   }, 0);
 
   const expectedPrize = game.bonusPrizes.reduce(
