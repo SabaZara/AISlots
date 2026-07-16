@@ -552,7 +552,7 @@ function buildLobby() {
     </section>`;
 
   ui.lobbyGames.className = "factory-builder";
-  ui.lobbyGames.setAttribute("aria-label", "Build a slot world");
+  ui.lobbyGames.setAttribute("aria-label", "Choose slot world layers");
   ui.lobbyGames.innerHTML = `
     <section class="factory-preview" id="factoryPreview" aria-label="Selected world preview">
       <div class="factory-preview-world" id="factoryPreviewWorld"></div>
@@ -566,12 +566,7 @@ function buildLobby() {
       <div class="factory-preview-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
     <div class="factory-controls">
-      <form class="factory-prompt-form" data-world-prompt-form>
-        <span class="factory-prompt-orb" aria-hidden="true">✦</span>
-        <label for="factoryPromptInput"><small>Describe your world</small><input id="factoryPromptInput" name="world-prompt" type="text" autocomplete="off" placeholder="dark ice phoenix" maxlength="80"></label>
-        <button type="submit">Make</button>
-      </form>
-      <div class="factory-prompt-result"><span>Creating</span><strong id="factoryPromptSummary"></strong><small id="factoryPromptHint">Type a few words or tap the themes below.</small></div>
+      <div class="factory-choice-intro"><span>Choose every layer</span><strong>Build your world</strong></div>
       ${group("World", "theme", THEMES)}
       ${group("Character", "companion", COMPANIONS)}
       ${group("Mood", "mood", MOODS)}
@@ -598,7 +593,6 @@ function updateLobbyPreview() {
   $("factoryPreviewCompanion").alt = `${visuals.companion.name} companion`;
   $("factoryPreviewName").textContent = visualConfigLabel(state.visualConfig);
   $("factoryPreviewMeta").textContent = `${visuals.symbols.name} · ${visuals.animation.name} motion`;
-  $("factoryPromptSummary").textContent = `${visuals.mood.name} ${visuals.theme.name} world with ${visuals.companion.name}`;
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
     const selected = state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
     button.classList.toggle("is-selected", selected);
@@ -625,68 +619,6 @@ function randomizeVisualConfig() {
     animation: pick(ANIMATION_STYLES)
   };
   updateLobbyPreview();
-}
-
-const VISUAL_PROMPT_ALIASES = Object.freeze({
-  theme: Object.freeze({
-    fire: ["fire", "lava", "volcano", "inferno"],
-    ice: ["ice", "frozen", "frost", "snow"],
-    nature: ["nature", "jungle", "forest", "green"],
-    void: ["void", "space", "cosmic", "galaxy"],
-    storm: ["storm", "lightning", "thunder", "electric"],
-    abyss: ["abyss", "ocean", "underwater", "deep sea"]
-  }),
-  companion: Object.freeze({
-    dragon: ["dragon"],
-    valkyrie: ["valkyrie", "warrior", "angel"],
-    kraken: ["kraken", "octopus", "tentacle"],
-    phoenix: ["phoenix", "fire bird", "bird"],
-    direwolf: ["direwolf", "wolf"],
-    titan: ["titan", "giant", "golem"]
-  }),
-  mood: Object.freeze({
-    epic: ["epic", "heroic", "triumphant"],
-    mystic: ["mystic", "magical", "ethereal"],
-    playful: ["playful", "bright", "fun"],
-    dark: ["dark", "ominous", "scary"]
-  }),
-  symbols: Object.freeze({
-    inferno: ["inferno relics", "fire relics"],
-    frost: ["frostbound", "frost relics", "ice relics"],
-    verdant: ["verdant", "nature relics", "jungle relics"],
-    cosmic: ["cosmic artifacts", "space relics"],
-    tempest: ["tempest", "storm relics", "lightning relics"],
-    abyssal: ["abyssal", "ocean relics", "sea relics"]
-  }),
-  animation: Object.freeze({
-    cascade: ["cascade", "falling"],
-    wave: ["wave", "flowing"],
-    slam: ["impact", "slam"],
-    strike: ["strike", "sharp"],
-    vortex: ["vortex", "spiral", "spinning"]
-  })
-});
-
-function applyVisualPrompt(value) {
-  const prompt = String(value || "").trim().toLowerCase();
-  const hint = $("factoryPromptHint");
-  if (!prompt) {
-    hint.textContent = "Type a few words or tap the themes below.";
-    return;
-  }
-  let matched = 0;
-  Object.entries(VISUAL_PROMPT_ALIASES).forEach(([group, aliasesById]) => {
-    const match = Object.entries(aliasesById).find(([, aliases]) => aliases.some((alias) => prompt.includes(alias)));
-    if (!match) return;
-    state.visualConfig[group] = match[0];
-    matched += 1;
-  });
-  if (!matched) {
-    hint.textContent = "Try words like dark, ice, storm, phoenix, or vortex.";
-    return;
-  }
-  updateLobbyPreview();
-  hint.textContent = `Made from “${String(value).trim()}”`;
 }
 
 function saveVisualConfig() {
@@ -1252,12 +1184,12 @@ function astralFlightProfile(multiplier) {
   return { duration: 650, progress: .56 };
 }
 
-function setAstralFlightPosition(progress, { landing = false } = {}) {
+function setAstralFlightPosition(progress) {
   const clamped = Math.max(0, Math.min(1, progress));
   const x = 27 + clamped * 46;
   const arc = Math.sin(clamped * Math.PI) * 9;
   const y = 73 - clamped * 47 - arc;
-  const tilt = landing ? -2 : -9 + clamped * 8;
+  const tilt = -9 + clamped * 8;
   ui.astralFlightPlane.style.setProperty("--flight-x", x.toFixed(2) + "%");
   ui.astralFlightPlane.style.setProperty("--flight-y", y.toFixed(2) + "%");
   ui.astralFlightPlane.style.setProperty("--flight-tilt", tilt.toFixed(2) + "deg");
@@ -1285,7 +1217,7 @@ function updateAstralFlightHud(progress, multiplier = 0) {
 
 function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, toMultiplier, duration, reducedMotion }) {
   if (reducedMotion) {
-    setAstralFlightPosition(toProgress, { landing: true });
+    setAstralFlightPosition(toProgress);
     updateAstralFlightHud(toProgress, toMultiplier);
     ui.astralRoundAward.textContent = formatMultiplier(toMultiplier);
     return delay(80);
@@ -1298,7 +1230,7 @@ function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, 
       const eased = 1 - Math.pow(1 - time, 3);
       const progress = fromProgress + (toProgress - fromProgress) * eased;
       const displayedMultiplier = fromMultiplier + (toMultiplier - fromMultiplier) * eased;
-      setAstralFlightPosition(progress, { landing: time > .82 });
+      setAstralFlightPosition(progress);
       updateAstralFlightHud(progress, displayedMultiplier);
       ui.astralRoundAward.textContent = formatMultiplier(displayedMultiplier);
       ui.astralFlightWorld.dataset.flightProgress = progress.toFixed(3);
@@ -1377,10 +1309,8 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
       lock.classList.add("is-locked", "rarity-" + astralFlightRarity(multiplier));
     }
     ui.astralTotalMultiplier.textContent = formatMultiplier(multiplierTotal);
-    jumpText(ui.astralRoundAward);
-    jumpText(ui.astralTotalMultiplier);
     audio.bonusReveal(roundIndex, multiplier);
-    burstParticles(multiplier >= 5 ? 58 : 32, multiplier >= 5 ? 1.42 : .9);
+    burstParticles(multiplier >= 5 ? 18 : 8, .55);
     ui.bonusMechanicProgress.textContent = (roundIndex + 1) + " / " + totalRounds;
     ui.bonusMechanicBar.style.width = (roundIndex + 1) / totalRounds * 100 + "%";
     await animateCreditValue(ui.bonusTotal, multiplierTotal * bet, 620, { sound: true, tierId: multiplier >= 5 ? "big" : "nice" });
@@ -1981,13 +1911,6 @@ function bindEvents() {
       return;
     }
     if (event.target.closest("[data-build-play]")) chooseLobbyGame();
-  });
-  ui.lobbyGames.addEventListener("submit", (event) => {
-    const form = event.target.closest("[data-world-prompt-form]");
-    if (!form) return;
-    event.preventDefault();
-    applyVisualPrompt(new FormData(form).get("world-prompt"));
-    playTone(880, .14, "triangle");
   });
   ui.betDown.addEventListener("click", () => {
     if (state.betIndex > 0) state.betIndex -= 1;

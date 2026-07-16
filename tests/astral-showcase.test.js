@@ -25,9 +25,9 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /function buildLobby\(\)/);
   assert.match(app, /factory-group-/);
   assert.match(app, /data-randomize-world/);
-  assert.match(app, /data-world-prompt-form/);
-  assert.match(app, /function applyVisualPrompt/);
-  assert.match(app, /Describe your world/);
+  assert.match(app, /factory-choice-intro/);
+  assert.match(app, /Choose every layer/);
+  assert.doesNotMatch(app, /data-world-prompt-form|function applyVisualPrompt|Describe your world/);
   assert.match(app, /resolveVisualConfig/);
   assert.match(app, /--game-characters/);
   assert.match(app, /--symbol-sheet/);
@@ -37,7 +37,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /transparentCompanionBreath/);
   assert.match(css, /\.factory-builder/);
   assert.match(css, /\.factory-preview-companion/);
-  assert.match(css, /\.factory-prompt-form/);
+  assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(html, /4,320 combinations/);
 });
 
@@ -78,7 +78,7 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.match(app, /function astralFlightProfile\(multiplier\)/);
   assert.match(app, /function animateAstralFlightLanding/);
   assert.match(app, /const progress = fromProgress \+ \(toProgress - fromProgress\) \* eased/);
-  assert.match(app, /setAstralFlightPosition\(progress, \{ landing: time > \.82 \}\)/);
+  assert.match(app, /setAstralFlightPosition\(progress\)/);
   assert.match(app, /activeRound = beginAstralFlight/);
   assert.match(app, /ui\.bonusAction\.textContent = "LAND NOW"/);
   assert.match(app, /ui\.bonusOverlay\.dataset\.mode = "astral-aviator"/);
@@ -93,6 +93,8 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.match(css, /\.astral-flight-plane img[\s\S]*?object-fit: contain/);
   assert.match(css, /\.astral-flight-telemetry/);
   assert.match(css, /\.astral-multiplier-ladder/);
+  assert.doesNotMatch(css, /flightLandedFlash/);
+  assert.doesNotMatch(app, /jumpText\(ui\.astralRoundAward\)/);
 });
 
 test("normal wins stay contained while only collector art breaks out", async () => {
@@ -141,7 +143,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.3.0");
+  assert.equal(JSON.parse(packageJson).version, "3.4.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {
