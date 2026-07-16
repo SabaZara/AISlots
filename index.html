@@ -12,8 +12,9 @@
     <link rel="preload" href="./assets/factory/scatter-inferno-v1.png" as="image" />
     <link rel="preload" href="./assets/factory/mood-epic-v1.jpg" as="image" />
     <link rel="preload" href="./assets/astral-multiplier-gate-v1.png" as="image" />
-    <link rel="preload" href="./assets/sky-runner-plane-cutout-v1.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=3.5.0" />
+    <link rel="preload" href="./assets/factory/bonus-loading-fire-v1.jpg" as="image" />
+    <link rel="preload" href="./assets/factory/plane-fire-cutout-v1.png" as="image" />
+    <link rel="stylesheet" href="./styles.css?v=3.6.0" />
     <title>AISlots World Forge · 4,320 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -327,7 +328,11 @@
               <small id="astralCascadeLabel">Ready</small>
             </div>
             <div class="astral-flight-world" id="astralFlightWorld" aria-label="Themed aviation multiplier flight">
+              <div class="astral-flight-depth is-far" aria-hidden="true"></div>
+              <div class="astral-flight-depth is-mid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="astral-flight-depth is-near" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
               <div class="astral-flight-clouds" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <div class="astral-flight-speed-lines" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
               <div class="astral-flight-path" aria-hidden="true"><i></i><i></i><i></i></div>
               <div class="astral-flight-telemetry" aria-label="Live flight telemetry">
                 <div class="astral-telemetry-card is-distance">
@@ -349,7 +354,7 @@
               </div>
               <div class="astral-flight-plane" id="astralFlightPlane" aria-hidden="true">
                 <span class="astral-plane-exhaust"></span>
-                <img src="./assets/sky-runner-plane-cutout-v1.png" alt="">
+                <img id="astralFlightPlaneImage" src="./assets/factory/plane-fire-cutout-v1.png" alt="">
               </div>
               <div class="astral-flight-altitude" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             </div>
@@ -414,6 +419,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=3.5.0"></script>
+    <script type="module" src="./app.js?v=3.6.0"></script>
   </body>
 </html>

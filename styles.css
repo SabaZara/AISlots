@@ -8910,3 +8910,159 @@ body {
   .scatter-meter-copy b { font-size: 18px; }
   .scatter-meter-copy small { font-size: 6px; }
 }
+
+/* 3.6 — theme-specific bonus launch art, parallax depth, and constant-speed flight. */
+.cinematic-overlay[data-mode="world-awakening"] .cinematic-guardian {
+  background-image:
+    var(--cinematic-companion),
+    linear-gradient(90deg, rgba(2,5,16,.86), rgba(2,5,16,.1) 42% 68%, rgba(2,5,16,.54)),
+    var(--cinematic-loading);
+  background-size: 42% 84%, cover, cover;
+  background-position: 79% center, center, center;
+}
+
+.bonus-overlay[data-mode="astral-aviator"] .bonus-scene {
+  background:
+    linear-gradient(180deg, rgba(2,5,16,.13), rgba(2,5,16,.72)),
+    var(--bonus-bg) center / cover no-repeat;
+}
+
+.astral-flight-world {
+  --flight-scale: .99;
+  --depth-far-x: 0%;
+  --depth-mid-x: 0%;
+  --depth-near-x: 0%;
+  perspective: 900px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--game-accent) 10%, rgba(4,10,27,.12)), rgba(2,5,17,.2) 58%, rgba(2,5,15,.66)),
+    var(--bonus-bg) center / cover no-repeat;
+}
+
+.astral-flight-depth {
+  position: absolute;
+  inset: -6%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.astral-flight-depth.is-far {
+  z-index: 1;
+  transform: translate3d(var(--depth-far-x), 0, -80px) scale(1.12);
+  background:
+    radial-gradient(ellipse at 72% 24%, color-mix(in srgb, var(--game-accent) 30%, transparent), transparent 35%),
+    linear-gradient(0deg, rgba(2,4,13,.56), transparent 38%);
+  filter: saturate(.9);
+}
+
+.astral-flight-depth.is-mid {
+  z-index: 4;
+  transform: translate3d(var(--depth-mid-x), 0, 0);
+}
+
+.astral-flight-depth.is-mid i {
+  position: absolute;
+  width: clamp(5px, .8vw, 10px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--game-accent) 65%, white 18%);
+  box-shadow: 0 0 14px var(--game-accent);
+  opacity: .58;
+  animation: flightDepthDrift 2.6s linear infinite;
+}
+.astral-flight-depth.is-mid i:nth-child(1) { top: 17%; left: 9%; animation-delay: -1.1s; }
+.astral-flight-depth.is-mid i:nth-child(2) { top: 28%; left: 34%; animation-delay: -2s; transform: scale(.6); }
+.astral-flight-depth.is-mid i:nth-child(3) { top: 51%; left: 52%; animation-delay: -.4s; transform: scale(1.25); }
+.astral-flight-depth.is-mid i:nth-child(4) { top: 13%; left: 73%; animation-delay: -1.7s; }
+.astral-flight-depth.is-mid i:nth-child(5) { top: 68%; left: 79%; animation-delay: -.8s; transform: scale(.72); }
+.astral-flight-depth.is-mid i:nth-child(6) { top: 76%; left: 22%; animation-delay: -2.3s; transform: scale(1.4); }
+
+.astral-flight-depth.is-near {
+  z-index: 11;
+  inset: 0 -12% -18%;
+  transform: translate3d(var(--depth-near-x), 0, 80px) scale(1.08);
+  overflow: hidden;
+}
+
+.astral-flight-depth.is-near i {
+  position: absolute;
+  bottom: -8%;
+  width: 19%;
+  height: 42%;
+  clip-path: polygon(0 100%, 30% 32%, 52% 62%, 75% 9%, 100% 100%);
+  background: linear-gradient(145deg, rgba(1,3,10,.96), color-mix(in srgb, var(--game-accent) 18%, rgba(1,3,10,.88)));
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--game-accent) 22%, transparent));
+  opacity: .78;
+}
+.astral-flight-depth.is-near i:nth-child(1) { left: 0; transform: scale(1.2); }
+.astral-flight-depth.is-near i:nth-child(2) { left: 19%; height: 27%; transform: scaleX(-1); opacity: .55; }
+.astral-flight-depth.is-near i:nth-child(3) { right: 17%; height: 24%; opacity: .5; }
+.astral-flight-depth.is-near i:nth-child(4) { right: -1%; transform: scaleX(-1.22); }
+
+.astral-flight-speed-lines {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.astral-flight-speed-lines i {
+  position: absolute;
+  left: -24%;
+  width: clamp(60px, 13vw, 170px);
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--game-accent) 60%, white 22%));
+  box-shadow: 0 0 6px var(--game-accent);
+  animation: flightDepthRush 900ms linear infinite;
+}
+.astral-flight-speed-lines i:nth-child(1) { top: 12%; animation-delay: -140ms; }
+.astral-flight-speed-lines i:nth-child(2) { top: 23%; animation-delay: -610ms; transform: scale(.6); }
+.astral-flight-speed-lines i:nth-child(3) { top: 35%; animation-delay: -330ms; }
+.astral-flight-speed-lines i:nth-child(4) { top: 47%; animation-delay: -790ms; transform: scale(.75); }
+.astral-flight-speed-lines i:nth-child(5) { top: 58%; animation-delay: -50ms; }
+.astral-flight-speed-lines i:nth-child(6) { top: 69%; animation-delay: -480ms; transform: scale(.55); }
+.astral-flight-speed-lines i:nth-child(7) { top: 78%; animation-delay: -230ms; }
+.astral-flight-speed-lines i:nth-child(8) { top: 88%; animation-delay: -680ms; transform: scale(.72); }
+
+.astral-flight-machine.is-flying .astral-flight-speed-lines,
+.astral-flight-machine.is-landing .astral-flight-speed-lines { opacity: .6; }
+
+.astral-flight-plane {
+  transform: translate(-50%, -50%) rotate(var(--flight-tilt)) scale(var(--flight-scale));
+}
+
+.astral-flight-plane img {
+  filter: drop-shadow(0 18px 16px rgba(0,0,0,.62)) drop-shadow(0 0 14px color-mix(in srgb, var(--game-accent) 48%, transparent));
+}
+
+@keyframes flightDepthDrift {
+  from { margin-left: 5%; opacity: 0; }
+  18%, 78% { opacity: .62; }
+  to { margin-left: -18%; opacity: 0; }
+}
+
+@keyframes flightDepthRush {
+  from { translate: 0; opacity: 0; }
+  12%, 76% { opacity: .72; }
+  to { translate: 150vw; opacity: 0; }
+}
+
+@media (max-width: 820px) and (orientation: portrait) {
+  .cinematic-overlay[data-mode="world-awakening"] .cinematic-guardian {
+    background-size: 70% 72%, cover, cover;
+    background-position: 70% 42%, center, center;
+  }
+  .astral-flight-depth.is-near { opacity: .65; }
+  .astral-flight-speed-lines i { width: clamp(42px, 20vw, 86px); }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .astral-flight-depth.is-near { opacity: .55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astral-flight-depth.is-mid i,
+  .astral-flight-speed-lines i { animation: none; }
+}

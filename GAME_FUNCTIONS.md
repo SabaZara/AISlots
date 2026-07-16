@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.5.0**
+Version reviewed: **3.6.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -43,8 +43,9 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Special Bet | Implemented | Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters. Costs are mathematically calibrated to preserve 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | 25×, 50×, or 100× demo-credit purchases with separately calibrated prize tables at 99.00% theoretical RTP. |
 | Bonus demo | Implemented | Top-of-machine no-wager preview. It does not spend credits, change progress, or create a fairness receipt. |
-| World-connected opening | Implemented | The selected background and companion introduce the bonus; the plane is reserved for the playable flight instead of appearing as the loading image. |
-| Sky Runner flights | Implemented | Three aviation rounds use a smaller original red-and-gold plane. It takes off, climbs continuously, and eases to the sealed multiplier without a last-frame scale flash or art jump. |
+| World-connected opening | Implemented | Fire, Ice, Nature, Void, Storm, and Abyss each use a separately generated launch-gate loading scene; the selected companion remains layered independently in front. The opening runs once. |
+| Sky Runner flights | Implemented | Each world uses its own transparent plane livery. The plane follows a linear, constant-speed route to the sealed destination, with duration determined by route distance and no last-frame acceleration, scale flash, or position jump. |
+| Flight depth | Implemented | Generated launch scenery, far haze, midground motes, near silhouettes, speed streaks, aircraft scale, and three parallax rates create visible foreground/midground/background separation. |
 | Land integrity | Implemented | Land affects reveal timing only. It cannot reroll, improve, or worsen the precomputed result. Flight duration and destination reflect the sealed result. |
 | Theme matching | Implemented | The selected environment artwork, accent, and secondary color also style the bonus sky, trail, frame, route, and multiplier locks. |
 | Flight telemetry | Implemented | Distance in kilometres, altitude in metres, a 10,000 m ceiling, route bars, and a 0.25×–10× multiplier ladder update continuously. |
@@ -53,7 +54,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 ## Visual and sound systems
 
-- 29 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, six transparent Scatter cutouts, and one transparent red Sky Runner plane.
+- 40 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, six transparent Scatter cutouts, six bonus launch scenes, and six transparent themed planes.
 - Backgrounds keep the central reel area low-detail; companion PNGs use true alpha transparency; symbol sheets use a fixed 4×2 atlas with the last cell empty.
 - One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.
 - The control deck, feature buttons, and bonus telemetry inherit the selected theme's accent and secondary colors.

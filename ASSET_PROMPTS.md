@@ -83,19 +83,26 @@ CSS displays these PNGs with `object-fit: contain`. Normal wins animate within t
 
 The mood modifier can be appended to any future background or companion prompt immediately before the shared art direction. Companion masters are generated against a single flat chroma field, then converted to edge-cleaned RGBA PNG cutouts so no black or square canvas appears in the builder, cabinet, or cinematic layer. Runtime mood overlays avoid duplicating the six backgrounds and six companions, which keeps all 144 theme × companion × mood combinations available from only 16 conceptual layer assets.
 
-## Sky Runner bonus plane
+## Theme-specific Sky Runner bonus assets
 
-The bonus aircraft is an original, unbranded fantasy-casino biplane. It does not reproduce a real operator logo, aircraft livery, or protected game UI.
+Every theme now has one 1672 × 941 loading scene and one 1536 × 1024 transparent RGBA aircraft. All are original and unbranded. The loading scenes were generated with the matching base theme as a style and world reference. The aircraft variants use the original biplane as a silhouette/camera reference, then receive a flat chroma field and the same soft-matte, despill, and edge-contraction workflow as the Scatter cutouts.
 
-Generation prompt:
+Shared loading prompt constraints: a new 16:9 launch-gate scene belonging unmistakably to the selected world; an empty central-right flight corridor; large foreground framing, readable midground launch architecture, and atmospheric far distance; one radiant destination portal; no plane, character, text, logo, UI, border, or watermark.
 
-> Create one original heroic fantasy casino biplane as a clean isolated game asset, dramatic front-left three-quarter view, nose pointing toward the upper right, wings level and fully visible, vivid glossy casino red fuselage and wings with intricate polished gold filigree trim, bright brass radial engine, red tail fins, small warm engine glow and restrained magical sparks, premium modern slot-game key-art finish, readable silhouette at small size, crisp hard-surface materials, no pilot visible, no text, no letters, no numbers, no logo, no UI, no watermark, no border. Center the entire aircraft with generous breathing room on a perfectly uniform flat chroma green background (#00FF00), with no green reflections or spill on the aircraft.
+- **Fire:** suspended obsidian bridge over lava rivers, huge black chains, molten pylons, caldera haze, circular fire portal.
+- **Ice:** translucent crystal runway across a blue chasm, near ice shards, silver pylons, aurora, circular frost portal.
+- **Nature:** vine-and-stone sky terrace above jungle canopy, foreground roots and leaves, misty ruins, waterfalls, circular leaf portal.
+- **Void:** fractured floating runway over a cosmic gulf, near amethyst shards, orbital structures, nebula depth, gravity portal.
+- **Storm:** rain-swept sky-citadel deck, foreground machinery and cables, lightning pylons, layered thunderclouds, electric portal.
+- **Abyss:** pearl-and-brass submerged bridge, near coral arches, bioluminescent towers, deep-water haze, teal current portal.
 
-Workflow:
+Shared plane prompt constraints: preserve the original biplane silhouette, front-right three-quarter view, geometry, propeller, landing gear, and padding; change only material and color identity; flat green chroma except magenta for green/teal liveries; no floor, shadow, reflection, text, logo, UI, border, or watermark.
 
-- generated master: \`tmp/imagegen/sky-runner-plane-red-v1-chroma.png\` during production;
-- chroma removed with the image-generation skill’s edge-cleaned chroma-key helper;
-- runtime output: \`assets/sky-runner-plane-cutout-v1.png\`;
-- export: 1536 × 1024 RGBA PNG with true transparency;
-- CSS always uses \`object-fit: contain\` and a fixed 3:2 plane stage, so the artwork is never stretched;
-- the selected World Forge environment remains a separate layer behind the plane and supplies all bonus-scene accent colors.
+- **Fire plane:** obsidian, molten crimson, orange seams, antique gold, ruby engine.
+- **Ice plane:** cobalt, frost white, cyan inlays, platinum, pale-blue engine crystal.
+- **Nature plane:** emerald, bronze-gold, leaf engraving, turquoise vines, amber-green engine.
+- **Void plane:** midnight black, royal violet, amethyst, dark chrome, singularity engine.
+- **Storm plane:** graphite, electric blue, lightning seams, platinum, blue-white engine.
+- **Abyss plane:** deep teal, midnight blue, cyan seams, pearl silver, antique brass, aquamarine engine.
+
+Runtime files are `assets/factory/bonus-loading-{theme}-v1.jpg` and `assets/factory/plane-{theme}-cutout-v1.png`. CSS uses `object-fit: contain`, while JavaScript selects the two files from the current theme and moves the aircraft on a linear distance/time path.

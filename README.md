@@ -27,7 +27,7 @@ Only one companion is displayed in a game. Each companion is a transparent RGBA 
 - persistent 18-Scatter feature progress shown by a compact themed Scatter-art tracker with no circular counter or dot field;
 - graphic Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
 - 25×, 50×, and 100× demo-credit Buy Bonus choices calibrated to the same 99.00% return;
-- three themed Sky Runner multiplier flights per bonus; the chosen world and companion introduce the bonus before a compact red-and-gold plane follows one continuous path to its pre-sealed result without a final scale jump;
+- three themed Sky Runner multiplier flights per bonus; every world has a separately generated launch scene and matching transparent plane livery, with layered parallax depth and one constant-speed path to the pre-sealed result without a final jump;
 - visible distance, altitude, 10,000 m ceiling, multiplier ladder, running multiplier total, and round progress;
 - animated win tiers, contained winner pulses, Scatter-art-only breakout, particles, cabinet reactions, and large-win cinematics;
 - four distinct procedural music/event-sound profiles, with a local high-energy sample layer for Epic;

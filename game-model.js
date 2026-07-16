@@ -38,6 +38,8 @@ const GAME_TEMPLATES = {
     characterLayer: "./assets/factory/companion-dragon-cutout-v2.png",
     symbolSheet: "./assets/factory/symbols-inferno-v1.jpg",
     scatterAsset: "./assets/factory/scatter-inferno-v1.png",
+    bonusLoadingArt: "./assets/factory/bonus-loading-fire-v1.jpg",
+    planeAsset: "./assets/factory/plane-fire-cutout-v1.png",
     bonusBarArt: "./assets/factory/mood-epic-v1.jpg",
     actionLabel: "Ignite",
     lobbyTag: "4,320 world combinations",

@@ -1,10 +1,10 @@
 export const THEMES = Object.freeze([
-  Object.freeze({ id: "fire", name: "Fire", action: "Ignite", accent: "#ff8a32", secondary: "#ff3d57", asset: "./assets/factory/theme-fire-v1.jpg" }),
-  Object.freeze({ id: "ice", name: "Ice", action: "Shatter", accent: "#7de7ff", secondary: "#a9bfff", asset: "./assets/factory/theme-ice-v1.jpg" }),
-  Object.freeze({ id: "nature", name: "Nature", action: "Awaken", accent: "#6cf2a2", secondary: "#d8dc62", asset: "./assets/factory/theme-nature-v1.jpg" }),
-  Object.freeze({ id: "void", name: "Void", action: "Warp", accent: "#b987ff", secondary: "#667dff", asset: "./assets/factory/theme-void-v1.jpg" }),
-  Object.freeze({ id: "storm", name: "Storm", action: "Surge", accent: "#73d8ff", secondary: "#d7e4ff", asset: "./assets/factory/theme-storm-v1.jpg" }),
-  Object.freeze({ id: "abyss", name: "Abyss", action: "Descend", accent: "#56e1d1", secondary: "#4e8ed8", asset: "./assets/factory/theme-abyss-v1.jpg" })
+  Object.freeze({ id: "fire", name: "Fire", action: "Ignite", accent: "#ff8a32", secondary: "#ff3d57", asset: "./assets/factory/theme-fire-v1.jpg", bonusLoading: "./assets/factory/bonus-loading-fire-v1.jpg", planeAsset: "./assets/factory/plane-fire-cutout-v1.png" }),
+  Object.freeze({ id: "ice", name: "Ice", action: "Shatter", accent: "#7de7ff", secondary: "#a9bfff", asset: "./assets/factory/theme-ice-v1.jpg", bonusLoading: "./assets/factory/bonus-loading-ice-v1.jpg", planeAsset: "./assets/factory/plane-ice-cutout-v1.png" }),
+  Object.freeze({ id: "nature", name: "Nature", action: "Awaken", accent: "#6cf2a2", secondary: "#d8dc62", asset: "./assets/factory/theme-nature-v1.jpg", bonusLoading: "./assets/factory/bonus-loading-nature-v1.jpg", planeAsset: "./assets/factory/plane-nature-cutout-v1.png" }),
+  Object.freeze({ id: "void", name: "Void", action: "Warp", accent: "#b987ff", secondary: "#667dff", asset: "./assets/factory/theme-void-v1.jpg", bonusLoading: "./assets/factory/bonus-loading-void-v1.jpg", planeAsset: "./assets/factory/plane-void-cutout-v1.png" }),
+  Object.freeze({ id: "storm", name: "Storm", action: "Surge", accent: "#73d8ff", secondary: "#d7e4ff", asset: "./assets/factory/theme-storm-v1.jpg", bonusLoading: "./assets/factory/bonus-loading-storm-v1.jpg", planeAsset: "./assets/factory/plane-storm-cutout-v1.png" }),
+  Object.freeze({ id: "abyss", name: "Abyss", action: "Descend", accent: "#56e1d1", secondary: "#4e8ed8", asset: "./assets/factory/theme-abyss-v1.jpg", bonusLoading: "./assets/factory/bonus-loading-abyss-v1.jpg", planeAsset: "./assets/factory/plane-abyss-cutout-v1.png" })
 ]);
 
 export const COMPANIONS = Object.freeze([

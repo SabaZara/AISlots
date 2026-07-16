@@ -52,6 +52,23 @@ test("each symbol family has a dedicated transparent Scatter cutout", async () =
   }
 });
 
+test("each world has dedicated bonus loading art and a transparent plane livery", async () => {
+  assert.equal(new Set(THEMES.map((theme) => theme.bonusLoading)).size, 6);
+  assert.equal(new Set(THEMES.map((theme) => theme.planeAsset)).size, 6);
+  for (const theme of THEMES) {
+    assert.match(theme.bonusLoading, /^\.\/assets\/factory\/bonus-loading-.+-v1\.jpg$/);
+    assert.match(theme.planeAsset, /^\.\/assets\/factory\/plane-.+-cutout-v1\.png$/);
+    const [loading, plane] = await Promise.all([
+      readFile(new URL(theme.bonusLoading.slice(2), root)),
+      readFile(new URL(theme.planeAsset.slice(2), root))
+    ]);
+    assert.deepEqual(Array.from(loading.subarray(0, 3)), [255, 216, 255]);
+    assert.deepEqual(Array.from(plane.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.ok(loading.length > 250_000, `${theme.bonusLoading} should retain cinematic detail`);
+    assert.ok(plane.length > 400_000, `${theme.planeAsset} should retain transparent aircraft detail`);
+  }
+});
+
 test("invalid saved choices resolve safely to the published default", () => {
   const resolved = resolveVisualConfig({
     theme: "missing",

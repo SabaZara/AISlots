@@ -79,7 +79,9 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   ]);
   assert.match(app, /function astralFlightProfile\(multiplier\)/);
   assert.match(app, /function animateAstralFlightLanding/);
-  assert.match(app, /const progress = fromProgress \+ \(toProgress - fromProgress\) \* eased/);
+  assert.match(app, /const progress = fromProgress \+ \(toProgress - fromProgress\) \* time/);
+  assert.match(app, /remainingDistance \/ ASTRAL_FLIGHT_PROGRESS_PER_MS/);
+  assert.doesNotMatch(app, /Math\.pow\(1 - time, 3\)/);
   assert.match(app, /setAstralFlightPosition\(progress\)/);
   assert.match(app, /activeRound = beginAstralFlight/);
   assert.match(app, /ui\.bonusAction\.textContent = "LAND NOW"/);
@@ -90,11 +92,16 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.match(app, /ui\.bonusAction\.textContent = preview \? "Play again"/);
   assert.match(model, /Land controls reveal timing only/);
   assert.match(html, /Themed aviation multiplier flight/);
-  assert.match(html, /sky-runner-plane-cutout-v1\.png/);
+  assert.match(html, /plane-fire-cutout-v1\.png/);
+  assert.match(html, /astral-flight-depth is-far/);
+  assert.match(html, /astral-flight-speed-lines/);
+  assert.equal((app.match(/await runAstralCinematicTransition\(/g) ?? []).length, 1);
   assert.match(css, /var\(--bonus-bg\) center \/ cover no-repeat/);
   assert.match(css, /\.astral-flight-plane img[\s\S]*?object-fit: contain/);
   assert.match(css, /\.astral-flight-telemetry/);
   assert.match(css, /\.astral-multiplier-ladder/);
+  assert.match(css, /flightDepthRush/);
+  assert.match(css, /--flight-scale/);
   assert.doesNotMatch(css, /flightLandedFlash/);
   assert.doesNotMatch(app, /jumpText\(ui\.astralRoundAward\)/);
 });
@@ -149,7 +156,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.5.0");
+  assert.equal(JSON.parse(packageJson).version, "3.6.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

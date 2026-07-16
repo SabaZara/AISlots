@@ -31,6 +31,7 @@ const INITIAL_BALANCE = 1000;
 const SPIN_SPEED_STORAGE_KEY = "aislots-spin-speed";
 const AUDIO_PREFERENCE_STORAGE_KEY = "aislots-audio-preference";
 const VISUAL_CONFIG_STORAGE_KEY = "aislots-visual-config";
+const ASTRAL_FLIGHT_PROGRESS_PER_MS = 0.00038;
 const SPIN_SPEEDS = Object.freeze([
   Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
   Object.freeze({ id: "fast", name: "Fast", label: "3×", resultDisplayMs: 780, settleScale: 0.4, shuffleScale: 0.58, autoplayGapMs: 140 })
@@ -134,6 +135,7 @@ const ui = {
   astralTotalMultiplier: $("astralTotalMultiplier"),
   astralFlightWorld: $("astralFlightWorld"),
   astralFlightPlane: $("astralFlightPlane"),
+  astralFlightPlaneImage: $("astralFlightPlaneImage"),
   astralDistanceValue: $("astralDistanceValue"),
   astralDistanceBar: $("astralDistanceBar"),
   astralAltitudeValue: $("astralAltitudeValue"),
@@ -683,6 +685,8 @@ function applyGameTheme({ resetGrid = false } = {}) {
   game.characterLayer = visuals.companion.asset;
   game.symbolSheet = visuals.symbols.asset;
   game.scatterAsset = visuals.symbols.scatterAsset;
+  game.bonusLoadingArt = visuals.theme.bonusLoading;
+  game.planeAsset = visuals.theme.planeAsset;
   game.bonusBarArt = "none";
   game.actionLabel = visuals.theme.action;
   game.reelMotion = visuals.animation.id;
@@ -723,12 +727,18 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--game-secondary", game.secondary);
-  ui.bonusOverlay.style.setProperty("--bonus-bg", `url("${visuals.theme.asset}")`);
+  ui.bonusOverlay.style.setProperty("--bonus-bg", `url("${game.bonusLoadingArt}")`);
   ui.bonusOverlay.dataset.theme = visuals.theme.id;
   ui.bonusOverlay.dataset.mood = visuals.mood.id;
   ui.cinematicOverlay.style.setProperty("--cinematic-companion", `url("${visuals.companion.asset}")`);
   ui.cinematicOverlay.style.setProperty("--cinematic-world", `url("${visuals.theme.asset}")`);
+  ui.cinematicOverlay.style.setProperty("--cinematic-loading", `url("${game.bonusLoadingArt}")`);
   ui.cinematicOverlay.style.setProperty("--cinematic-accent", visuals.theme.accent);
+  ui.astralFlightPlaneImage.src = game.planeAsset;
+  [game.bonusLoadingArt, game.planeAsset].forEach((src) => {
+    const preload = new Image();
+    preload.src = src;
+  });
   ui.companionPortrait.src = visuals.companion.asset;
   document.title = `${visualConfigLabel(state.visualConfig)} · AISlots`;
   $("brandName").textContent = game.name;
@@ -1183,12 +1193,12 @@ function astralFlightRarity(multiplier) {
 }
 
 function astralFlightProfile(multiplier) {
-  if (multiplier >= 10) return { duration: 1550, progress: .94 };
-  if (multiplier >= 5) return { duration: 1320, progress: .88 };
-  if (multiplier >= 2) return { duration: 1100, progress: .80 };
-  if (multiplier >= 1) return { duration: 900, progress: .72 };
-  if (multiplier >= .5) return { duration: 760, progress: .64 };
-  return { duration: 650, progress: .56 };
+  if (multiplier >= 10) return { progress: .94 };
+  if (multiplier >= 5) return { progress: .88 };
+  if (multiplier >= 2) return { progress: .80 };
+  if (multiplier >= 1) return { progress: .72 };
+  if (multiplier >= .5) return { progress: .64 };
+  return { progress: .56 };
 }
 
 function setAstralFlightPosition(progress) {
@@ -1197,10 +1207,15 @@ function setAstralFlightPosition(progress) {
   const arc = Math.sin(clamped * Math.PI) * 9;
   const y = 73 - clamped * 47 - arc;
   const tilt = -9 + clamped * 8;
+  const scale = 1 - clamped * .2;
   ui.astralFlightPlane.style.setProperty("--flight-x", x.toFixed(2) + "%");
   ui.astralFlightPlane.style.setProperty("--flight-y", y.toFixed(2) + "%");
   ui.astralFlightPlane.style.setProperty("--flight-tilt", tilt.toFixed(2) + "deg");
+  ui.astralFlightPlane.style.setProperty("--flight-scale", scale.toFixed(3));
   ui.astralFlightWorld.style.setProperty("--flight-progress", (clamped * 100).toFixed(2) + "%");
+  ui.astralFlightWorld.style.setProperty("--depth-far-x", (-clamped * 3).toFixed(2) + "%");
+  ui.astralFlightWorld.style.setProperty("--depth-mid-x", (-clamped * 8).toFixed(2) + "%");
+  ui.astralFlightWorld.style.setProperty("--depth-near-x", (-clamped * 16).toFixed(2) + "%");
 }
 
 function updateAstralFlightHud(progress, multiplier = 0) {
@@ -1234,9 +1249,8 @@ function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, 
     const draw = (now) => {
       if (startedAt === null) startedAt = now;
       const time = Math.min(1, (now - startedAt) / duration);
-      const eased = 1 - Math.pow(1 - time, 3);
-      const progress = fromProgress + (toProgress - fromProgress) * eased;
-      const displayedMultiplier = fromMultiplier + (toMultiplier - fromMultiplier) * eased;
+      const progress = fromProgress + (toProgress - fromProgress) * time;
+      const displayedMultiplier = fromMultiplier + (toMultiplier - fromMultiplier) * time;
       setAstralFlightPosition(progress);
       updateAstralFlightHud(progress, displayedMultiplier);
       ui.astralRoundAward.textContent = formatMultiplier(displayedMultiplier);
@@ -1251,7 +1265,7 @@ function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, 
 function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRounds) {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const profile = astralFlightProfile(multiplier);
-  const cruiseCeiling = Math.min(profile.progress - .08, .32 + roundIndex * .035);
+  const cruiseCeiling = Math.min(profile.progress - .12, .32);
   const liveMultiplierCeiling = Math.max(.03, multiplier * .58);
   let currentProgress = .04;
   let currentMultiplier = .01;
@@ -1274,9 +1288,9 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
   const fly = (now) => {
     if (startedAt === null) startedAt = now;
     const elapsed = now - startedAt;
-    const cruiseProgress = 1 - Math.exp(-elapsed / 1050);
-    currentProgress = .04 + (cruiseCeiling - .04) * cruiseProgress;
-    currentMultiplier = .01 + (liveMultiplierCeiling - .01) * cruiseProgress;
+    currentProgress = Math.min(cruiseCeiling, .04 + elapsed * ASTRAL_FLIGHT_PROGRESS_PER_MS);
+    const cruiseRatio = Math.max(0, Math.min(1, (currentProgress - .04) / Math.max(.001, cruiseCeiling - .04)));
+    currentMultiplier = .01 + (liveMultiplierCeiling - .01) * cruiseRatio;
     setAstralFlightPosition(currentProgress);
     updateAstralFlightHud(currentProgress, currentMultiplier);
     ui.astralRoundAward.textContent = formatMultiplier(currentMultiplier);
@@ -1295,12 +1309,14 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     ui.astralCascadeLabel.textContent = multiplier >= 5 ? "Afterburner" : "Landing";
     ui.astralMultiplierDial.classList.remove("is-flying");
     ui.astralMultiplierDial.classList.add("is-landing");
+    const remainingDistance = Math.max(0, profile.progress - currentProgress);
+    const travelDuration = Math.max(180, remainingDistance / ASTRAL_FLIGHT_PROGRESS_PER_MS);
     await animateAstralFlightLanding({
       fromProgress: currentProgress,
       toProgress: profile.progress,
       fromMultiplier: currentMultiplier,
       toMultiplier: multiplier,
-      duration: profile.duration,
+      duration: travelDuration,
       reducedMotion
     });
     ui.astralMultiplierDial.classList.remove("is-landing");
@@ -1325,7 +1341,7 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     resolveFinished();
     return finished;
   };
-  automaticLand = window.setTimeout(() => void land(), reducedMotion ? 180 : 2600);
+  automaticLand = window.setTimeout(() => void land(), reducedMotion ? 180 : 700);
   return { finished, land };
 }
 
