@@ -63,6 +63,7 @@ const ui = {
   companionStage: $("companionStage"),
   companionPortrait: $("companionPortrait"),
   featureVisual: $("featureVisual"),
+  scatterMeterArt: $("scatterMeterArt"),
   petalMeter: $("petalMeter"),
   petalCountLarge: $("petalCountLarge"),
   meterMessage: $("meterMessage"),
@@ -326,6 +327,9 @@ function symbolGlow(id) {
 function symbolGraphic(id) {
   const index = SYMBOL_SHEET_INDEX[id];
   const game = currentGame();
+  if (id === "petal" && game.scatterAsset) {
+    return `<img class="scatter-symbol" src="${game.scatterAsset}" alt="" aria-hidden="true">`;
+  }
   if (game.symbolSheet && Number.isInteger(index)) {
     return `<span class="generated-symbol symbol-sheet-${index}" style="--symbol-sheet:url('${game.symbolSheet}')" aria-hidden="true"></span>`;
   }
@@ -678,6 +682,7 @@ function applyGameTheme({ resetGrid = false } = {}) {
   game.background = visuals.theme.asset;
   game.characterLayer = visuals.companion.asset;
   game.symbolSheet = visuals.symbols.asset;
+  game.scatterAsset = visuals.symbols.scatterAsset;
   game.bonusBarArt = "none";
   game.actionLabel = visuals.theme.action;
   game.reelMotion = visuals.animation.id;
@@ -685,9 +690,9 @@ function applyGameTheme({ resetGrid = false } = {}) {
   game.spinInterval = visuals.animation.spinInterval;
   game.collectionName = visuals.symbols.collector;
   game.collectionPlural = `${visuals.symbols.collector}s`;
-  game.featureName = `${visuals.theme.name} Relic Vault`;
-  game.featureEyebrow = "Persistent collector";
-  game.featureCopy = `Every ${game.collectionName} stays in your vault. Collect ${game.threshold} to launch ${game.bonusDraws} sealed multiplier flights.`;
+  game.featureName = `${visuals.theme.name} Scatter Flight`;
+  game.featureEyebrow = "Scatter collection";
+  game.featureCopy = `Every ${game.collectionName} counts. Collect ${game.threshold} to launch ${game.bonusDraws} sealed multiplier flights.`;
   game.meterCarryCopy = `Every ${game.collectionName} stays between spins`;
   game.anticipationCopy = `${visuals.theme.name} energy is charging the final reel…`;
   game.bonusTitle = `${visuals.theme.name} vault awakened.`;
@@ -706,6 +711,8 @@ function applyGameTheme({ resetGrid = false } = {}) {
   setAutoplayMenuOpen(false);
   ui.featureCard.dataset.game = game.id;
   ui.featureVisual.dataset.meter = game.meterMode;
+  ui.scatterMeterArt.src = game.scatterAsset;
+  ui.scatterMeterArt.alt = game.collectionName;
   ui.reels.dataset.motion = game.reelMotion;
   gameStage.style.setProperty("--game-bg", `url("${game.background}")`);
   gameStage.style.setProperty("--game-characters", `url("${game.characterLayer}")`);

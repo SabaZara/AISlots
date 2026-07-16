@@ -66,6 +66,21 @@ Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the f
 - runtime location: `assets/factory/`;
 - mapping and combination logic: `asset-catalog.js`.
 
+## Transparent Scatter cutouts
+
+Each symbol family has one separate 512 × 512 RGBA Scatter master. These are not cropped from the black-background atlas: they are generated as isolated objects on a single flat chroma field, cleaned with the image-generation skill's soft-matte chroma workflow, and exported with true transparency. Runtime files are `assets/factory/scatter-{family}-v1.png`.
+
+All six use the shared premium slot-art direction above plus: one centered iconic object, generous breathing room, complete silhouette visible, crisp edge separation at small size, no floor, no scenery, no cast shadow outside the object, and no text, logo, UI, watermark, frame, or border.
+
+- **Inferno Scatter:** an ornate obsidian royal crown formed from flame spires, glowing molten cracks, a central faceted ruby, restrained polished-gold filigree, volcanic red-orange light; flat chroma green source.
+- **Frost Scatter:** a crystalline silver ice crown with snowflake geometry, razor-clear frozen facets, a luminous cyan heart gem, pale-blue frost light and platinum trim; flat chroma green source.
+- **Verdant Scatter:** an emerald-and-gold lotus crown, layered living leaves, a radiant golden seed at its center, small green gems and elegant botanical filigree; flat chroma magenta source.
+- **Cosmic Scatter:** a violet cosmic crown built around a miniature black-hole core, faceted amethysts, curved silver-gold orbital prongs and controlled purple starlight; flat chroma green source.
+- **Tempest Scatter:** a winged platinum storm crest surrounding an electric-blue thunder core, angular lightning geometry, small gold accents and energetic but contained arcs; flat chroma green source.
+- **Abyssal Scatter:** a silver-and-teal royal trench key crowned by a translucent jellyfish form, pearl and coral details, deep-blue gemstones and bioluminescent cyan light; flat chroma magenta source.
+
+CSS displays these PNGs with `object-fit: contain`. Normal wins animate within the cell. Scatter collection animates only the transparent artwork beyond its stationary tile, so no rectangular atlas background can jump into neighboring cells.
+
 The mood modifier can be appended to any future background or companion prompt immediately before the shared art direction. Companion masters are generated against a single flat chroma field, then converted to edge-cleaned RGBA PNG cutouts so no black or square canvas appears in the builder, cabinet, or cinematic layer. Runtime mood overlays avoid duplicating the six backgrounds and six companions, which keeps all 144 theme × companion × mood combinations available from only 16 conceptual layer assets.
 
 ## Sky Runner bonus plane

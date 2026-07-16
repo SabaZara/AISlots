@@ -30,12 +30,12 @@ function symbolNames(values) {
 }
 
 export const SYMBOL_SETS = Object.freeze([
-  Object.freeze({ id: "inferno", name: "Inferno Relics", collector: "Flame Crown", asset: "./assets/factory/symbols-inferno-v1.jpg", names: symbolNames(["Sunsteel Coin", "Horned Ring", "Flame Crystal", "Ember Blade", "Magma Drop", "Dragon Scale", "Flame Crown"]) }),
-  Object.freeze({ id: "frost", name: "Frostbound Treasures", collector: "Frost Crown", asset: "./assets/factory/symbols-frost-v1.jpg", names: symbolNames(["Ice Sun", "Frozen Orbit", "Frost Star", "Comet Shard", "Frozen Drop", "Snow Leaf", "Frost Crown"]) }),
-  Object.freeze({ id: "verdant", name: "Verdant Relics", collector: "Ancient Bloom", asset: "./assets/factory/symbols-verdant-v1.jpg", names: symbolNames(["Golden Seed", "Vine Ring", "Amethyst Flower", "Blossom Dagger", "Dew Orb", "Leaf Shield", "Ancient Bloom"]) }),
-  Object.freeze({ id: "cosmic", name: "Cosmic Artifacts", collector: "Void Crown", asset: "./assets/factory/symbols-cosmic-v1.jpg", names: symbolNames(["Stellar Coin", "Ringed Planet", "Nova Crystal", "Comet Lantern", "Stardust Drop", "Void Shield", "Void Crown"]) }),
-  Object.freeze({ id: "tempest", name: "Tempest Arsenal", collector: "Storm Core", asset: "./assets/factory/symbols-tempest-v1.jpg", names: symbolNames(["Thunder Seal", "Storm Ring", "Lightning Star", "Thunder Blade", "Rain Gem", "Wing Shield", "Storm Core"]) }),
-  Object.freeze({ id: "abyssal", name: "Abyssal Treasures", collector: "Trench Key", asset: "./assets/factory/symbols-abyssal-v1.jpg", names: symbolNames(["Pearl Medallion", "Coral Ring", "Deep Crystal", "Trident Shard", "Water Drop", "Royal Shell", "Trench Key"]) })
+  Object.freeze({ id: "inferno", name: "Inferno Relics", collector: "Inferno Scatter", asset: "./assets/factory/symbols-inferno-v1.jpg", scatterAsset: "./assets/factory/scatter-inferno-v1.png", names: symbolNames(["Sunsteel Coin", "Horned Ring", "Flame Crystal", "Ember Blade", "Magma Drop", "Dragon Scale", "Inferno Scatter"]) }),
+  Object.freeze({ id: "frost", name: "Frostbound Treasures", collector: "Frost Scatter", asset: "./assets/factory/symbols-frost-v1.jpg", scatterAsset: "./assets/factory/scatter-frost-v1.png", names: symbolNames(["Ice Sun", "Frozen Orbit", "Frost Star", "Comet Shard", "Frozen Drop", "Snow Leaf", "Frost Scatter"]) }),
+  Object.freeze({ id: "verdant", name: "Verdant Relics", collector: "Verdant Scatter", asset: "./assets/factory/symbols-verdant-v1.jpg", scatterAsset: "./assets/factory/scatter-verdant-v1.png", names: symbolNames(["Golden Seed", "Vine Ring", "Amethyst Flower", "Blossom Dagger", "Dew Orb", "Leaf Shield", "Verdant Scatter"]) }),
+  Object.freeze({ id: "cosmic", name: "Cosmic Artifacts", collector: "Cosmic Scatter", asset: "./assets/factory/symbols-cosmic-v1.jpg", scatterAsset: "./assets/factory/scatter-cosmic-v1.png", names: symbolNames(["Stellar Coin", "Ringed Planet", "Nova Crystal", "Comet Lantern", "Stardust Drop", "Void Shield", "Cosmic Scatter"]) }),
+  Object.freeze({ id: "tempest", name: "Tempest Arsenal", collector: "Tempest Scatter", asset: "./assets/factory/symbols-tempest-v1.jpg", scatterAsset: "./assets/factory/scatter-tempest-v1.png", names: symbolNames(["Thunder Seal", "Storm Ring", "Lightning Star", "Thunder Blade", "Rain Gem", "Wing Shield", "Tempest Scatter"]) }),
+  Object.freeze({ id: "abyssal", name: "Abyssal Treasures", collector: "Abyssal Scatter", asset: "./assets/factory/symbols-abyssal-v1.jpg", scatterAsset: "./assets/factory/scatter-abyssal-v1.png", names: symbolNames(["Pearl Medallion", "Coral Ring", "Deep Crystal", "Trident Shard", "Water Drop", "Royal Shell", "Abyssal Scatter"]) })
 ]);
 
 export const ANIMATION_STYLES = Object.freeze([

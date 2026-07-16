@@ -41,6 +41,17 @@ test("each generated raster asset is local and production-sized", async () => {
   }
 });
 
+test("each symbol family has a dedicated transparent Scatter cutout", async () => {
+  assert.equal(new Set(SYMBOL_SETS.map((set) => set.scatterAsset)).size, 6);
+  for (const set of SYMBOL_SETS) {
+    assert.match(set.scatterAsset, /^\.\/assets\/factory\/scatter-.+-v1\.png$/);
+    assert.match(set.collector, /Scatter$/);
+    const image = await readFile(new URL(set.scatterAsset.slice(2), root));
+    assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.ok(image.length > 150_000, `${set.scatterAsset} should retain transparent production detail`);
+  }
+});
+
 test("invalid saved choices resolve safely to the published default", () => {
   const resolved = resolveVisualConfig({
     theme: "missing",

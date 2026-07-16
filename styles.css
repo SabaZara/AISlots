@@ -8650,3 +8650,263 @@ body {
   .factory-choice-intro strong { font-size: 10px; }
   .factory-choice-intro span { font-size: 5px; }
 }
+
+/* 3.5 — transparent Scatter art, art-only breakout, and a true full-screen World Forge. */
+.lobby-overlay {
+  padding: 0;
+  place-items: stretch;
+  overflow: hidden;
+}
+
+.lobby-shell {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  padding: clamp(12px, 1.7vw, 26px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 0;
+  background:
+    radial-gradient(circle at 13% 14%, color-mix(in srgb, var(--builder-accent, #7de7ff) 11%, transparent), transparent 32%),
+    linear-gradient(145deg, #081020, #02050d 65%);
+  box-shadow: none;
+}
+
+.lobby-heading { margin-bottom: clamp(6px, 1vh, 12px); }
+.lobby-foot { margin-top: clamp(4px, .8vh, 10px); }
+.factory-builder { width: 100%; height: 100%; }
+
+.game-stage[data-game="astral"] .scatter-symbol {
+  position: relative;
+  z-index: 2;
+  width: min(88cqw, 88cqh);
+  height: min(88cqw, 88cqh);
+  max-width: 92%;
+  max-height: 92%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+  filter: drop-shadow(0 7px 8px rgba(0,0,0,.55)) drop-shadow(0 0 10px var(--symbol-glow));
+  transform-origin: 50% 56%;
+  pointer-events: none;
+}
+
+.game-stage[data-game="astral"] .symbol-cell.is-scatter {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 47%, color-mix(in srgb, var(--game-accent) 15%, transparent), transparent 57%),
+    rgba(1, 4, 13, .68);
+}
+
+.game-stage[data-game="astral"] .symbol-cell.is-scatter.is-special-hit { overflow: visible; }
+
+.game-stage[data-game="astral"] .reel-viewport.is-spinning .symbol-cell.is-shuffling .scatter-symbol {
+  animation: naturalReelRoll 120ms linear infinite !important;
+  animation-delay: var(--motion-delay) !important;
+  will-change: transform, opacity;
+}
+
+.game-stage[data-speed="fast"] .reel-viewport.is-spinning .symbol-cell.is-shuffling .scatter-symbol {
+  animation-duration: 70ms !important;
+}
+
+.game-stage[data-game="astral"] .reel-viewport.is-stopping .symbol-cell.is-settling .scatter-symbol {
+  animation: naturalReelLand 440ms cubic-bezier(.13,.84,.18,1) both !important;
+  animation-delay: var(--stop-delay) !important;
+}
+
+.game-stage[data-game="astral"] .reels.has-winners .symbol-cell.is-winner .scatter-symbol {
+  animation: containedWinnerPulse 620ms cubic-bezier(.2,.82,.25,1) infinite alternate !important;
+}
+
+.game-stage[data-game="astral"] .symbol-cell.is-special-hit .scatter-symbol {
+  z-index: 20;
+  animation: scatterArtBreakout 1080ms cubic-bezier(.16,.86,.22,1) both !important;
+}
+
+@keyframes scatterArtBreakout {
+  0% { transform: translateY(0) scale(1); filter: brightness(1) drop-shadow(0 7px 8px rgba(0,0,0,.55)); }
+  28% { transform: translateY(-25%) scale(1.38) rotate(-4deg); filter: brightness(1.85) drop-shadow(0 0 28px var(--game-accent)); }
+  58% { transform: translateY(-14%) scale(1.23) rotate(3deg); filter: brightness(1.5) drop-shadow(0 12px 18px rgba(0,0,0,.58)); }
+  100% { transform: translateY(0) scale(1); filter: drop-shadow(0 7px 8px rgba(0,0,0,.55)) drop-shadow(0 0 10px var(--symbol-glow)); }
+}
+
+/* The old circular counter and dot field are replaced by one compact Scatter tile. */
+.game-stage[data-game="astral"] .feature-card {
+  top: 50%;
+  left: 8px;
+  width: clamp(118px, 10vw, 152px);
+  height: auto;
+  min-height: 0;
+  padding: 7px;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 60%, #fff 10%);
+  border-radius: 14px 4px;
+  background: linear-gradient(145deg, rgba(9,18,40,.91), rgba(2,5,15,.94));
+  box-shadow: inset 0 1px rgba(255,255,255,.11), 0 12px 28px rgba(0,0,0,.48), 0 0 18px color-mix(in srgb, var(--game-accent) 18%, transparent);
+  filter: none;
+  transform: translateY(-58%);
+  overflow: visible;
+}
+
+.game-stage[data-game="astral"] .feature-card::before,
+.game-stage[data-game="astral"] .feature-card::after { display: none !important; }
+
+.game-stage[data-game="astral"] .feature-card > .eyebrow,
+.game-stage[data-game="astral"] .feature-card > h2,
+.game-stage[data-game="astral"] .feature-card > .feature-copy,
+.game-stage[data-game="astral"] .feature-card > .meter-message,
+.game-stage[data-game="astral"] .feature-card > .feature-steps,
+.game-stage[data-game="astral"] .feature-card > .game-performance { display: none !important; }
+
+.game-stage[data-game="astral"] .feature-card .scatter-tracker {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 3px;
+  display: grid;
+  grid-template-columns: 48% minmax(0, 1fr);
+  grid-template-rows: minmax(48px, auto) 5px;
+  place-items: center;
+  gap: 3px 5px;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+#featureCard #featureVisual.scatter-tracker {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  aspect-ratio: auto;
+}
+
+.game-stage[data-game="astral"] .scatter-meter-art {
+  width: 100%;
+  height: 58px;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+  filter: drop-shadow(0 5px 7px rgba(0,0,0,.52)) drop-shadow(0 0 9px color-mix(in srgb, var(--game-accent) 45%, transparent));
+}
+
+.scatter-meter-copy { min-width: 0; color: #fff; text-align: center; }
+.scatter-meter-copy > span {
+  display: block;
+  color: color-mix(in srgb, var(--game-accent) 72%, #fff 28%);
+  font-size: 6px;
+  font-weight: 950;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.scatter-meter-copy strong { margin-top: 2px; display: flex; align-items: baseline; justify-content: center; text-shadow: 0 2px 8px #000; }
+.scatter-meter-copy b { font: 700 clamp(25px, 2.2vw, 34px)/1 var(--serif); }
+.scatter-meter-copy small { color: #c8d4e9; font-size: 8px; font-weight: 900; }
+.scatter-meter-track {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 5px;
+  display: block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.7);
+}
+.scatter-meter-track > b {
+  width: var(--meter-fill, 0%);
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--game-secondary), var(--game-accent), #fff0ad);
+  box-shadow: 0 0 10px var(--game-accent);
+  transition: width 300ms ease;
+}
+
+.game-stage[data-game="astral"] .feature-card .visually-hidden-progress {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media (max-width: 820px) and (orientation: portrait) {
+  .lobby-shell { padding: max(7px, env(safe-area-inset-top)) max(7px, env(safe-area-inset-right)) max(7px, env(safe-area-inset-bottom)) max(7px, env(safe-area-inset-left)); }
+  .game-stage[data-game="astral"] .feature-card {
+    top: 5px;
+    left: max(5px, env(safe-area-inset-left));
+    width: clamp(105px, 28vw, 132px);
+    padding: 4px;
+    transform: none;
+  }
+  .game-stage[data-game="astral"] .feature-card .scatter-tracker {
+    grid-template-columns: 43% minmax(0, 1fr);
+    grid-template-rows: minmax(39px, auto) 4px;
+    gap: 2px 4px;
+  }
+  .game-stage[data-game="astral"] .scatter-meter-art { height: 43px; }
+  .scatter-meter-copy b { font-size: clamp(20px, 6.4vw, 29px); }
+}
+
+@media (max-width: 560px) and (orientation: portrait) {
+  .lobby-heading h2 { font-size: 24px; }
+  .factory-builder { grid-template-rows: minmax(92px, 22%) minmax(0, 1fr); }
+  .game-stage[data-game="astral"] .scatter-symbol { max-width: 96%; max-height: 96%; }
+}
+
+@media (max-width: 560px) and (orientation: portrait) and (max-height: 600px) {
+  .game-stage[data-game="astral"] .feature-card {
+    top: 44px;
+    width: 105px;
+    padding: 3px;
+  }
+  .game-stage[data-game="astral"] .feature-card .scatter-tracker {
+    grid-template-columns: 42% minmax(0, 1fr);
+    grid-template-rows: 34px 3px;
+  }
+  .game-stage[data-game="astral"] .scatter-meter-art { height: 36px; }
+  .scatter-meter-copy > span { font-size: 5px; }
+  .scatter-meter-copy b { font-size: 19px; }
+  .scatter-meter-copy small { font-size: 6px; }
+  .scatter-meter-track { height: 3px; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .lobby-shell { padding: max(4px, env(safe-area-inset-top)) max(5px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(5px, env(safe-area-inset-left)); }
+  .lobby-heading { margin-bottom: 3px; }
+  .lobby-heading h2 { margin: 0; font-size: 19px; }
+  .lobby-heading .eyebrow,
+  .lobby-heading > p,
+  .lobby-foot { display: none; }
+  .factory-builder { height: 100%; }
+  .game-stage[data-game="astral"] .feature-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 4px;
+    display: grid;
+    place-items: center;
+    transform: none;
+  }
+  .game-stage[data-game="astral"] .feature-card .scatter-tracker {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(30px, 1fr) auto 4px;
+    gap: 1px;
+  }
+  .game-stage[data-game="astral"] .scatter-meter-art { height: min(13vh, 48px); }
+  .scatter-meter-copy > span { display: none; }
+  .scatter-meter-copy b { font-size: 18px; }
+  .scatter-meter-copy small { font-size: 6px; }
+}

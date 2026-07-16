@@ -9,10 +9,11 @@
     <link rel="preload" href="./assets/factory/theme-fire-v1.jpg" as="image" />
     <link rel="preload" href="./assets/factory/companion-dragon-cutout-v2.png" as="image" />
     <link rel="preload" href="./assets/factory/symbols-inferno-v1.jpg" as="image" />
+    <link rel="preload" href="./assets/factory/scatter-inferno-v1.png" as="image" />
     <link rel="preload" href="./assets/factory/mood-epic-v1.jpg" as="image" />
     <link rel="preload" href="./assets/astral-multiplier-gate-v1.png" as="image" />
     <link rel="preload" href="./assets/sky-runner-plane-cutout-v1.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=3.4.0" />
+    <link rel="stylesheet" href="./styles.css?v=3.5.0" />
     <title>AISlots World Forge · 4,320 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -58,15 +59,13 @@
             <h2 id="moonwellTitle">Fire Relic Vault</h2>
             <p class="feature-copy" id="featureCopy">Every Flame Crown stays in your vault. Collect 18 to launch three sealed multiplier flights.</p>
 
-            <div class="moonwell-visual" id="featureVisual" data-meter="constellation" aria-hidden="true">
-              <div class="moon-orbit moon-orbit-one"></div>
-              <div class="moon-orbit moon-orbit-two"></div>
-              <div class="meter-energy meter-energy-one"></div>
-              <div class="meter-energy meter-energy-two"></div>
-              <div class="moon-core"><span id="petalCountLarge">0</span><small id="meterThreshold">/18</small></div>
+            <div class="scatter-tracker" id="featureVisual" data-meter="scatter">
+              <img class="scatter-meter-art" id="scatterMeterArt" src="./assets/factory/scatter-inferno-v1.png" alt="Inferno Scatter">
+              <div class="scatter-meter-copy"><span>Scatter</span><strong><b id="petalCountLarge">0</b><small id="meterThreshold">/18</small></strong></div>
+              <i class="scatter-meter-track" aria-hidden="true"><b></b></i>
             </div>
 
-            <div class="petal-meter" id="petalMeter" role="progressbar" aria-valuemin="0" aria-valuemax="18" aria-valuenow="0" aria-label="Collector symbols stored"></div>
+            <div class="petal-meter visually-hidden-progress" id="petalMeter" role="progressbar" aria-valuemin="0" aria-valuemax="18" aria-valuenow="0" aria-label="Scatter symbols stored"></div>
             <p class="meter-message" id="meterMessage"><strong>18 Flame Crowns to go</strong><span>Progress carries between spins</span></p>
 
             <div class="feature-steps" id="featureSteps" aria-label="Bonus journey"></div>
@@ -216,7 +215,7 @@
 
         <section class="bonus-explainer">
           <div class="bonus-icon">✿</div>
-          <div><h3 id="rulesFeatureTitle">Relic Vault bonus</h3><p id="rulesFeatureCopy">Collector symbols do not pay on lines. Every collector anywhere on the grid fills one permanent meter position. At 18, the vault launches three independently weighted multiplier flights, then the meter rolls over.</p></div>
+          <div><h3 id="rulesFeatureTitle">Scatter Flight bonus</h3><p id="rulesFeatureCopy">Scatter symbols do not pay on lines. Every Scatter anywhere on the grid fills one permanent meter position. At 18, the vault launches three independently weighted multiplier flights, then the meter rolls over.</p></div>
         </section>
 
         <section>
@@ -382,11 +381,11 @@
           <article class="feature-market-card is-special-card" id="specialBetPanel">
             <div class="market-card-emblem" aria-hidden="true">✦</div>
             <h3>Special bets</h3>
-            <p class="market-card-copy">Pay a calibrated amount to guarantee +1 or +2 collector symbols every spin. RTP stays exactly 99%.</p>
+            <p class="market-card-copy">Pay a calibrated amount to guarantee +1 or +2 Scatter symbols every spin. RTP stays exactly 99%.</p>
             <div class="special-bet-options" role="group" aria-label="Choose a special bet">
               <button type="button" data-progress-boost="0" aria-pressed="true"><span>Standard</span><strong>1.00×</strong><small>Normal meter</small></button>
-              <button type="button" data-progress-boost="1" aria-pressed="false"><span>Vault charge</span><strong>1.30×</strong><small>+1 collector every spin</small></button>
-              <button type="button" data-progress-boost="2" aria-pressed="false"><span>Power charge</span><strong>1.60×</strong><small>+2 collectors every spin</small></button>
+              <button type="button" data-progress-boost="1" aria-pressed="false"><span>Scatter charge</span><strong>1.30×</strong><small>+1 Scatter every spin</small></button>
+              <button type="button" data-progress-boost="2" aria-pressed="false"><span>Power charge</span><strong>1.60×</strong><small>+2 Scatters every spin</small></button>
             </div>
           </article>
           <article class="feature-market-card is-buy-card" id="buyFeaturePanel">
@@ -415,6 +414,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=3.4.0"></script>
+    <script type="module" src="./app.js?v=3.5.0"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.4.0**
+Version reviewed: **3.5.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -8,12 +8,12 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| First-screen game creator | Implemented | The site opens on a focused full-screen layer chooser with a large live foreground preview of the selected companion. The cabinet stays completely hidden until play starts. |
+| First-screen game creator | Implemented | The site opens on a true edge-to-edge, viewport-filling layer chooser with a large live foreground preview of the selected companion. The cabinet stays completely hidden until play starts. |
 | Explicit layer choices | Implemented | World, Character, Mood, Relics, and Motion remain visible as named choices; the removed free-text prompt cannot bypass those categories. |
 | Theme selection | Implemented | Text chips select Fire, Ice, Nature, Void, Storm, or Abyss without presenting the source images as a thumbnail catalog. |
 | One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one transparent standalone cutout is displayed. |
 | Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. |
-| Symbol selection | Implemented | Six generated seven-symbol families with distinct collector icons and names. |
+| Symbol selection | Implemented | Six generated seven-symbol families with distinct transparent Scatter icons and names. |
 | Motion selection | Implemented | Cascade, Wave, Impact, Strike, or Vortex changes spin presentation timing/animation only. |
 | Surprise me | Implemented | Randomly chooses all five visual layers, then updates the preview. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
@@ -31,16 +31,16 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Autoplay | Implemented | Finite 10, 25, or 50 spins. Stop remains accessible and autoplay stops on insufficient demo balance. |
 | Positive-return display | Implemented | Every positive payout receives an animated numeric result, even when it is smaller than the wager. |
 | Win celebrations | Implemented | Win, Nice, Big, Mega, and Epic tiers scale the banner, particles, cabinet reaction, audio, and cinematic treatment. |
-| Winner animation | Implemented | Normal winners pulse inside their cells. Only the special collector art jumps beyond its cell; the tile never moves. |
+| Winner animation | Implemented | Normal winners pulse inside their cells. Only transparent Scatter artwork jumps beyond its cell; the tile never moves or stretches. |
 | Result history | Implemented | Total won, spins, best win, and last-win details are available without showing session loss. |
 
 ## Persistent feature and bonus
 
 | Function | Status | Behavior |
 |---|---|---|
-| Relic Vault meter | Implemented | Every collector symbol anywhere on the board advances a persistent 18-step meter. Overflow carries into the next meter. The gauge is CSS-rendered without a rectangular background image. |
-| Dynamic collector art | Implemented | The collector name and art come from the selected symbol family. |
-| Special Bet | Implemented | Standard, guaranteed +1 collector, or guaranteed +2 collectors. Costs are mathematically calibrated to preserve 99.00% theoretical RTP. |
+| Scatter tracker | Implemented | Every Scatter anywhere on the board advances persistent 18-step progress. Overflow carries into the next tracker. The old circular counter and dot field are removed. |
+| Dynamic Scatter art | Implemented | Each selected symbol family supplies a dedicated transparent PNG used both in the reels and in the compact feature tracker. |
+| Special Bet | Implemented | Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters. Costs are mathematically calibrated to preserve 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | 25×, 50×, or 100× demo-credit purchases with separately calibrated prize tables at 99.00% theoretical RTP. |
 | Bonus demo | Implemented | Top-of-machine no-wager preview. It does not spend credits, change progress, or create a fairness receipt. |
 | World-connected opening | Implemented | The selected background and companion introduce the bonus; the plane is reserved for the playable flight instead of appearing as the loading image. |
@@ -53,7 +53,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 ## Visual and sound systems
 
-- 23 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, and one transparent red Sky Runner plane.
+- 29 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, six transparent Scatter cutouts, and one transparent red Sky Runner plane.
 - Backgrounds keep the central reel area low-detail; companion PNGs use true alpha transparency; symbol sheets use a fixed 4×2 atlas with the last cell empty.
 - One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.
 - The control deck, feature buttons, and bonus telemetry inherit the selected theme's accent and secondary colors.
@@ -80,7 +80,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - Spin, bet, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain clickable.
 - Autoplay opens as a viewport-level dialog that cannot be clipped by the cabinet.
 - The 6×5 board and transparent companion are resized/repositioned on narrow screens without covering interactive controls.
-- Regular winner art remains square and contained. Only the special collector can animate outside its cell; interactive controls remain inside their safe regions.
+- Regular winner art remains square and contained. Only transparent Scatter artwork can animate outside its cell; its block remains stationary and interactive controls stay inside their safe regions.
 - Reduced-motion preferences shorten or remove nonessential movement without changing game timing integrity.
 
 ## Deliberately absent
