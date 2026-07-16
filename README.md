@@ -15,20 +15,20 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 | Moods | Epic, Mystic, Playful, Dark |
 | Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
 
-Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every family also has its own transparent Scatter cutout. The opening creator fills the viewport, presents one graphical choice group at a time, automatically advances to the next layer, keeps a cinematic preview below, and completely hides the cabinet until the player creates the world. Phones show every choice in a fixed two-row grid with no internal scrolling. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every symbol family is also a true-alpha 4×2 atlas: seven isolated world-specific silhouettes and one empty cell, with no square artwork background. The opening creator fills the viewport, presents one graphical choice group at a time, automatically advances to the next layer, keeps a cinematic preview below, and completely hides the cabinet until the player creates the world. Phones show every choice in a fixed two-row grid with no internal scrolling. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
 ## Play features
 
 - six reels, five rows, and 25 fixed left-to-right paylines;
 - continuous downward reel travel followed by six sequential stops, with Normal 1× or Fast 3× presentation speed;
 - every positive return is shown, including returns smaller than the wager;
-- finite 10, 25, or 50-spin autoplay with an always-accessible Stop control;
+- finite 10, 25, or 50-spin autoplay directly beside Spin, with an always-accessible Stop state;
 - persistent 18-Scatter feature progress shown by a compact themed Scatter-art tracker with no circular counter or dot field;
 - theme-art Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
-- theme-art 25×, 50×, and 100× demo-credit Buy Bonus choices calibrated to the same 99.00% return;
+- theme-art 25×, 50×, and 100× free-play Buy Bonus choices calibrated to the same 99.00% return;
 - three themed Sky Runner multiplier flights per bonus; every world has a separately generated launch scene and matching transparent plane livery, with multiplier-scaled destination distance, layered parallax depth, and one constant-speed path without a pause or final jump;
 - visible distance, altitude, 10,000 m ceiling, multiplier ladder, running multiplier total, and round progress;
-- animated win tiers, contained winner pulses, Scatter-art-only breakout, particles, cabinet reactions, and large-win cinematics;
+- animated win tiers, symbol-to-core fusion threads and bursts, transparent Scatter breakout, particles, cabinet reactions, and large-win cinematics;
 - four distinct procedural music/event-sound profiles, with a local high-energy sample layer for Epic;
 - persistent demo balance, bonus progress, visual configuration, audio preference, and spin-speed preference;
 - game rules, paytable, last-win detail, and a compact top-bar fairness verifier;
@@ -59,7 +59,7 @@ The built-in verifier recomputes the commitment and outcome. Changing presentati
 
 ## Responsive layout
 
-Gameplay and the World Forge creator are viewport-locked with no document scrolling on desktop, phone, or iPad. The creator now opens in a neutral state with no environment selected or preloaded; world art is staged only after the player explicitly picks a theme. Phones use a dedicated touch-first composition with large swipeable choice cards, a portrait preview, safe-area padding, and roomier separation around Spin and adjacent controls. Rotated phones and tablets retain their own viewport-specific sizing. On laptops the companion receives a larger dedicated stage, while the navigation bar, control deck, feature buttons, feature market, and bonus HUD inherit the selected world artwork and colors. The 6×5 board, Scatter tracker, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Regular winner art stays contained; only the transparent Scatter artwork can break out across neighboring cells, while its tile remains still.
+Gameplay and the World Forge creator are viewport-locked with no document scrolling on desktop, phone, or iPad. The creator opens in a neutral state with no environment selected or preloaded; world art is staged only after the player explicitly picks a theme. Phones use a dedicated touch-first composition with a fixed choice grid, portrait preview, safe-area padding, and roomier separation around controls. Rotated phones and tablets retain their own viewport-specific sizing. The cabinet uses a quieter frame and one unified control language; Autoplay is attached to Spin, and the enlarged 99.00% RTP badge remains visible on narrow screens. On laptops the companion retains a dedicated but balanced right-side stage. The 6×5 board, Scatter tracker, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. During a win, transparent symbol art can fuse toward a shared energy core while every underlying reel tile stays still.
 
 ## Run locally
 

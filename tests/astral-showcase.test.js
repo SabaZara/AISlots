@@ -16,7 +16,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
     "astralFlightPlane", "astralDistanceValue", "astralDistanceBar", "astralAltitudeValue",
     "astralAltitudeBar", "astralMultiplierLadder", "bonusExit",
     "specialBetButton", "buyFeatureButton", "featureMarketOverlay", "autoplayOverlay",
-    "reels", "spinButton", "fairnessButton", "companionStage", "companionPortrait",
+    "reels", "spinButton", "spinCenter", "fairnessButton", "companionStage", "companionPortrait",
     "scatterMeterArt", "featureVisual"
   ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`));
@@ -48,7 +48,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
   assert.match(html, /864 combinations/);
-  assert.match(html, /app\.js\?v=4\.1\.0/);
+  assert.match(html, /app\.js\?v=4\.2\.0/);
   assert.doesNotMatch(app, /group\("Motion", "animation"/);
 });
 
@@ -124,22 +124,22 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.doesNotMatch(app, /jumpText\(ui\.astralRoundAward\)/);
 });
 
-test("normal wins stay contained while only transparent Scatter art breaks out", async () => {
+test("transparent symbols fuse while reel tiles remain stationary", async () => {
   const [app, css] = await Promise.all([
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("styles.css", root), "utf8")
   ]);
   assert.match(app, /function revealSpecialCollectors\(collectorCount\)/);
   assert.match(app, /revealSpecialCollectors\(outcome\.collectorCount\)/);
-  assert.match(css, /\.reels\.has-winners,[\s\S]*?overflow: hidden/);
-  assert.match(css, /containedWinnerPulse/);
-  assert.match(app, /id === "petal" && game\.scatterAsset/);
-  assert.match(app, /class="scatter-symbol"/);
-  assert.match(css, /\.symbol-cell\.is-special-hit \.scatter-symbol/);
-  assert.match(css, /scatterArtBreakout/);
-  assert.match(css, /\.scatter-symbol[\s\S]*?object-fit: contain/);
-  assert.match(css, /\.symbol-cell\.is-scatter\.is-special-hit \{ overflow: visible/);
-  assert.match(css, /width: min\(88cqw, 88cqh\)/);
+  assert.match(app, /async function playSymbolFusion\(outcome\)/);
+  assert.match(app, /await playSymbolFusion\(outcome\)/);
+  assert.match(app, /symbol-fusion-thread/);
+  assert.match(css, /@keyframes symbolFusionPull/);
+  assert.match(css, /@keyframes fusionCoreBurst/);
+  assert.match(css, /\.symbol-cell\.is-fusing \.generated-symbol/);
+  assert.match(css, /\.symbol-cell\.is-winner[\s\S]*?transform: none/);
+  assert.match(app, /transparent-v2/);
+  assert.match(css, /mix-blend-mode: normal/);
 });
 
 test("autoplay, Normal/Fast spin, and every positive payout remain visible", async () => {
@@ -149,6 +149,7 @@ test("autoplay, Normal/Fast spin, and every positive payout remain visible", asy
     readFile(new URL("styles.css", root), "utf8")
   ]);
   assert.match(html, /id="autoplayOverlay"[\s\S]*?id="autoplayMenu"[\s\S]*?aria-modal="true"/);
+  assert.match(html, /id="spinCenter"[\s\S]*?id="spinButton"[\s\S]*?id="autoButton"/);
   assert.match(app, /function setAutoplayMenuOpen/);
   assert.match(css, /\.autoplay-overlay \{[\s\S]*?position: fixed;[\s\S]*?inset: 0/);
   for (const speed of ["normal", "fast"]) assert.match(app, new RegExp(`id: ["']${speed}["']`));
@@ -174,7 +175,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "4.1.0");
+  assert.equal(JSON.parse(packageJson).version, "4.2.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

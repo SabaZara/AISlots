@@ -46,23 +46,23 @@ Generate against a pure black field so CSS screen blending preserves only the li
 - **Playful:** buoyant saturated color trails, star-like confetti lights, rounded magical sparks and cheerful edge glows.
 - **Dark:** deep crimson-violet smoke, narrow ominous rim light, sparse embers and shadowy tendrils around the perimeter.
 
-## Symbol atlases — exact 2:1 sheet
+## Symbol atlases — exact 2:1 transparent sheet
 
-Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the first seven cells; bottom-right cell intentionally empty; every cell equal size; each icon centered and fully inside its cell; pure black background; no shadows crossing cells; no text, labels, numbers, frames, or repeated icons.
+Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the first seven cells; bottom-right cell intentionally empty; every cell equal size; each icon centered and fully inside its cell; one flat chroma field for soft-matte removal; no shadows crossing cells; no text, labels, numbers, plaques, frames, or repeated icons. Every family deliberately varies silhouette, dominant hue, material, and value tier so it remains readable at reel size.
 
-- **Inferno Relics:** sunsteel coin, horned gold ring, faceted flame crystal, ember blade, magma drop, dragon-scale shield, elaborate flame crown collector.
-- **Frostbound Treasures:** ice-sun medallion, frozen orbit ring, faceted frost star, comet shard, frozen water drop, snow-leaf shield, elaborate frost crown collector.
-- **Verdant Relics:** golden seed medallion, vine ring, amethyst flower crystal, blossom dagger, dew orb, leaf shield, elaborate ancient bloom collector.
-- **Cosmic Artifacts:** stellar coin, ringed planet, nova crystal, comet lantern, stardust drop, void shield, elaborate void crown collector.
-- **Tempest Arsenal:** thunder seal, storm ring, lightning star, thunder blade, rain gem, wing shield, elaborate storm core collector.
-- **Abyssal Treasures:** pearl medallion, coral ring, deep-sea crystal, trident shard, water drop, royal shell shield, elaborate trench key collector.
+- **Inferno Relics:** gold Phoenix Coin, long red Rebirth Feather, faceted purple Violet Egg, blue Skywing Blade, blue-flame Ashen Urn, dark architectural Ember Temple, white-winged Rebirth Scatter.
+- **Frostbound Treasures:** silver Snow Sun, slender Frost Key, radial Sapphire Flake, long Ice Spear, round Winter Globe, broad Winged Shield, horned Dragon Scatter.
+- **Verdant Relics:** amber seed coin, curved emerald Fern Feather, pink Lotus Bloom, narrow Vine Dagger, aqua Dew Terrarium, tall Jungle Gate, branching World Tree Scatter.
+- **Cosmic Artifacts:** gold Eclipse Coin, silver Comet Feather, violet Nova, cyan Meteor Lance, round Galaxy Orb, broken-stone Void Portal, purple Titan Scatter.
+- **Tempest Arsenal:** bronze Thunder Coin, white Storm Feather, electric-blue Storm Eye, violet Thunder Lance, aqua Rain Orb, tall silver Storm Tower, gold-and-blue Valkyrie Scatter.
+- **Abyssal Treasures:** iridescent Pearl Coin, pink Coral Feather, violet Jelly Star, turquoise Tide Trident, glass Wave Orb, teal Shell Temple, tentacled Kraken Scatter.
 
 ## Export map
 
 - backgrounds: 1672 × 941 JPG;
 - companions: 1254 × 1254 transparent RGBA PNG cutouts;
 - mood overlays: 1672 × 941 JPG;
-- symbol atlases: 1774 × 887 JPG;
+- symbol atlases: 1774 × 887 transparent RGBA PNG;
 - runtime location: `assets/factory/`;
 - mapping and combination logic: `asset-catalog.js`.
 

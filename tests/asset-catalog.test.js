@@ -33,7 +33,9 @@ test("each generated raster asset is local and production-sized", async () => {
     const image = await readFile(new URL(item.asset.slice(2), root));
     if (item.asset.endsWith(".png")) {
       assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
-      assert.match(item.asset, /companion-.+-cutout-v2\.png$/);
+      assert.equal(image[25], 6, `${item.asset} should use RGBA transparency`);
+      if (COMPANIONS.includes(item)) assert.match(item.asset, /companion-.+-cutout-v2\.png$/);
+      if (SYMBOL_SETS.includes(item)) assert.match(item.asset, /symbols-.+-transparent-v2\.png$/);
     } else {
       assert.deepEqual(Array.from(image.subarray(0, 3)), [255, 216, 255]);
     }
@@ -49,6 +51,17 @@ test("each symbol family has a dedicated transparent Scatter cutout", async () =
     const image = await readFile(new URL(set.scatterAsset.slice(2), root));
     assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
     assert.ok(image.length > 150_000, `${set.scatterAsset} should retain transparent production detail`);
+  }
+});
+
+test("each symbol family uses a transparent seven-symbol atlas", async () => {
+  assert.equal(new Set(SYMBOL_SETS.map((set) => set.asset)).size, 6);
+  for (const set of SYMBOL_SETS) {
+    assert.match(set.asset, /^\.\/assets\/factory\/symbols-.+-transparent-v2\.png$/);
+    const image = await readFile(new URL(set.asset.slice(2), root));
+    assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.equal(image[25], 6);
+    assert.ok(image.length > 500_000, `${set.asset} should retain transparent production detail`);
   }
 });
 

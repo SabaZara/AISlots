@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="AISlots World Forge — 864 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4.1.0" />
+    <link rel="stylesheet" href="./styles.css?v=4.2.0" />
     <title>AISlots World Forge · 864 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -23,7 +23,7 @@
         <div class="session-strip" aria-label="Session information">
           <div class="session-stat">
             <span>Balance</span>
-            <strong><span id="balance">1,000.00</span> <small>CR</small></strong>
+            <strong>$<span id="balance">1,000.00</span></strong>
           </div>
           <span class="rtp-pill">RTP 99.00%</span>
           <span class="demo-pill">Free play</span>
@@ -63,16 +63,16 @@
 
             <div class="feature-steps" id="featureSteps" aria-label="Bonus journey"></div>
             <div class="game-performance" aria-label="Current game results">
-              <div><span>Total won</span><strong id="currentGameWon">0.00 CR</strong></div>
+              <div><span>Total won</span><strong id="currentGameWon">$0.00</strong></div>
               <div><span>Spins played</span><strong id="currentGameSpins">0</strong></div>
-              <div><span>Best win</span><strong id="currentGameBest">0.00 CR</strong></div>
+              <div><span>Best win</span><strong id="currentGameBest">$0.00</strong></div>
             </div>
           </aside>
 
           <section class="machine" aria-labelledby="gameTitle">
             <div class="companion-stage" id="companionStage" aria-hidden="true"><img id="companionPortrait" src="./assets/factory/companion-dragon-cutout-v2.png" alt=""></div>
             <div class="machine-top-actions" id="machineTopActions">
-              <button class="showcase-button" id="astralShowcaseButton" type="button" aria-label="Play the no-wager relic vault bonus demo" title="Shows the bonus animation without spending credits or changing progress."><span>✦</span> Bonus demo</button>
+              <button class="showcase-button" id="astralShowcaseButton" type="button" aria-label="Play the no-wager relic vault bonus demo" title="Shows the bonus animation without changing your balance or progress."><span>✦</span> Bonus demo</button>
             </div>
             <div class="astral-feature-dock" id="astralFeatureDock" aria-label="Relic Vault feature controls">
               <button class="astral-feature-button is-special" id="specialBetButton" type="button" aria-label="Open special bet options">
@@ -105,13 +105,13 @@
               </div>
               <div class="win-banner" id="winBanner" aria-hidden="true">
                 <span id="winBannerLabel">Celestial win</span>
-                <strong id="winBannerAmount">0.00 CR</strong>
+                <strong id="winBannerAmount">$0.00</strong>
                 <small id="winBannerMultiplier">0.00× bet</small>
               </div>
               <div class="return-chip" id="returnChip" hidden aria-live="polite" aria-hidden="true">
                 <span>Returned</span>
-                <strong id="returnAmount">0.00 CR</strong>
-                <small id="returnComparison">0.00× · 0.00 CR bet</small>
+                <strong id="returnAmount">$0.00</strong>
+                <small id="returnComparison">0.00× · $0.00 bet</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">
@@ -127,22 +127,25 @@
                 <span class="control-label">Bet</span>
                 <div class="stepper">
                   <button id="betDown" type="button" aria-label="Decrease bet">−</button>
-                  <strong><span id="betAmount">2.00</span><small> CR</small></strong>
+                  <strong>$<span id="betAmount">2.00</span></strong>
                   <button id="betUp" type="button" aria-label="Increase bet">+</button>
                 </div>
                 <button class="mini-action" id="maxBetButton" type="button">MAX</button>
               </div>
 
-              <button class="spin-button" id="spinButton" type="button" aria-label="Spin for 2 credits">
-                <span class="spin-rings" aria-hidden="true"></span>
-                <span class="spin-icon" aria-hidden="true">↻</span>
-                <span class="spin-label" id="spinLabel">Spin</span>
-              </button>
+              <div class="spin-center" id="spinCenter">
+                <button class="spin-button" id="spinButton" type="button" aria-label="Spin for 2 dollars">
+                  <span class="spin-rings" aria-hidden="true"></span>
+                  <span class="spin-icon" aria-hidden="true">↻</span>
+                  <span class="spin-label" id="spinLabel">Spin</span>
+                </button>
+                <button class="auto-button" id="autoButton" type="button" aria-label="Open autoplay options" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">AUTO</span><strong>10 · 25 · 50</strong></button>
+              </div>
 
               <div class="win-panel">
                 <div class="win-readout">
                   <span class="control-label">Win</span>
-                  <strong><span id="lastWin">0.00</span><small> CR</small></strong>
+                  <strong>$<span id="lastWin">0.00</span></strong>
                   <span id="lastMultiplier">—</span>
                 </div>
                 <div class="spin-options" id="spinOptions">
@@ -150,7 +153,6 @@
                     <button class="speed-choice is-selected" type="button" data-spin-speed="normal" aria-pressed="true"><strong>Normal</strong><small>1×</small></button>
                     <button class="speed-choice" type="button" data-spin-speed="fast" aria-pressed="false"><strong><span aria-hidden="true">⚡</span> Fast</strong><small>3×</small></button>
                   </div>
-                  <button class="auto-button" id="autoButton" type="button" aria-label="Open autoplay options" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">↻</span><strong>10 · 25 · 50</strong></button>
                 </div>
               </div>
             </div>
@@ -223,7 +225,7 @@
           <p>The combined long-run theoretical return is exactly 99.00% for every visual configuration. Actual sessions vary. The model uses fixed symbol and prize weights; it never adapts to balance, wins, losses, mood, theme, or play history.</p>
         </section>
 
-        <section class="plain-note"><strong>Free-play only.</strong> This build uses demo credits and has no cash value. A real-money release requires jurisdiction-specific licensing, certified game mathematics and RNG testing, age and identity checks, responsible-gambling controls, secure account services, and an approved wallet integration.</section>
+        <section class="plain-note"><strong>Free-play only.</strong> Dollar amounts are a demo balance and have no cash value. A real-money release requires jurisdiction-specific licensing, certified game mathematics and RNG testing, age and identity checks, responsible-gambling controls, secure account services, and an approved wallet integration.</section>
         <section class="plain-note audio-credit">Epic, Mystic, Playful, and Dark audio profiles use distinct background motifs and event-sound treatments. The optional Epic sample layer retains its source record in <code>assets/audio/LICENSES.md</code>.</section>
       </div>
     </dialog>
@@ -279,7 +281,7 @@
         <div class="celebration-burst" aria-hidden="true"><i></i><i></i><i></i></div>
         <span class="celebration-kicker" id="celebrationKicker">10× bet or more</span>
         <h2 id="celebrationTitle">Big win</h2>
-        <strong class="celebration-amount" id="celebrationAmount">0.00 CR</strong>
+        <strong class="celebration-amount" id="celebrationAmount">$0.00</strong>
         <p><span id="celebrationMultiplier">0.00× bet</span> · <span id="celebrationGame">Fire Dragon</span></p>
         <button class="primary-button celebration-collect" id="celebrationCollect" type="button">Collect win</button>
       </section>
@@ -362,7 +364,7 @@
           <div class="astral-total-multiplier"><span>Total multiplier</span><strong id="astralTotalMultiplier">0.00×</strong></div>
         </div>
         <div class="constellation-picks" id="constellationPicks"></div>
-        <div class="bonus-total"><span id="bonusTotalLabel">Bonus win</span><strong id="bonusTotal">0.00 CR</strong></div>
+        <div class="bonus-total"><span id="bonusTotalLabel">Bonus win</span><strong id="bonusTotal">$0.00</strong></div>
         <button class="secondary-button bonus-exit" id="bonusExit" type="button" hidden>Back to game</button>
         <button class="primary-button bonus-action" id="bonusAction" type="button">Take off</button>
       </div>
@@ -389,14 +391,14 @@
             <div class="market-card-emblem" aria-hidden="true">☾</div>
             <h3>Buy bonus</h3>
             <p class="market-card-copy">Pay 25×, 50×, or 100× the bet to launch three sealed multiplier flights now. Land changes reveal timing only. RTP stays 99%.</p>
-            <div class="buy-feature-options" role="group" aria-label="Buy a sealed Relic Vault bonus with free-play credits">
-              <button type="button" data-buy-feature="25"><span>Vault</span><strong>25×</strong><small data-buy-price="25">50.00 CR</small></button>
-              <button type="button" data-buy-feature="50"><span>Super</span><strong>50×</strong><small data-buy-price="50">100.00 CR</small></button>
-              <button type="button" data-buy-feature="100"><span>Grand</span><strong>100×</strong><small data-buy-price="100">200.00 CR</small></button>
+            <div class="buy-feature-options" role="group" aria-label="Buy a sealed Relic Vault bonus with free-play dollars">
+              <button type="button" data-buy-feature="25"><span>Vault</span><strong>25×</strong><small data-buy-price="25">$50.00</small></button>
+              <button type="button" data-buy-feature="50"><span>Super</span><strong>50×</strong><small data-buy-price="50">$100.00</small></button>
+              <button type="button" data-buy-feature="100"><span>Grand</span><strong>100×</strong><small data-buy-price="100">$200.00</small></button>
             </div>
           </article>
         </div>
-        <p class="feature-market-note">Feature prizes are sealed before animation. Purchases use demo credits only.</p>
+        <p class="feature-market-note">Feature prizes are sealed before animation. All dollar amounts are free-play only.</p>
       </section>
     </div>
 
@@ -411,6 +413,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.1.0"></script>
+    <script type="module" src="./app.js?v=4.2.0"></script>
   </body>
 </html>

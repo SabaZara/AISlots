@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **4.1.0**
+Version reviewed: **4.2.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -13,7 +13,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
 | One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one transparent standalone cutout is displayed. |
 | Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. |
-| Symbol selection | Implemented | Six generated seven-symbol families with distinct transparent Scatter icons and names. |
+| Symbol selection | Implemented | Six newly generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, feathers, eggs/orbs, weapons, temples, wings, and rebirth crests. |
 | Surprise me | Implemented | Randomly chooses all four player-facing visual layers, updates the preview, and advances directly to review. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
 | Combination count | Implemented | 6 × 6 × 4 × 6 = 864 configurations. |
@@ -27,10 +27,10 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Bet controls | Implemented | Minus, plus, and Max with balance-aware limits. |
 | Spin | Implemented | Wager is sealed before the presentation begins; symbols travel downward continuously and reels settle in six visible phases. |
 | Normal/Fast | Implemented | Separate 1× and 3× presentation choices next to Spin; neither changes the result. |
-| Autoplay | Implemented | Finite 10, 25, or 50 spins. Stop remains accessible and autoplay stops on insufficient demo balance. |
+| Autoplay | Implemented | Finite 10, 25, or 50 spins. The button sits directly beside Spin, becomes Stop while active, and stops on insufficient free-play balance. |
 | Positive-return display | Implemented | Every positive payout receives an animated numeric result, even when it is smaller than the wager. |
 | Win celebrations | Implemented | Win, Nice, Big, Mega, and Epic tiers scale the banner, particles, cabinet reaction, audio, and cinematic treatment. |
-| Winner animation | Implemented | Normal winners pulse inside their cells. Only transparent Scatter artwork jumps beyond its cell; the tile never moves or stretches. |
+| Winner animation | Implemented | Winning symbol art pulls toward a shared energy core, connects with themed light threads, bursts, and settles into a readable pulse. Reel tiles never move or stretch; only transparent art animates. |
 | Result history | Implemented | Total won, spins, best win, and last-win details are available without showing session loss. |
 
 ## Persistent feature and bonus
@@ -38,23 +38,25 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Function | Status | Behavior |
 |---|---|---|
 | Scatter tracker | Implemented | Every Scatter anywhere on the board advances persistent 18-step progress. Overflow carries into the next tracker. The old circular counter and dot field are removed. |
-| Dynamic Scatter art | Implemented | Each selected symbol family supplies a dedicated transparent PNG used both in the reels and in the compact feature tracker. |
+| Dynamic Scatter art | Implemented | Each selected family supplies a transparent rebirth/Scatter crest in its reel atlas plus a dedicated transparent tracker cutout. |
 | Special Bet | Implemented | The selected world image and Scatter art theme both the cabinet control and market panel. Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters remain calibrated to 99.00% theoretical RTP. |
-| Buy Bonus | Implemented | The selected launch scene and plane art theme both the cabinet control and market panel. 25×, 50×, or 100× demo-credit purchases use separately calibrated 99.00% prize tables. |
-| Bonus demo | Implemented | Top-of-machine no-wager preview. It does not spend credits, change progress, or create a fairness receipt. |
+| Buy Bonus | Implemented | The selected launch scene and plane art theme both the cabinet control and market panel. 25×, 50×, or 100× free-play purchases use separately calibrated 99.00% prize tables. |
+| Bonus demo | Implemented | Top-of-machine no-wager preview. It does not change balance, progress, or create a fairness receipt. |
 | World-connected opening | Implemented | Fire, Ice, Nature, Void, Storm, and Abyss each use a separately generated launch-gate loading scene. The loading cinematic shows only the environment—no companion layer. The opening runs once. |
 | Sky Runner flights | Implemented | Each world uses its own transparent plane livery. Multiplier determines destination distance: 0.25× lands just beyond takeoff, then 0.5×, 1×, 2×, 5×, and 10× stop at increasingly distant route points. The aircraft keeps one linear speed with no pause or last-frame jump. |
 | Flight depth | Implemented | Generated launch scenery, far haze, midground motes, near silhouettes, speed streaks, aircraft scale, and three parallax rates create visible foreground/midground/background separation. |
 | Land integrity | Implemented | Land affects reveal timing only. It cannot reroll, improve, or worsen the precomputed result. Flight duration and destination reflect the sealed result. |
 | Theme matching | Implemented | The selected environment artwork, accent, and secondary color also style the bonus sky, trail, frame, route, and multiplier locks. |
 | Flight telemetry | Implemented | Distance in kilometres, altitude in metres, a 10,000 m ceiling, route bars, and a 0.25×–10× multiplier ladder update continuously. |
-| Round clarity | Implemented | Current flight, live X, labelled landed multipliers, total X, flight progress, and final credit award stay visible. |
+| Round clarity | Implemented | Current flight, live X, labelled landed multipliers, total X, flight progress, and final dollar award stay visible. |
 | Preview replay | Implemented | The no-wager Bonus Demo ends with Play Again and Back to game controls. |
 
 ## Visual and sound systems
 
-- 40 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, six transparent Scatter cutouts, six bonus launch scenes, and six transparent themed planes.
-- Backgrounds keep the central reel area low-detail; companion PNGs use true alpha transparency; symbol sheets use a fixed 4×2 atlas with the last cell empty.
+- 40 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six transparent symbol atlases, six transparent Scatter tracker cutouts, six bonus launch scenes, and six transparent themed planes.
+- Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency; symbol atlases use a fixed 4×2 layout with the last cell empty and no square art canvas.
+- The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
+- Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
 - One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
@@ -83,7 +85,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - Spin, bet, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain clickable.
 - Autoplay opens as a viewport-level dialog that cannot be clipped by the cabinet.
 - The 6×5 board and transparent companion are resized/repositioned on narrow screens without covering interactive controls.
-- Regular winner art remains square and contained. Only transparent Scatter artwork can animate outside its cell; its block remains stationary and interactive controls stay inside their safe regions.
+- Winning transparent art can pull inward and pulse beyond its tile during the fusion effect. Tiles remain stationary; controls stay inside their safe regions.
 - Reduced-motion preferences shorten or remove nonessential movement without changing game timing integrity.
 
 ## Deliberately absent
