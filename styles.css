@@ -9066,3 +9066,307 @@ body {
   .astral-flight-depth.is-mid i,
   .astral-flight-speed-lines i { animation: none; }
 }
+
+/* 3.7 — guided World Forge and theme-native navigation / feature artwork. */
+.topbar {
+  border-bottom-color: color-mix(in srgb, var(--topbar-accent, #7de7ff) 54%, rgba(255,255,255,.12));
+  background:
+    linear-gradient(90deg, rgba(2,5,16,.93), color-mix(in srgb, var(--topbar-accent, #7de7ff) 9%, rgba(2,5,16,.87)) 48%, rgba(2,5,16,.94)),
+    var(--topbar-art) center 48% / cover no-repeat;
+  box-shadow: inset 0 -1px color-mix(in srgb, var(--topbar-accent, #7de7ff) 22%, transparent), 0 8px 28px rgba(0,0,0,.34);
+}
+
+.brand-mark {
+  border-color: color-mix(in srgb, var(--topbar-accent, #7de7ff) 70%, white 16%);
+  background: radial-gradient(circle at 34% 28%, white, var(--topbar-accent, #7de7ff) 27%, var(--topbar-secondary, #9d7cff) 68%, rgba(3,6,18,.9));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--topbar-accent, #7de7ff) 34%, transparent);
+}
+
+.session-strip,
+.icon-button {
+  border-color: color-mix(in srgb, var(--topbar-accent, #7de7ff) 27%, rgba(255,255,255,.08));
+  background: color-mix(in srgb, var(--topbar-accent, #7de7ff) 7%, rgba(3,7,19,.78));
+  box-shadow: inset 0 1px rgba(255,255,255,.07);
+}
+
+.rtp-pill,
+.demo-pill { border-color: color-mix(in srgb, var(--topbar-accent, #7de7ff) 44%, rgba(255,255,255,.1)); }
+.icon-button svg { stroke: color-mix(in srgb, var(--topbar-accent, #7de7ff) 68%, white); }
+
+.game-stage[data-game="astral"] .astral-feature-button.is-special {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--game-accent) 20%, rgba(3,7,19,.42)), rgba(2,5,15,.9)),
+    var(--feature-world-art) center / cover no-repeat;
+}
+
+.game-stage[data-game="astral"] .astral-feature-button.is-buy {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--game-secondary) 17%, rgba(3,7,19,.35)), rgba(2,5,15,.9)),
+    var(--feature-bonus-art) center / cover no-repeat;
+}
+
+.game-stage[data-game="astral"] .astral-feature-button strong,
+.game-stage[data-game="astral"] .astral-feature-button small {
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 7px #000, 0 0 10px #000;
+}
+
+.game-stage[data-game="astral"] .astral-feature-button.is-special .feature-button-orb {
+  background:
+    var(--feature-symbol-art) center / 84% 84% no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--game-accent) 46%, #091127), #030611 72%);
+}
+
+.game-stage[data-game="astral"] .astral-feature-button.is-buy .feature-button-orb {
+  background:
+    var(--feature-plane-art) center / 90% auto no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--game-secondary) 46%, #091127), #030611 72%);
+}
+
+.game-stage[data-game="astral"] .astral-feature-button.is-special .feature-button-orb,
+.game-stage[data-game="astral"] .astral-feature-button.is-buy .feature-button-orb,
+.is-special-card .market-card-emblem,
+.is-buy-card .market-card-emblem { color: transparent; text-shadow: none; }
+
+.feature-market-scene {
+  border-color: color-mix(in srgb, var(--game-accent) 62%, white 18%);
+  background:
+    linear-gradient(180deg, rgba(2,5,19,.18), rgba(2,4,16,.32) 42%, rgba(3,4,20,.9) 82%),
+    var(--market-bonus-art) center / cover no-repeat;
+  box-shadow: 0 34px 120px rgba(0,0,0,.82), inset 0 0 65px color-mix(in srgb, var(--game-secondary) 24%, transparent), 0 0 68px color-mix(in srgb, var(--game-accent) 24%, transparent);
+}
+
+.feature-market-card.is-special-card {
+  border-color: color-mix(in srgb, var(--game-accent) 60%, white 12%);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--game-accent) 15%, rgba(3,7,19,.58)), rgba(2,5,15,.94)),
+    var(--market-world-art) center / cover no-repeat;
+}
+
+.feature-market-card.is-buy-card {
+  border-color: color-mix(in srgb, var(--game-secondary) 60%, white 14%);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--game-secondary) 15%, rgba(3,7,19,.54)), rgba(2,5,15,.94)),
+    var(--market-bonus-art) center / cover no-repeat;
+}
+
+.is-special-card .market-card-emblem {
+  background:
+    var(--market-symbol-art) center / 88% 88% no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--game-accent) 50%, #0a1027), #030611 74%);
+}
+
+.is-buy-card .market-card-emblem {
+  background:
+    var(--market-plane-art) center / 92% auto no-repeat,
+    radial-gradient(circle, color-mix(in srgb, var(--game-secondary) 50%, #0a1027), #030611 74%);
+}
+
+.feature-market-heading { text-shadow: 0 4px 18px #000, 0 0 22px color-mix(in srgb, var(--game-accent) 62%, transparent); }
+.feature-market-heading > span { color: color-mix(in srgb, var(--game-accent) 68%, white); }
+
+.factory-builder {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(205px, .46fr) minmax(0, 1fr);
+  gap: clamp(9px, 1.5vh, 16px);
+}
+
+.factory-controls {
+  grid-row: 1;
+  min-height: 0;
+  padding: clamp(7px, 1vw, 12px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-content: stretch;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--builder-accent) 28%, rgba(255,255,255,.09));
+  border-radius: 18px 5px;
+  background: color-mix(in srgb, var(--builder-accent) 4%, rgba(2,6,18,.82));
+}
+
+.factory-choice-intro {
+  min-height: 42px;
+  padding: 4px 5px;
+  display: grid;
+  grid-template-columns: minmax(74px, auto) 1fr minmax(86px, auto);
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+}
+
+.factory-choice-intro > div { min-width: 0; display: grid; gap: 2px; }
+.factory-choice-intro span { color: color-mix(in srgb, var(--builder-accent) 76%, white); font-size: 7px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.factory-choice-intro strong { overflow: hidden; color: white; font: 500 clamp(18px, 2vw, 28px)/1 var(--serif); text-overflow: ellipsis; white-space: nowrap; }
+.factory-choice-intro button {
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid color-mix(in srgb, var(--builder-accent) 38%, rgba(255,255,255,.1));
+  border-radius: 999px;
+  color: #dceaff;
+  background: color-mix(in srgb, var(--builder-accent) 8%, rgba(3,7,19,.82));
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.factory-choice-intro button:disabled { opacity: .3; cursor: default; }
+
+.factory-step-track {
+  min-height: 28px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.factory-step-track i {
+  position: relative;
+  min-width: 0;
+  padding: 4px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 999px;
+  color: #66748a;
+  background: rgba(255,255,255,.025);
+  font-style: normal;
+}
+.factory-step-track span { font-size: 7px; font-weight: 950; }
+.factory-step-track b { overflow: hidden; font-size: 6px; letter-spacing: .08em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.factory-step-track i.is-current { border-color: color-mix(in srgb, var(--builder-accent) 68%, white 12%); color: white; background: color-mix(in srgb, var(--builder-accent) 16%, rgba(3,7,19,.8)); box-shadow: 0 0 14px color-mix(in srgb, var(--builder-accent) 22%, transparent); }
+.factory-step-track i.is-complete { border-color: color-mix(in srgb, var(--builder-accent) 38%, rgba(255,255,255,.08)); color: color-mix(in srgb, var(--builder-accent) 64%, white); }
+.factory-step-track i.is-complete span::before { content: "✓"; }
+.factory-step-track i.is-complete span { font-size: 0; }
+.factory-step-track i.is-complete span::before { font-size: 7px; }
+
+.factory-group {
+  min-height: 0;
+  padding: 5px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 0;
+  background: transparent;
+}
+.factory-group[hidden] { display: none; }
+.factory-group-head { margin-bottom: 5px; }
+.factory-group-head span { display: none; }
+.factory-options { min-height: 0; grid-template-columns: repeat(var(--option-count), minmax(0, 1fr)); gap: clamp(5px, .8vw, 10px); }
+
+.factory-options button {
+  min-width: 0;
+  min-height: 94px;
+  padding: 5px;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  place-items: stretch;
+  justify-content: stretch;
+  align-content: stretch;
+  align-items: stretch;
+  gap: 5px;
+  overflow: hidden;
+  border-radius: 14px 4px;
+}
+
+.factory-options button > .factory-option-art {
+  width: 100%;
+  height: 100%;
+  min-height: 58px;
+  margin: 0;
+  display: block;
+  border: 0;
+  border-radius: 10px 3px;
+  background: var(--choice-art, linear-gradient(135deg, var(--choice-color), #071024)) center / cover no-repeat;
+  box-shadow: inset 0 0 20px rgba(0,0,0,.16);
+}
+.factory-group-companion .factory-options button > .factory-option-art { background-size: contain; }
+.factory-options button > span { margin: 0; color: #d9e5f5; font-size: 8px; line-height: 1.1; text-align: center; }
+
+.factory-options button[data-config-group="animation"] > .factory-option-art { background: repeating-linear-gradient(90deg, transparent 0 9%, rgba(255,255,255,.25) 10% 11%, transparent 12% 22%), linear-gradient(135deg, color-mix(in srgb, var(--choice-color) 68%, #071024), #02040d); }
+.factory-options button[data-config-id="wave"] > .factory-option-art { background: repeating-radial-gradient(ellipse at 50% 120%, transparent 0 12px, color-mix(in srgb, var(--choice-color) 68%, transparent) 13px 15px, transparent 16px 24px), #05091c; }
+.factory-options button[data-config-id="slam"] > .factory-option-art { background: conic-gradient(from 45deg at 50% 50%, transparent, var(--choice-color), transparent 18%, #05091c 20% 80%, var(--choice-color), transparent); }
+.factory-options button[data-config-id="strike"] > .factory-option-art { background: linear-gradient(112deg, transparent 42%, white 43% 45%, var(--choice-color) 46% 50%, transparent 51%), #05091c; }
+.factory-options button[data-config-id="vortex"] > .factory-option-art { background: repeating-radial-gradient(circle, transparent 0 7px, color-mix(in srgb, var(--choice-color) 68%, transparent) 8px 10px, transparent 11px 17px), #05091c; }
+
+.factory-review {
+  min-height: 0;
+  display: grid;
+  place-content: center;
+  gap: 5px;
+  text-align: center;
+}
+.factory-review[hidden] { display: none; }
+.factory-review span { color: color-mix(in srgb, var(--builder-accent) 72%, white); font-size: 7px; font-weight: 950; letter-spacing: .15em; text-transform: uppercase; }
+.factory-review strong { color: white; font: 500 clamp(24px, 3vw, 38px)/1 var(--serif); }
+.factory-review small { color: #91a2ba; font-size: 8px; }
+.factory-actions { grid-template-columns: minmax(0, 1fr); }
+.factory-actions[hidden] { display: none; }
+.factory-actions button { width: min(520px, 100%); min-height: 44px; justify-self: center; }
+
+.factory-preview {
+  grid-row: 2;
+  min-height: 0;
+  border-radius: 22px 7px;
+}
+.factory-preview-companion { right: 1%; width: 46%; height: 112%; }
+.factory-preview-copy { right: 48%; }
+
+@media (max-width: 820px) and (orientation: portrait) {
+  .factory-builder { grid-template-rows: minmax(218px, 42%) minmax(0, 1fr); gap: 7px; }
+  .factory-controls { padding: 5px; gap: 5px; }
+  .factory-choice-intro { min-height: 38px; grid-template-columns: 64px 1fr 76px; gap: 4px; }
+  .factory-choice-intro strong { font-size: clamp(15px, 5vw, 21px); }
+  .factory-choice-intro button { min-height: 31px; padding: 5px 6px; font-size: 5.5px; }
+  .factory-step-track { min-height: 24px; gap: 3px; }
+  .factory-step-track i { padding: 3px 2px; }
+  .factory-step-track b { font-size: 5px; }
+  .factory-options { gap: 3px; }
+  .factory-options button { min-height: 82px; padding: 3px; gap: 3px; }
+  .factory-options button > .factory-option-art { min-height: 48px; }
+  .factory-options button > span { font-size: 6px; white-space: normal; }
+  .factory-preview-companion { width: 58%; height: 110%; }
+  .factory-preview-copy { right: 49%; }
+}
+
+@media (max-width: 560px) and (orientation: portrait) {
+  .lobby-heading h2 { font-size: 22px; }
+  .factory-builder { grid-template-rows: minmax(205px, 39%) minmax(0, 1fr); }
+  .factory-choice-intro span { font-size: 5px; }
+  .factory-choice-intro strong { font-size: 16px; }
+  .factory-step-track b { display: none; }
+  .factory-step-track i { min-height: 20px; }
+  .factory-group { padding: 2px; }
+  .factory-group-head { margin-bottom: 3px; font-size: 6px; }
+  .factory-options button { min-height: 72px; }
+  .factory-options button > .factory-option-art { min-height: 43px; }
+  .factory-options button > span { font-size: 5.5px; }
+  .factory-review strong { font-size: 23px; }
+  .factory-actions button { min-height: 38px; font-size: 7px; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .factory-builder { grid-template-columns: 1fr; grid-template-rows: minmax(126px, 50%) minmax(0, 1fr); gap: 4px; }
+  .factory-controls { padding: 3px 5px; gap: 3px; }
+  .factory-choice-intro { min-height: 27px; grid-template-columns: 58px 1fr 70px; }
+  .factory-choice-intro strong { font-size: 13px; }
+  .factory-choice-intro button { min-height: 24px; padding: 3px 5px; font-size: 5px; }
+  .factory-step-track { min-height: 18px; }
+  .factory-step-track i { min-height: 17px; padding: 2px; }
+  .factory-step-track b { font-size: 4.5px; }
+  .factory-group { padding: 1px 3px; }
+  .factory-group-head { margin: 0 0 2px; font-size: 5px; }
+  .factory-options button { min-height: 58px; padding: 2px; }
+  .factory-options button > .factory-option-art { min-height: 35px; }
+  .factory-options button > span { font-size: 5px; }
+  .factory-review { gap: 2px; }
+  .factory-review strong { font-size: 18px; }
+  .factory-review small { font-size: 5px; }
+  .factory-actions button { min-height: 30px; font-size: 6px; }
+  .factory-preview-companion { width: 43%; }
+}

@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.6.0**
+Version reviewed: **3.7.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -8,14 +8,14 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| First-screen game creator | Implemented | The site opens on a true edge-to-edge, viewport-filling layer chooser with a large live foreground preview of the selected companion. The cabinet stays completely hidden until play starts. |
-| Explicit layer choices | Implemented | World, Character, Mood, Relics, and Motion remain visible as named choices; the removed free-text prompt cannot bypass those categories. |
-| Theme selection | Implemented | Text chips select Fire, Ice, Nature, Void, Storm, or Abyss without presenting the source images as a thumbnail catalog. |
+| First-screen game creator | Implemented | The site opens on a true edge-to-edge, viewport-filling guided creator. One horizontal choice row appears at a time and a large live foreground preview stays below. The cabinet remains hidden until play starts. |
+| Explicit layer choices | Implemented | World, Character, Mood, Relics, and Motion are five ordered steps. Selecting an option automatically opens the next step; Back revisits the previous step. |
+| Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
 | One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one transparent standalone cutout is displayed. |
 | Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. |
 | Symbol selection | Implemented | Six generated seven-symbol families with distinct transparent Scatter icons and names. |
 | Motion selection | Implemented | Cascade, Wave, Impact, Strike, or Vortex changes spin presentation timing/animation only. |
-| Surprise me | Implemented | Randomly chooses all five visual layers, then updates the preview. |
+| Surprise me | Implemented | Randomly chooses all five visual layers, updates the preview, and advances directly to review. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
 | Combination count | Implemented | 6 × 6 × 4 × 6 × 5 = 4,320 configurations. |
 
@@ -40,8 +40,8 @@ This file is the team-review checklist for the current free-play build. Runtime 
 |---|---|---|
 | Scatter tracker | Implemented | Every Scatter anywhere on the board advances persistent 18-step progress. Overflow carries into the next tracker. The old circular counter and dot field are removed. |
 | Dynamic Scatter art | Implemented | Each selected symbol family supplies a dedicated transparent PNG used both in the reels and in the compact feature tracker. |
-| Special Bet | Implemented | Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters. Costs are mathematically calibrated to preserve 99.00% theoretical RTP. |
-| Buy Bonus | Implemented | 25×, 50×, or 100× demo-credit purchases with separately calibrated prize tables at 99.00% theoretical RTP. |
+| Special Bet | Implemented | The selected world image and Scatter art theme both the cabinet control and market panel. Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters remain calibrated to 99.00% theoretical RTP. |
+| Buy Bonus | Implemented | The selected launch scene and plane art theme both the cabinet control and market panel. 25×, 50×, or 100× demo-credit purchases use separately calibrated 99.00% prize tables. |
 | Bonus demo | Implemented | Top-of-machine no-wager preview. It does not spend credits, change progress, or create a fairness receipt. |
 | World-connected opening | Implemented | Fire, Ice, Nature, Void, Storm, and Abyss each use a separately generated launch-gate loading scene; the selected companion remains layered independently in front. The opening runs once. |
 | Sky Runner flights | Implemented | Each world uses its own transparent plane livery. The plane follows a linear, constant-speed route to the sealed destination, with duration determined by route distance and no last-frame acceleration, scale flash, or position jump. |
@@ -57,7 +57,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - 40 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, six transparent Scatter cutouts, six bonus launch scenes, and six transparent themed planes.
 - Backgrounds keep the central reel area low-detail; companion PNGs use true alpha transparency; symbol sheets use a fixed 4×2 atlas with the last cell empty.
 - One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.
-- The control deck, feature buttons, and bonus telemetry inherit the selected theme's accent and secondary colors.
+- The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
 - Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.

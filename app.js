@@ -32,6 +32,13 @@ const SPIN_SPEED_STORAGE_KEY = "aislots-spin-speed";
 const AUDIO_PREFERENCE_STORAGE_KEY = "aislots-audio-preference";
 const VISUAL_CONFIG_STORAGE_KEY = "aislots-visual-config";
 const ASTRAL_FLIGHT_PROGRESS_PER_MS = 0.00038;
+const FACTORY_STEPS = Object.freeze([
+  Object.freeze({ key: "theme", label: "World", prompt: "Choose your world" }),
+  Object.freeze({ key: "companion", label: "Character", prompt: "Choose your character" }),
+  Object.freeze({ key: "mood", label: "Mood", prompt: "Choose the atmosphere" }),
+  Object.freeze({ key: "symbols", label: "Relics", prompt: "Choose your symbols" }),
+  Object.freeze({ key: "animation", label: "Motion", prompt: "Choose reel motion" })
+]);
 const SPIN_SPEEDS = Object.freeze([
   Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
   Object.freeze({ id: "fast", name: "Fast", label: "3×", resultDisplayMs: 780, settleScale: 0.4, shuffleScale: 0.58, autoplayGapMs: 140 })
@@ -165,6 +172,7 @@ const state = {
   soundPreference: null,
   speedIndex: 0,
   specialBetBoost: 0,
+  lobbyStep: 0,
   visualConfig: { ...DEFAULT_VISUAL_CONFIG },
   lastOutcome: null,
   lastReceipt: null
@@ -549,17 +557,41 @@ function buildRules() {
 }
 
 function buildLobby() {
-  const group = (label, key, items) => `
-    <section class="factory-group factory-group-${key}" aria-labelledby="factory-${key}-label">
+  const group = (label, key, items, stepIndex) => `
+    <section class="factory-group factory-group-${key}" data-factory-step="${stepIndex}" aria-labelledby="factory-${key}-label"${stepIndex === 0 ? "" : " hidden"}>
       <div class="factory-group-head"><strong id="factory-${key}-label">${label}</strong><span>${items.length}</span></div>
       <div class="factory-options" style="--option-count:${items.length}" role="group" aria-label="Choose ${label.toLowerCase()}">
-        ${items.map((item) => `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}"><i aria-hidden="true"></i><span>${item.name}</span></button>`).join("")}
+        ${items.map((item) => {
+          const art = item.asset ? ` style="--choice-art:url('${item.asset}')"` : "";
+          return `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}"><i class="factory-option-art"${art} aria-hidden="true"></i><span>${item.name}</span></button>`;
+        }).join("")}
       </div>
     </section>`;
 
   ui.lobbyGames.className = "factory-builder";
   ui.lobbyGames.setAttribute("aria-label", "Choose slot world layers");
   ui.lobbyGames.innerHTML = `
+    <div class="factory-controls">
+      <div class="factory-choice-intro">
+        <button type="button" data-factory-back aria-label="Return to the previous choice" disabled>← Back</button>
+        <div><span id="factoryStepCount">Step 1 of ${FACTORY_STEPS.length}</span><strong id="factoryStepPrompt">${FACTORY_STEPS[0].prompt}</strong></div>
+        <button type="button" data-randomize-world>Surprise me</button>
+      </div>
+      <div class="factory-step-track" aria-label="World creation progress">
+        ${FACTORY_STEPS.map((step, index) => `<i data-factory-progress="${index}"><span>${index + 1}</span><b>${step.label}</b></i>`).join("")}
+      </div>
+      ${group("World", "theme", THEMES, 0)}
+      ${group("Character", "companion", COMPANIONS, 1)}
+      ${group("Mood", "mood", MOODS, 2)}
+      ${group("Relics", "symbols", SYMBOL_SETS, 3)}
+      ${group("Motion", "animation", ANIMATION_STYLES, 4)}
+      <section class="factory-review" id="factoryReview" hidden>
+        <span>World complete</span><strong id="factoryReviewName"></strong><small>Review the preview, then enter your game.</small>
+      </section>
+      <div class="factory-actions" hidden>
+        <button class="primary-button" type="button" data-build-play>Create &amp; play</button>
+      </div>
+    </div>
     <section class="factory-preview" id="factoryPreview" aria-label="Selected world preview">
       <div class="factory-preview-world" id="factoryPreviewWorld"></div>
       <div class="factory-preview-mood" id="factoryPreviewMood"></div>
@@ -570,20 +602,42 @@ function buildLobby() {
         <small id="factoryPreviewMeta"></small>
       </div>
       <div class="factory-preview-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-    </section>
-    <div class="factory-controls">
-      <div class="factory-choice-intro"><span>Choose every layer</span><strong>Build your world</strong></div>
-      ${group("World", "theme", THEMES)}
-      ${group("Character", "companion", COMPANIONS)}
-      ${group("Mood", "mood", MOODS)}
-      ${group("Relics", "symbols", SYMBOL_SETS)}
-      ${group("Motion", "animation", ANIMATION_STYLES)}
-      <div class="factory-actions">
-        <button class="secondary-button" type="button" data-randomize-world>Surprise me</button>
-        <button class="primary-button" type="button" data-build-play>Create &amp; play</button>
-      </div>
-    </div>`;
+    </section>`;
   updateLobbyPreview();
+  updateLobbyStep();
+}
+
+function updateLobbyStep() {
+  const stepIndex = Math.max(0, Math.min(FACTORY_STEPS.length, state.lobbyStep));
+  const isReview = stepIndex === FACTORY_STEPS.length;
+  const step = FACTORY_STEPS[Math.min(stepIndex, FACTORY_STEPS.length - 1)];
+  state.lobbyStep = stepIndex;
+  ui.lobbyGames.dataset.factoryStep = isReview ? "review" : step.key;
+  ui.lobbyGames.querySelectorAll("[data-factory-step]").forEach((group) => {
+    group.hidden = Number(group.dataset.factoryStep) !== stepIndex;
+  });
+  ui.lobbyGames.querySelectorAll("[data-factory-progress]").forEach((marker) => {
+    const markerIndex = Number(marker.dataset.factoryProgress);
+    marker.classList.toggle("is-current", markerIndex === stepIndex);
+    marker.classList.toggle("is-complete", markerIndex < stepIndex || isReview);
+  });
+  const counter = $("factoryStepCount");
+  const prompt = $("factoryStepPrompt");
+  const review = $("factoryReview");
+  const actions = ui.lobbyGames.querySelector(".factory-actions");
+  const back = ui.lobbyGames.querySelector("[data-factory-back]");
+  if (counter) counter.textContent = isReview ? "Ready to play" : `Step ${stepIndex + 1} of ${FACTORY_STEPS.length}`;
+  if (prompt) prompt.textContent = isReview ? "Your world is ready" : step.prompt;
+  if (review) review.hidden = !isReview;
+  if (actions) actions.hidden = !isReview;
+  if (back) back.disabled = stepIndex === 0;
+  ui.lobbyGames.classList.toggle("is-reviewing", isReview);
+  window.requestAnimationFrame(() => {
+    const focusTarget = isReview
+      ? ui.lobbyGames.querySelector("[data-build-play]")
+      : ui.lobbyGames.querySelector(`[data-factory-step="${stepIndex}"] [data-config-group]`);
+    focusTarget?.focus({ preventScroll: true });
+  });
 }
 
 function updateLobbyPreview() {
@@ -599,6 +653,8 @@ function updateLobbyPreview() {
   $("factoryPreviewCompanion").alt = `${visuals.companion.name} companion`;
   $("factoryPreviewName").textContent = visualConfigLabel(state.visualConfig);
   $("factoryPreviewMeta").textContent = `${visuals.symbols.name} · ${visuals.animation.name} motion`;
+  const reviewName = $("factoryReviewName");
+  if (reviewName) reviewName.textContent = visualConfigLabel(state.visualConfig);
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
     const selected = state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
     button.classList.toggle("is-selected", selected);
@@ -625,6 +681,8 @@ function randomizeVisualConfig() {
     animation: pick(ANIMATION_STYLES)
   };
   updateLobbyPreview();
+  state.lobbyStep = FACTORY_STEPS.length;
+  updateLobbyStep();
 }
 
 function saveVisualConfig() {
@@ -653,8 +711,9 @@ function openLobby() {
   ui.lobbyOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;
   document.body.classList.add("is-lobby-open");
+  state.lobbyStep = 0;
   updateLobbyPreview();
-  window.requestAnimationFrame(() => ui.lobbyGames.querySelector("[data-config-group]")?.focus());
+  updateLobbyStep();
 }
 
 function chooseLobbyGame() {
@@ -724,6 +783,19 @@ function applyGameTheme({ resetGrid = false } = {}) {
   gameStage.style.setProperty("--mood-overlay", `url("${visuals.mood.asset}")`);
   gameStage.style.setProperty("--game-accent", game.accent);
   gameStage.style.setProperty("--game-secondary", game.secondary);
+  gameStage.style.setProperty("--feature-world-art", `url("${game.background}")`);
+  gameStage.style.setProperty("--feature-bonus-art", `url("${game.bonusLoadingArt}")`);
+  gameStage.style.setProperty("--feature-symbol-art", `url("${game.scatterAsset}")`);
+  gameStage.style.setProperty("--feature-plane-art", `url("${game.planeAsset}")`);
+  document.documentElement.style.setProperty("--topbar-art", `url("${game.background}")`);
+  document.documentElement.style.setProperty("--topbar-accent", game.accent);
+  document.documentElement.style.setProperty("--topbar-secondary", game.secondary);
+  ui.featureMarketOverlay.style.setProperty("--market-world-art", `url("${game.background}")`);
+  ui.featureMarketOverlay.style.setProperty("--market-bonus-art", `url("${game.bonusLoadingArt}")`);
+  ui.featureMarketOverlay.style.setProperty("--market-symbol-art", `url("${game.scatterAsset}")`);
+  ui.featureMarketOverlay.style.setProperty("--market-plane-art", `url("${game.planeAsset}")`);
+  ui.featureMarketOverlay.style.setProperty("--game-accent", game.accent);
+  ui.featureMarketOverlay.style.setProperty("--game-secondary", game.secondary);
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--game-secondary", game.secondary);
@@ -1926,6 +1998,17 @@ function bindEvents() {
     if (option) {
       setVisualConfigChoice(option.dataset.configGroup, option.dataset.configId);
       playTone(520 + [...option.parentElement.children].indexOf(option) * 55, .08, "triangle");
+      const choiceStep = FACTORY_STEPS.findIndex((step) => step.key === option.dataset.configGroup);
+      if (choiceStep >= 0) {
+        state.lobbyStep = Math.min(FACTORY_STEPS.length, choiceStep + 1);
+        updateLobbyStep();
+      }
+      return;
+    }
+    if (event.target.closest("[data-factory-back]")) {
+      state.lobbyStep = Math.max(0, state.lobbyStep - 1);
+      updateLobbyStep();
+      playTone(420, .07, "triangle");
       return;
     }
     if (event.target.closest("[data-randomize-world]")) {

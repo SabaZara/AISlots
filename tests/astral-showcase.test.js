@@ -27,7 +27,10 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /factory-group-/);
   assert.match(app, /data-randomize-world/);
   assert.match(app, /factory-choice-intro/);
-  assert.match(app, /Choose every layer/);
+  assert.match(app, /FACTORY_STEPS/);
+  assert.match(app, /function updateLobbyStep\(\)/);
+  assert.match(app, /data-factory-step/);
+  assert.match(app, /factory-option-art/);
   assert.doesNotMatch(app, /data-world-prompt-form|function applyVisualPrompt|Describe your world/);
   assert.match(app, /resolveVisualConfig/);
   assert.match(app, /--game-characters/);
@@ -38,9 +41,14 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /transparentCompanionBreath/);
   assert.match(css, /\.factory-builder/);
   assert.match(css, /\.factory-preview-companion/);
+  assert.match(css, /\.factory-step-track/);
+  assert.match(css, /--feature-world-art/);
+  assert.match(css, /--market-bonus-art/);
+  assert.match(css, /--topbar-art/);
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
   assert.match(html, /4,320 combinations/);
+  assert.match(html, /app\.js\?v=3\.7\.0/);
 });
 
 test("runtime contains no payline, near-miss, or reality-check UI", async () => {
@@ -156,7 +164,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.6.0");
+  assert.equal(JSON.parse(packageJson).version, "3.7.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

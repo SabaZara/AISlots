@@ -1,6 +1,6 @@
 # AISlots World Forge
 
-AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player explicitly chooses a background world, one companion, a mood, a symbol family, and a reel-motion style from text theme chips.
+AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player chooses a background world, one companion, a mood, a symbol family, and a reel-motion style in a guided five-step creator.
 
 `6 themes × 6 companions × 4 moods × 6 symbol sets × 5 motion styles = 4,320 configurations`
 
@@ -16,7 +16,7 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 | Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
 | Motion | Cascade, Wave, Impact, Strike, Vortex |
 
-Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every family also has its own transparent Scatter cutout. The opening creator fills the entire viewport, uses theme names instead of image thumbnails, gives the selected companion a large live preview, and completely hides the cabinet until the player chooses to create the world. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every family also has its own transparent Scatter cutout. The opening creator fills the entire viewport, presents one horizontal image-choice row at a time, automatically advances to the next layer, keeps a large live preview below, and completely hides the cabinet until the player creates the world. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
 ## Play features
 
@@ -25,8 +25,8 @@ Only one companion is displayed in a game. Each companion is a transparent RGBA 
 - every positive return is shown, including returns smaller than the wager;
 - finite 10, 25, or 50-spin autoplay with an always-accessible Stop control;
 - persistent 18-Scatter feature progress shown by a compact themed Scatter-art tracker with no circular counter or dot field;
-- graphic Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
-- 25×, 50×, and 100× demo-credit Buy Bonus choices calibrated to the same 99.00% return;
+- theme-art Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
+- theme-art 25×, 50×, and 100× demo-credit Buy Bonus choices calibrated to the same 99.00% return;
 - three themed Sky Runner multiplier flights per bonus; every world has a separately generated launch scene and matching transparent plane livery, with layered parallax depth and one constant-speed path to the pre-sealed result without a final jump;
 - visible distance, altitude, 10,000 m ceiling, multiplier ladder, running multiplier total, and round progress;
 - animated win tiers, contained winner pulses, Scatter-art-only breakout, particles, cabinet reactions, and large-win cinematics;
@@ -60,7 +60,7 @@ The built-in verifier recomputes the commitment and outcome. Changing presentati
 
 ## Responsive layout
 
-Gameplay and the World Forge creator are viewport-locked with no document scrolling on desktop, phone, or iPad. It includes dynamic-viewport units, safe-area padding, dedicated portrait controls, a horizontal phone cabinet after rotation, and tablet-specific sizing. On laptops the companion receives a larger dedicated stage, while the control deck, feature buttons, and bonus HUD inherit the selected world colors. The 6×5 board, Scatter tracker, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Regular winner art stays contained; only the transparent Scatter artwork can break out across neighboring cells, while its tile remains still.
+Gameplay and the World Forge creator are viewport-locked with no document scrolling on desktop, phone, or iPad. It includes dynamic-viewport units, safe-area padding, dedicated portrait controls, a horizontal phone cabinet after rotation, and tablet-specific sizing. On laptops the companion receives a larger dedicated stage, while the navigation bar, control deck, feature buttons, feature market, and bonus HUD inherit the selected world artwork and colors. The 6×5 board, Scatter tracker, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Regular winner art stays contained; only the transparent Scatter artwork can break out across neighboring cells, while its tile remains still.
 
 ## Run locally
 
