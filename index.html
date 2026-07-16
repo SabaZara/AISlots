@@ -12,7 +12,7 @@
     <link rel="preload" href="./assets/factory/mood-epic-v1.jpg" as="image" />
     <link rel="preload" href="./assets/astral-multiplier-gate-v1.png" as="image" />
     <link rel="preload" href="./assets/sky-runner-plane-cutout-v1.png" as="image" />
-    <link rel="stylesheet" href="./styles.css?v=3.2.0" />
+    <link rel="stylesheet" href="./styles.css?v=3.3.0" />
     <title>AISlots World Forge · 4,320 combinations</title>
   </head>
   <body>
@@ -330,11 +330,29 @@
             <div class="astral-flight-world" id="astralFlightWorld" aria-label="Themed aviation multiplier flight">
               <div class="astral-flight-clouds" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
               <div class="astral-flight-path" aria-hidden="true"><i></i><i></i><i></i></div>
+              <div class="astral-flight-telemetry" aria-label="Live flight telemetry">
+                <div class="astral-telemetry-card is-distance">
+                  <span>Distance</span><strong id="astralDistanceValue">0 km</strong><small>of 120 km</small>
+                  <i aria-hidden="true"><b id="astralDistanceBar"></b></i>
+                </div>
+                <div class="astral-telemetry-card is-altitude">
+                  <span>Altitude</span><strong id="astralAltitudeValue">0 m</strong><small>max 10,000 m</small>
+                  <i aria-hidden="true"><b id="astralAltitudeBar"></b></i>
+                </div>
+              </div>
+              <div class="astral-multiplier-ladder" id="astralMultiplierLadder" aria-label="Multiplier flight levels">
+                <span data-multiplier-step="10">10×</span>
+                <span data-multiplier-step="5">5×</span>
+                <span data-multiplier-step="2">2×</span>
+                <span data-multiplier-step="1">1×</span>
+                <span data-multiplier-step="0.5">0.5×</span>
+                <span data-multiplier-step="0.25">0.25×</span>
+              </div>
               <div class="astral-flight-plane" id="astralFlightPlane" aria-hidden="true">
                 <span class="astral-plane-exhaust"></span>
                 <img src="./assets/sky-runner-plane-cutout-v1.png" alt="">
               </div>
-              <div class="astral-flight-altitude" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="astral-flight-altitude" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             </div>
             <div class="astral-flight-award" aria-live="polite">
               <small>Flight multiplier</small>
@@ -389,14 +407,14 @@
     <div class="lobby-overlay" id="lobbyOverlay" aria-hidden="false">
       <section class="lobby-shell" role="dialog" aria-modal="true" aria-labelledby="lobbyTitle">
         <div class="lobby-heading">
-          <div><span class="eyebrow">18+ · Free play</span><h2 id="lobbyTitle">Forge your world</h2></div>
-          <p>6 themes × 6 companions × 4 moods × 6 symbol sets × 5 motions</p>
+          <div><span class="eyebrow">18+ · Free play</span><h2 id="lobbyTitle">Create your slot world</h2></div>
+          <p>Describe a vibe or tap the themes that fit.</p>
         </div>
         <div class="lobby-games" id="lobbyGames" aria-label="Build a slot world"></div>
         <div class="lobby-foot"><span>One math model · exact 99.00% theoretical RTP</span><span>18+ · Free play · no cash value</span></div>
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=3.2.0"></script>
+    <script type="module" src="./app.js?v=3.3.0"></script>
   </body>
 </html>

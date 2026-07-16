@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **3.2.0**
+Version reviewed: **3.3.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -8,8 +8,9 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| First-screen game builder | Implemented | The site opens on World Forge before gameplay, with a larger foreground preview of the selected companion. |
-| Theme selection | Implemented | Fire, Ice, Nature, Void, Storm, or Abyss changes the 16:9 environment. |
+| First-screen game creator | Implemented | The site opens on a prompt-first, Genmoji-style creator with a large live foreground preview of the selected companion. |
+| Prompt creation | Implemented | Short descriptions such as `dark ice phoenix` map matching words to published layers and update the live world immediately. |
+| Theme selection | Implemented | Text chips select Fire, Ice, Nature, Void, Storm, or Abyss without presenting the source images as a thumbnail catalog. |
 | One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one transparent standalone cutout is displayed. |
 | Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. |
 | Symbol selection | Implemented | Six generated seven-symbol families with distinct collector icons and names. |
@@ -42,17 +43,20 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Special Bet | Implemented | Standard, guaranteed +1 collector, or guaranteed +2 collectors. Costs are mathematically calibrated to preserve 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | 25×, 50×, or 100× demo-credit purchases with separately calibrated prize tables at 99.00% theoretical RTP. |
 | Bonus demo | Implemented | Top-of-machine no-wager preview. It does not spend credits, change progress, or create a fairness receipt. |
-| Sky Runner flights | Implemented | Three aviation rounds use an original red-and-gold plane. The plane takes off, climbs continuously, and eases to the sealed multiplier when the player presses Land. |
+| World-connected opening | Implemented | The selected background and companion introduce the bonus; the plane is reserved for the playable flight instead of appearing as the loading image. |
+| Sky Runner flights | Implemented | Three aviation rounds use an original compact red-and-gold plane. The plane takes off, climbs continuously, and eases to the sealed multiplier when the player presses Land. |
 | Land integrity | Implemented | Land affects reveal timing only. It cannot reroll, improve, or worsen the precomputed result. Flight duration and destination reflect the sealed result. |
 | Theme matching | Implemented | The selected environment artwork, accent, and secondary color also style the bonus sky, trail, frame, route, and multiplier locks. |
-| Round clarity | Implemented | Current flight, live X, landed multipliers, total X, flight progress, and final credit award stay visible. |
+| Flight telemetry | Implemented | Distance in kilometres, altitude in metres, a 10,000 m ceiling, route bars, and a 0.25×–10× multiplier ladder update continuously. |
+| Round clarity | Implemented | Current flight, live X, labelled landed multipliers, total X, flight progress, and final credit award stay visible. |
 | Preview replay | Implemented | The no-wager Bonus Demo ends with Play Again and Back to game controls. |
 
 ## Visual and sound systems
 
 - 23 active project-local generated raster assets: six backgrounds, six transparent companion cutouts, four mood overlays, six symbol sheets, and one transparent red Sky Runner plane.
 - Backgrounds keep the central reel area low-detail; companion PNGs use true alpha transparency; symbol sheets use a fixed 4×2 atlas with the last cell empty.
-- One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle.
+- One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.
+- The control deck, feature buttons, and bonus telemetry inherit the selected theme's accent and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
 - Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.

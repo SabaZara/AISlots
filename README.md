@@ -1,6 +1,6 @@
 # AISlots World Forge
 
-AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player combines a generated background, one companion, a mood, a symbol family, and a reel-motion style.
+AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player describes a world in a Genmoji-style prompt composer or taps text theme chips for a background, one companion, a mood, a symbol family, and a reel-motion style.
 
 `6 themes × 6 companions × 4 moods × 6 symbol sets × 5 motion styles = 4,320 configurations`
 
@@ -16,7 +16,7 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 | Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
 | Motion | Cascade, Wave, Impact, Strike, Vortex |
 
-Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol sheet remain independent layers. The opening builder gives the selected companion a larger dedicated preview. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol sheet remain independent layers. The opening creator uses theme names instead of image thumbnails and gives the selected companion a large live preview. Prompts such as `dark ice phoenix` immediately choose matching layers. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
 ## Play features
 
@@ -27,8 +27,8 @@ Only one companion is displayed in a game. Each companion is a transparent RGBA 
 - persistent 18-symbol Relic Vault meter drawn as a transparent floating gauge with no bitmap background;
 - graphic Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
 - 25×, 50×, and 100× demo-credit Buy Bonus choices calibrated to the same 99.00% return;
-- three themed Sky Runner multiplier flights per bonus; Land changes reveal timing only, then the red-and-gold plane follows a continuous path to its pre-sealed result;
-- visible running multiplier total and round progress;
+- three themed Sky Runner multiplier flights per bonus; the chosen world and companion introduce the bonus before the smaller red-and-gold plane follows a continuous path to its pre-sealed result;
+- visible distance, altitude, 10,000 m ceiling, multiplier ladder, running multiplier total, and round progress;
 - animated win tiers, contained winner pulses, collector-only symbol breakout, particles, cabinet reactions, and large-win cinematics;
 - four distinct procedural music/event-sound profiles, with a local high-energy sample layer for Epic;
 - persistent demo balance, bonus progress, visual configuration, audio preference, and spin-speed preference;
@@ -60,7 +60,7 @@ The built-in verifier recomputes the commitment and outcome. Changing presentati
 
 ## Responsive layout
 
-Gameplay is viewport-locked with no document scrolling on desktop, phone, or iPad. It includes dynamic-viewport units, safe-area padding, dedicated portrait controls, a horizontal phone cabinet after rotation, and tablet-specific sizing. The 6×5 board, transparent meter, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Regular winners stay contained in their cells; only the special collector symbol can break out across neighboring cells.
+Gameplay is viewport-locked with no document scrolling on desktop, phone, or iPad. It includes dynamic-viewport units, safe-area padding, dedicated portrait controls, a horizontal phone cabinet after rotation, and tablet-specific sizing. On laptops the companion receives a larger dedicated stage, while the control deck, feature buttons, and bonus HUD inherit the selected world colors. The 6×5 board, transparent meter, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. Regular winners stay contained in their cells; only the special collector symbol can break out across neighboring cells.
 
 ## Run locally
 

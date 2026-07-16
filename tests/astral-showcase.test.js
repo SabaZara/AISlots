@@ -13,7 +13,8 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
 
   for (const id of [
     "astralShowcaseButton", "cinematicOverlay", "astralBonusStage", "astralFlightWorld",
-    "astralFlightPlane", "bonusExit",
+    "astralFlightPlane", "astralDistanceValue", "astralDistanceBar", "astralAltitudeValue",
+    "astralAltitudeBar", "astralMultiplierLadder", "bonusExit",
     "specialBetButton", "buyFeatureButton", "featureMarketOverlay", "autoplayOverlay",
     "reels", "spinButton", "fairnessButton", "companionStage", "companionPortrait"
   ]) {
@@ -24,6 +25,9 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /function buildLobby\(\)/);
   assert.match(app, /factory-group-/);
   assert.match(app, /data-randomize-world/);
+  assert.match(app, /data-world-prompt-form/);
+  assert.match(app, /function applyVisualPrompt/);
+  assert.match(app, /Describe your world/);
   assert.match(app, /resolveVisualConfig/);
   assert.match(app, /--game-characters/);
   assert.match(app, /--symbol-sheet/);
@@ -33,6 +37,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /transparentCompanionBreath/);
   assert.match(css, /\.factory-builder/);
   assert.match(css, /\.factory-preview-companion/);
+  assert.match(css, /\.factory-prompt-form/);
   assert.match(html, /4,320 combinations/);
 });
 
@@ -77,12 +82,17 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.match(app, /activeRound = beginAstralFlight/);
   assert.match(app, /ui\.bonusAction\.textContent = "LAND NOW"/);
   assert.match(app, /ui\.bonusOverlay\.dataset\.mode = "astral-aviator"/);
+  assert.match(app, /ui\.cinematicOverlay\.dataset\.mode = "world-awakening"/);
+  assert.match(app, /function updateAstralFlightHud/);
+  assert.match(app, /10_000|10000/);
   assert.match(app, /ui\.bonusAction\.textContent = preview \? "Play again"/);
   assert.match(model, /Land controls reveal timing only/);
   assert.match(html, /Themed aviation multiplier flight/);
   assert.match(html, /sky-runner-plane-cutout-v1\.png/);
   assert.match(css, /var\(--bonus-bg\) center \/ cover no-repeat/);
   assert.match(css, /\.astral-flight-plane img[\s\S]*?object-fit: contain/);
+  assert.match(css, /\.astral-flight-telemetry/);
+  assert.match(css, /\.astral-multiplier-ladder/);
 });
 
 test("normal wins stay contained while only collector art breaks out", async () => {
@@ -131,7 +141,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "3.2.0");
+  assert.equal(JSON.parse(packageJson).version, "3.3.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

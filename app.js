@@ -133,6 +133,11 @@ const ui = {
   astralTotalMultiplier: $("astralTotalMultiplier"),
   astralFlightWorld: $("astralFlightWorld"),
   astralFlightPlane: $("astralFlightPlane"),
+  astralDistanceValue: $("astralDistanceValue"),
+  astralDistanceBar: $("astralDistanceBar"),
+  astralAltitudeValue: $("astralAltitudeValue"),
+  astralAltitudeBar: $("astralAltitudeBar"),
+  astralMultiplierLadder: $("astralMultiplierLadder"),
   astralChoiceProgress: $("astralChoiceProgress"),
   astralChoiceBar: $("astralChoiceBar"),
   bonusExit: $("bonusExit")
@@ -538,11 +543,11 @@ function buildRules() {
 }
 
 function buildLobby() {
-  const group = (label, key, items, { art = false } = {}) => `
+  const group = (label, key, items) => `
     <section class="factory-group factory-group-${key}" aria-labelledby="factory-${key}-label">
       <div class="factory-group-head"><strong id="factory-${key}-label">${label}</strong><span>${items.length}</span></div>
       <div class="factory-options" style="--option-count:${items.length}" role="group" aria-label="Choose ${label.toLowerCase()}">
-        ${items.map((item) => `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}">${art ? `<img src="${item.asset}" alt="" loading="lazy">` : `<i aria-hidden="true"></i>`}<span>${item.name}</span></button>`).join("")}
+        ${items.map((item) => `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}"><i aria-hidden="true"></i><span>${item.name}</span></button>`).join("")}
       </div>
     </section>`;
 
@@ -554,20 +559,27 @@ function buildLobby() {
       <div class="factory-preview-mood" id="factoryPreviewMood"></div>
       <img class="factory-preview-companion" id="factoryPreviewCompanion" alt="">
       <div class="factory-preview-copy">
-        <span>${VISUAL_COMBINATION_COUNT.toLocaleString()} combinations · 99% RTP</span>
+        <span>Live world · ${VISUAL_COMBINATION_COUNT.toLocaleString()} combinations</span>
         <strong id="factoryPreviewName"></strong>
         <small id="factoryPreviewMeta"></small>
       </div>
+      <div class="factory-preview-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </section>
     <div class="factory-controls">
-      ${group("Theme", "theme", THEMES, { art: true })}
-      ${group("Companion", "companion", COMPANIONS, { art: true })}
+      <form class="factory-prompt-form" data-world-prompt-form>
+        <span class="factory-prompt-orb" aria-hidden="true">✦</span>
+        <label for="factoryPromptInput"><small>Describe your world</small><input id="factoryPromptInput" name="world-prompt" type="text" autocomplete="off" placeholder="dark ice phoenix" maxlength="80"></label>
+        <button type="submit">Make</button>
+      </form>
+      <div class="factory-prompt-result"><span>Creating</span><strong id="factoryPromptSummary"></strong><small id="factoryPromptHint">Type a few words or tap the themes below.</small></div>
+      ${group("World", "theme", THEMES)}
+      ${group("Character", "companion", COMPANIONS)}
       ${group("Mood", "mood", MOODS)}
-      ${group("Symbols", "symbols", SYMBOL_SETS, { art: true })}
-      ${group("Animation", "animation", ANIMATION_STYLES)}
+      ${group("Relics", "symbols", SYMBOL_SETS)}
+      ${group("Motion", "animation", ANIMATION_STYLES)}
       <div class="factory-actions">
         <button class="secondary-button" type="button" data-randomize-world>Surprise me</button>
-        <button class="primary-button" type="button" data-build-play>Play this world</button>
+        <button class="primary-button" type="button" data-build-play>Create &amp; play</button>
       </div>
     </div>`;
   updateLobbyPreview();
@@ -577,6 +589,8 @@ function updateLobbyPreview() {
   const visuals = currentVisuals();
   const preview = $("factoryPreview");
   if (!preview) return;
+  ui.lobbyGames.style.setProperty("--builder-accent", visuals.theme.accent);
+  ui.lobbyGames.style.setProperty("--builder-secondary", visuals.theme.secondary);
   preview.dataset.mood = visuals.mood.id;
   $("factoryPreviewWorld").style.backgroundImage = `url("${visuals.theme.asset}")`;
   $("factoryPreviewMood").style.backgroundImage = `url("${visuals.mood.asset}")`;
@@ -584,13 +598,14 @@ function updateLobbyPreview() {
   $("factoryPreviewCompanion").alt = `${visuals.companion.name} companion`;
   $("factoryPreviewName").textContent = visualConfigLabel(state.visualConfig);
   $("factoryPreviewMeta").textContent = `${visuals.symbols.name} · ${visuals.animation.name} motion`;
+  $("factoryPromptSummary").textContent = `${visuals.mood.name} ${visuals.theme.name} world with ${visuals.companion.name}`;
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
     const selected = state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
     button.classList.toggle("is-selected", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
   const play = ui.lobbyGames.querySelector("[data-build-play]");
-  if (play) play.textContent = `Play ${visuals.theme.name} ${visuals.companion.name}`;
+  if (play) play.textContent = `Create ${visuals.theme.name} ${visuals.companion.name}`;
 }
 
 function setVisualConfigChoice(group, id) {
@@ -610,6 +625,68 @@ function randomizeVisualConfig() {
     animation: pick(ANIMATION_STYLES)
   };
   updateLobbyPreview();
+}
+
+const VISUAL_PROMPT_ALIASES = Object.freeze({
+  theme: Object.freeze({
+    fire: ["fire", "lava", "volcano", "inferno"],
+    ice: ["ice", "frozen", "frost", "snow"],
+    nature: ["nature", "jungle", "forest", "green"],
+    void: ["void", "space", "cosmic", "galaxy"],
+    storm: ["storm", "lightning", "thunder", "electric"],
+    abyss: ["abyss", "ocean", "underwater", "deep sea"]
+  }),
+  companion: Object.freeze({
+    dragon: ["dragon"],
+    valkyrie: ["valkyrie", "warrior", "angel"],
+    kraken: ["kraken", "octopus", "tentacle"],
+    phoenix: ["phoenix", "fire bird", "bird"],
+    direwolf: ["direwolf", "wolf"],
+    titan: ["titan", "giant", "golem"]
+  }),
+  mood: Object.freeze({
+    epic: ["epic", "heroic", "triumphant"],
+    mystic: ["mystic", "magical", "ethereal"],
+    playful: ["playful", "bright", "fun"],
+    dark: ["dark", "ominous", "scary"]
+  }),
+  symbols: Object.freeze({
+    inferno: ["inferno relics", "fire relics"],
+    frost: ["frostbound", "frost relics", "ice relics"],
+    verdant: ["verdant", "nature relics", "jungle relics"],
+    cosmic: ["cosmic artifacts", "space relics"],
+    tempest: ["tempest", "storm relics", "lightning relics"],
+    abyssal: ["abyssal", "ocean relics", "sea relics"]
+  }),
+  animation: Object.freeze({
+    cascade: ["cascade", "falling"],
+    wave: ["wave", "flowing"],
+    slam: ["impact", "slam"],
+    strike: ["strike", "sharp"],
+    vortex: ["vortex", "spiral", "spinning"]
+  })
+});
+
+function applyVisualPrompt(value) {
+  const prompt = String(value || "").trim().toLowerCase();
+  const hint = $("factoryPromptHint");
+  if (!prompt) {
+    hint.textContent = "Type a few words or tap the themes below.";
+    return;
+  }
+  let matched = 0;
+  Object.entries(VISUAL_PROMPT_ALIASES).forEach(([group, aliasesById]) => {
+    const match = Object.entries(aliasesById).find(([, aliases]) => aliases.some((alias) => prompt.includes(alias)));
+    if (!match) return;
+    state.visualConfig[group] = match[0];
+    matched += 1;
+  });
+  if (!matched) {
+    hint.textContent = "Try words like dark, ice, storm, phoenix, or vortex.";
+    return;
+  }
+  updateLobbyPreview();
+  hint.textContent = `Made from “${String(value).trim()}”`;
 }
 
 function saveVisualConfig() {
@@ -711,7 +788,8 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.bonusOverlay.dataset.theme = visuals.theme.id;
   ui.bonusOverlay.dataset.mood = visuals.mood.id;
   ui.cinematicOverlay.style.setProperty("--cinematic-companion", `url("${visuals.companion.asset}")`);
-  ui.cinematicOverlay.style.setProperty("--cinematic-plane", "url(\"./assets/sky-runner-plane-cutout-v1.png\")");
+  ui.cinematicOverlay.style.setProperty("--cinematic-world", `url("${visuals.theme.asset}")`);
+  ui.cinematicOverlay.style.setProperty("--cinematic-accent", visuals.theme.accent);
   ui.companionPortrait.src = visuals.companion.asset;
   document.title = `${visualConfigLabel(state.visualConfig)} · AISlots`;
   $("brandName").textContent = game.name;
@@ -1117,10 +1195,10 @@ function cinematicDelay(milliseconds) {
 
 async function runAstralCinematicTransition({ preview = false, multiplierCount = 3 } = {}) {
   const game = currentGame();
-  ui.cinematicOverlay.dataset.mode = "sky-runner";
+  ui.cinematicOverlay.dataset.mode = "world-awakening";
   ui.cinematicOverlay.dataset.phase = "sleeping";
-  ui.cinematicTitle.textContent = preview ? "Flight Demo" : "Clear for takeoff";
-  ui.cinematicCopy.textContent = preview ? "No wager" : `${game.featureName} flight deck opening`;
+  ui.cinematicTitle.textContent = game.name;
+  ui.cinematicCopy.textContent = preview ? "Your world opens · no wager" : `${game.featureName} awakens`;
   ui.cinematicAward.textContent = `${multiplierCount} FLIGHTS`;
   ui.cinematicOverlay.hidden = false;
   ui.cinematicOverlay.setAttribute("aria-hidden", "false");
@@ -1131,7 +1209,7 @@ async function runAstralCinematicTransition({ preview = false, multiplierCount =
   await cinematicDelay(1050);
   ui.cinematicOverlay.dataset.phase = "awakened";
   ui.cinematicTitle.textContent = game.featureName;
-  ui.cinematicCopy.textContent = preview ? "No payout" : "Sealed multiplier flights";
+  ui.cinematicCopy.textContent = preview ? "World preview · no payout" : "Three sealed multiplier flights";
   ui.cinematicAward.textContent = `${multiplierCount} FLIGHTS`;
   jumpText(ui.cinematicTitle);
   jumpText(ui.cinematicAward);
@@ -1147,6 +1225,14 @@ async function runAstralCinematicTransition({ preview = false, multiplierCount =
 
 function formatMultiplier(value) {
   return `${Number(value).toFixed(2)}×`;
+}
+
+function buildAstralFlightLocks(count) {
+  return Array.from({ length: count }, (_, index) => {
+    const lock = document.createElement("span");
+    lock.innerHTML = `<small>Flight ${index + 1}</small><strong>—</strong>`;
+    return lock;
+  });
 }
 
 function astralFlightRarity(multiplier) {
@@ -1178,9 +1264,29 @@ function setAstralFlightPosition(progress, { landing = false } = {}) {
   ui.astralFlightWorld.style.setProperty("--flight-progress", (clamped * 100).toFixed(2) + "%");
 }
 
+function updateAstralFlightHud(progress, multiplier = 0) {
+  const routeProgress = Math.max(0, Math.min(1, (progress - .04) / .9));
+  const distance = Math.round(routeProgress * 120);
+  const altitude = Math.round(routeProgress * 10000 / 50) * 50;
+  ui.astralDistanceValue.textContent = distance + " km";
+  ui.astralAltitudeValue.textContent = altitude.toLocaleString() + " m";
+  ui.astralDistanceBar.style.width = routeProgress * 100 + "%";
+  ui.astralAltitudeBar.style.width = routeProgress * 100 + "%";
+  ui.astralFlightWorld.style.setProperty("--route-progress", routeProgress.toFixed(3));
+  ui.astralFlightWorld.dataset.distance = String(distance);
+  ui.astralFlightWorld.dataset.altitude = String(altitude);
+  const ladderSteps = [...ui.astralMultiplierLadder.querySelectorAll("[data-multiplier-step]")];
+  ladderSteps.forEach((step) => step.classList.toggle("is-reached", Number(step.dataset.multiplierStep) <= multiplier));
+  const next = ladderSteps
+    .filter((step) => Number(step.dataset.multiplierStep) > multiplier)
+    .sort((a, b) => Number(a.dataset.multiplierStep) - Number(b.dataset.multiplierStep))[0];
+  ladderSteps.forEach((step) => step.classList.toggle("is-next", step === next));
+}
+
 function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, toMultiplier, duration, reducedMotion }) {
   if (reducedMotion) {
     setAstralFlightPosition(toProgress, { landing: true });
+    updateAstralFlightHud(toProgress, toMultiplier);
     ui.astralRoundAward.textContent = formatMultiplier(toMultiplier);
     return delay(80);
   }
@@ -1193,6 +1299,7 @@ function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, 
       const progress = fromProgress + (toProgress - fromProgress) * eased;
       const displayedMultiplier = fromMultiplier + (toMultiplier - fromMultiplier) * eased;
       setAstralFlightPosition(progress, { landing: time > .82 });
+      updateAstralFlightHud(progress, displayedMultiplier);
       ui.astralRoundAward.textContent = formatMultiplier(displayedMultiplier);
       ui.astralFlightWorld.dataset.flightProgress = progress.toFixed(3);
       if (time < 1) window.requestAnimationFrame(draw);
@@ -1223,6 +1330,7 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
   ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · land when ready";
   ui.astralFlightWorld.dataset.rarity = astralFlightRarity(multiplier);
   setAstralFlightPosition(currentProgress);
+  updateAstralFlightHud(currentProgress, 0);
 
   const fly = (now) => {
     if (startedAt === null) startedAt = now;
@@ -1231,6 +1339,7 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     currentProgress = .04 + (cruiseCeiling - .04) * cruiseProgress;
     currentMultiplier = .01 + (liveMultiplierCeiling - .01) * cruiseProgress;
     setAstralFlightPosition(currentProgress);
+    updateAstralFlightHud(currentProgress, currentMultiplier);
     ui.astralRoundAward.textContent = formatMultiplier(currentMultiplier);
     ui.astralFlightWorld.dataset.flightProgress = currentProgress.toFixed(3);
     frame = window.requestAnimationFrame(fly);
@@ -1259,11 +1368,12 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     ui.astralMultiplierDial.classList.add("is-landed");
     ui.astralCascadeLabel.textContent = "Landed";
     ui.astralRoundAward.textContent = formatMultiplier(multiplier);
+    updateAstralFlightHud(profile.progress, multiplier);
     ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · landed";
     ui.astralChoiceBar.style.width = (roundIndex + 1) / totalRounds * 100 + "%";
     const lock = ui.astralLockedMultipliers.children[roundIndex];
     if (lock) {
-      lock.textContent = formatMultiplier(multiplier);
+      lock.querySelector("strong").textContent = formatMultiplier(multiplier);
       lock.classList.add("is-locked", "rarity-" + astralFlightRarity(multiplier));
     }
     ui.astralTotalMultiplier.textContent = formatMultiplier(multiplierTotal);
@@ -1297,11 +1407,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     ui.bonusMechanicProgress.textContent = "0 / " + picks.length;
     ui.bonusMechanicBar.style.width = "0%";
     ui.astralBonusStage.hidden = false;
-    ui.astralLockedMultipliers.replaceChildren(...picks.map(() => {
-      const lock = document.createElement("span");
-      lock.textContent = "—";
-      return lock;
-    }));
+    ui.astralLockedMultipliers.replaceChildren(...buildAstralFlightLocks(picks.length));
     ui.astralRoundAward.textContent = "0.00×";
     ui.astralTotalMultiplier.textContent = "0.00×";
     ui.astralCascadeLabel.textContent = "Ready";
@@ -1309,6 +1415,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     ui.astralChoiceProgress.textContent = "Flight 1 of " + picks.length;
     ui.astralChoiceBar.style.width = "0%";
     setAstralFlightPosition(.04);
+    updateAstralFlightHud(.04, 0);
     ui.constellationPicks.hidden = true;
     ui.constellationPicks.replaceChildren();
     ui.bonusAction.textContent = preview ? "Take off" : "Take off · flight 1 / " + picks.length;
@@ -1344,11 +1451,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       roundIndex = 0;
       multiplierTotal = 0;
       activeRound = null;
-      ui.astralLockedMultipliers.replaceChildren(...picks.map(() => {
-        const lock = document.createElement("span");
-        lock.textContent = "—";
-        return lock;
-      }));
+      ui.astralLockedMultipliers.replaceChildren(...buildAstralFlightLocks(picks.length));
       ui.astralRoundAward.textContent = "0.00×";
       ui.astralTotalMultiplier.textContent = "0.00×";
       ui.bonusTotal.textContent = "0.00 CR";
@@ -1365,6 +1468,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.bonusAction.disabled = false;
       ui.bonusExit.hidden = true;
       setAstralFlightPosition(.04);
+      updateAstralFlightHud(.04, 0);
     };
 
     ui.bonusExit.onclick = close;
@@ -1877,6 +1981,13 @@ function bindEvents() {
       return;
     }
     if (event.target.closest("[data-build-play]")) chooseLobbyGame();
+  });
+  ui.lobbyGames.addEventListener("submit", (event) => {
+    const form = event.target.closest("[data-world-prompt-form]");
+    if (!form) return;
+    event.preventDefault();
+    applyVisualPrompt(new FormData(form).get("world-prompt"));
+    playTone(880, .14, "triangle");
   });
   ui.betDown.addEventListener("click", () => {
     if (state.betIndex > 0) state.betIndex -= 1;
