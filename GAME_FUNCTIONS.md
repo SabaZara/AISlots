@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **4.0.0**
+Version reviewed: **4.1.0**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -8,16 +8,15 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| First-screen game creator | Implemented | The site opens on a true edge-to-edge guided creator. One graphical horizontal choice row appears at a time and a compact cinematic 16:9 preview stays centered below. The cabinet remains hidden until play starts. |
-| Explicit layer choices | Implemented | World, Character, Mood, Relics, and Motion are five ordered steps. Selecting an option automatically opens the next step; Back revisits the previous step. |
+| First-screen game creator | Implemented | The site opens on a true edge-to-edge guided creator. One graphical choice group appears at a time and a cinematic preview stays centered below. The cabinet remains hidden until play starts. |
+| Explicit layer choices | Implemented | World, Character, Mood, and Relics are four ordered steps. Selecting an option automatically opens the next step; Back revisits the previous step. |
 | Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
 | One companion | Implemented | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, or Titan; exactly one transparent standalone cutout is displayed. |
 | Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. |
 | Symbol selection | Implemented | Six generated seven-symbol families with distinct transparent Scatter icons and names. |
-| Motion selection | Implemented | Cascade, Wave, Impact, Strike, or Vortex changes spin presentation timing/animation only. |
-| Surprise me | Implemented | Randomly chooses all five visual layers, updates the preview, and advances directly to review. |
+| Surprise me | Implemented | Randomly chooses all four player-facing visual layers, updates the preview, and advances directly to review. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
-| Combination count | Implemented | 6 × 6 × 4 × 6 × 5 = 4,320 configurations. |
+| Combination count | Implemented | 6 × 6 × 4 × 6 = 864 configurations. |
 
 ## Core play
 
@@ -71,13 +70,13 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - Server seed, client seed, nonce, bet, prior progress, configuration, and deterministic outcome are revealed afterward.
 - The client seed is editable before play.
 - The verifier recomputes both the commitment and complete result.
-- Themes, companions, moods, symbol art, animation choice, balance, and session history never change weights or RNG input.
+- Themes, companions, moods, symbol art, presentation animation, balance, and session history never change weights or RNG input.
 
 ## Responsive and usability review
 
 - No document scrolling during gameplay on desktop, mobile portrait, rotated phone landscape, or iPad/tablet layouts.
 - World Forge starts neutral on every visit: no environment is selected or applied until the player chooses a theme.
-- Phone World Forge uses larger horizontal swipe cards and a portrait preview instead of shrinking the desktop selector.
+- Phone World Forge uses a fixed two-row choice grid with no internal scrolling and a dedicated portrait preview.
 - Phone Spin, bet, win, and feature controls use larger responsive gaps to reduce accidental taps.
 - `100dvh` sizing and safe-area insets account for mobile browser chrome and notches.
 - Mobile controls are rearranged rather than reduced into overlapping desktop positions.

@@ -14,7 +14,6 @@ import {
 } from "./game-model.js";
 import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
 import {
-  ANIMATION_STYLES,
   COMPANIONS,
   DEFAULT_VISUAL_CONFIG,
   MOODS,
@@ -36,8 +35,7 @@ const FACTORY_STEPS = Object.freeze([
   Object.freeze({ key: "theme", label: "World", prompt: "Choose your world" }),
   Object.freeze({ key: "companion", label: "Character", prompt: "Choose your character" }),
   Object.freeze({ key: "mood", label: "Mood", prompt: "Choose the atmosphere" }),
-  Object.freeze({ key: "symbols", label: "Relics", prompt: "Choose your symbols" }),
-  Object.freeze({ key: "animation", label: "Motion", prompt: "Choose reel motion" })
+  Object.freeze({ key: "symbols", label: "Relics", prompt: "Choose your symbols" })
 ]);
 const SPIN_SPEEDS = Object.freeze([
   Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
@@ -585,7 +583,6 @@ function buildLobby() {
       ${group("Character", "companion", COMPANIONS, 1)}
       ${group("Mood", "mood", MOODS, 2)}
       ${group("Relics", "symbols", SYMBOL_SETS, 3)}
-      ${group("Motion", "animation", ANIMATION_STYLES, 4)}
       <section class="factory-review" id="factoryReview" hidden>
         <span>World complete</span><strong id="factoryReviewName"></strong><small>Review the preview, then enter your game.</small>
       </section>
@@ -697,7 +694,7 @@ function updateLobbyPreview() {
   $("factoryPreviewName").textContent = chosenName;
   $("factoryPreviewMeta").textContent = nextUnchosen
     ? `Next · ${nextUnchosen.label}`
-    : `${visuals.symbols.name} · ${visuals.animation.name} motion`;
+    : `${visuals.symbols.name} · Ready`;
   const reviewName = $("factoryReviewName");
   if (reviewName) reviewName.textContent = chosenName;
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
@@ -711,7 +708,7 @@ function updateLobbyPreview() {
 }
 
 function setVisualConfigChoice(group, id) {
-  const catalogs = { theme: THEMES, companion: COMPANIONS, mood: MOODS, symbols: SYMBOL_SETS, animation: ANIMATION_STYLES };
+  const catalogs = { theme: THEMES, companion: COMPANIONS, mood: MOODS, symbols: SYMBOL_SETS };
   if (!catalogs[group]?.some((item) => item.id === id)) return;
   state.visualConfig[group] = id;
   state.lobbyChoices[group] = true;
@@ -725,7 +722,7 @@ function randomizeVisualConfig() {
     companion: pick(COMPANIONS),
     mood: pick(MOODS),
     symbols: pick(SYMBOL_SETS),
-    animation: pick(ANIMATION_STYLES)
+    animation: DEFAULT_VISUAL_CONFIG.animation
   };
   Object.keys(state.lobbyChoices).forEach((group) => { state.lobbyChoices[group] = true; });
   updateLobbyPreview();
@@ -747,7 +744,7 @@ function restoreVisualConfig() {
         companion: resolved.companion.id,
         mood: resolved.mood.id,
         symbols: resolved.symbols.id,
-        animation: resolved.animation.id
+        animation: DEFAULT_VISUAL_CONFIG.animation
       };
     }
   } catch { /* local storage is optional */ }

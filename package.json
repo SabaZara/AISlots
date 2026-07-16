@@ -1,9 +1,9 @@
 {
   "name": "aislots",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "private": true,
   "type": "module",
-  "description": "AISlots World Forge — one provably fair 99% RTP slot with 4,320 generated visual combinations.",
+  "description": "AISlots World Forge — one provably fair 99% RTP slot with 864 generated visual combinations.",
   "scripts": {
     "dev": "python3 -m http.server 4173",
     "test": "node --test",

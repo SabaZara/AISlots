@@ -54,7 +54,7 @@ export const DEFAULT_VISUAL_CONFIG = Object.freeze({
   animation: "cascade"
 });
 
-export const VISUAL_COMBINATION_COUNT = THEMES.length * COMPANIONS.length * MOODS.length * SYMBOL_SETS.length * ANIMATION_STYLES.length;
+export const VISUAL_COMBINATION_COUNT = THEMES.length * COMPANIONS.length * MOODS.length * SYMBOL_SETS.length;
 
 function itemFor(items, id, fallbackId) {
   return items.find((item) => item.id === id) ?? items.find((item) => item.id === fallbackId) ?? items[0];

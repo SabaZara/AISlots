@@ -15,14 +15,14 @@ import {
 
 const root = new URL("../", import.meta.url);
 
-test("World Forge publishes all 4,320 independent combinations", () => {
+test("World Forge publishes all 864 player-selectable combinations", () => {
   assert.equal(THEMES.length, 6);
   assert.equal(COMPANIONS.length, 6);
   assert.equal(MOODS.length, 4);
   assert.equal(SYMBOL_SETS.length, 6);
   assert.equal(ANIMATION_STYLES.length, 5);
-  assert.equal(VISUAL_COMBINATION_COUNT, 6 * 6 * 4 * 6 * 5);
-  assert.equal(VISUAL_COMBINATION_COUNT, 4320);
+  assert.equal(VISUAL_COMBINATION_COUNT, 6 * 6 * 4 * 6);
+  assert.equal(VISUAL_COMBINATION_COUNT, 864);
 });
 
 test("each generated raster asset is local and production-sized", async () => {

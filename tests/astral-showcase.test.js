@@ -47,8 +47,9 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /--topbar-art/);
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
-  assert.match(html, /4,320 combinations/);
-  assert.match(html, /app\.js\?v=3\.9\.0/);
+  assert.match(html, /864 combinations/);
+  assert.match(html, /app\.js\?v=4\.1\.0/);
+  assert.doesNotMatch(app, /group\("Motion", "animation"/);
 });
 
 test("runtime contains no payline, near-miss, or reality-check UI", async () => {
@@ -173,7 +174,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "4.0.0");
+  assert.equal(JSON.parse(packageJson).version, "4.1.0");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

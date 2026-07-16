@@ -1,8 +1,8 @@
 # AISlots World Forge
 
-AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player chooses a background world, one companion, a mood, a symbol family, and a reel-motion style in a guided five-step creator.
+AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player chooses a background world, one companion, a mood, and a symbol family in a guided four-step creator.
 
-`6 themes × 6 companions × 4 moods × 6 symbol sets × 5 motion styles = 4,320 configurations`
+`6 themes × 6 companions × 4 moods × 6 symbol sets = 864 configurations`
 
 Every configuration uses the same deterministic outcome model, exact **99.00% theoretical RTP**, and SHA-256 commit/reveal receipt. Visual choices, sound choices, balance, and play history never change outcome probabilities.
 
@@ -14,9 +14,8 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 | Companions | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, Titan |
 | Moods | Epic, Mystic, Playful, Dark |
 | Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
-| Motion | Cascade, Wave, Impact, Strike, Vortex |
 
-Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every family also has its own transparent Scatter cutout. The opening creator fills the viewport, presents one polished horizontal image-choice row at a time, automatically advances to the next layer, keeps a compact cinematic 16:9 preview below, and completely hides the cabinet until the player creates the world. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every family also has its own transparent Scatter cutout. The opening creator fills the viewport, presents one graphical choice group at a time, automatically advances to the next layer, keeps a cinematic preview below, and completely hides the cabinet until the player creates the world. Phones show every choice in a fixed two-row grid with no internal scrolling. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
 ## Play features
 
