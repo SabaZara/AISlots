@@ -55,8 +55,8 @@ This file is the team-review checklist for the current simulated-credit build. R
 - Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed. The catalog module is versioned with the release so deployed browsers cannot reuse obsolete atlas mappings.
 - The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
 - Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
-- One larger static companion is layered independently from the selected background in the original right-side cabinet position.
-- The Bet, Auto, Spin, and Speed controls float directly on the world art without a dark control-deck block.
+- One static companion is layered independently from the selected background at the right edge, with only a small overlap against the restored earlier reel position.
+- Scatter progress, Bet, Auto, Spin, Speed, Special Bet, and Buy Bonus share one responsive bottom rail and float directly on the world art without a dark control-deck block.
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
@@ -79,7 +79,7 @@ This file is the team-review checklist for the current simulated-credit build. R
 - No document scrolling during gameplay on desktop, mobile portrait, rotated phone landscape, or iPad/tablet layouts.
 - World Forge starts neutral on every visit: no environment is selected or applied until the player chooses a theme, and the unloaded preview contains no ambient dots or rings.
 - Phone World Forge uses fixed two-row choice grids with no internal scrolling; the eight-character step uses a 4×2 grid beside a dedicated portrait preview.
-- Phone Spin, bet, win, and feature controls use larger responsive gaps to reduce accidental taps.
+- Phone Scatter, bet, Spin, and feature controls use a two-row responsive rail with larger gaps to reduce accidental taps.
 - `100dvh` sizing and safe-area insets account for mobile browser chrome and notches.
 - Mobile controls are rearranged rather than reduced into overlapping desktop positions.
 - Spin, bet, Normal/Fast, Autoplay, Special Bet, and Buy Bonus remain clickable.

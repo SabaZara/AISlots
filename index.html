@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="AISlots World Forge — 1,152 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4.6.6" />
+    <link rel="stylesheet" href="./styles.css?v=4.6.7" />
     <title>AISlots World Forge · 1,152 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -45,33 +45,8 @@
         <div class="mood-overlay" id="moodOverlay" aria-hidden="true"></div>
         <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
         <section class="game-layout" aria-label="AISlots configurable game">
-          <aside class="feature-card glass-panel" id="featureCard" data-game="astral" aria-labelledby="moonwellTitle">
-            <div class="eyebrow"><span class="eyebrow-dot"></span><span id="featureEyebrow">Persistent feature</span></div>
-            <h2 id="moonwellTitle">Fire Relic Vault</h2>
-            <p class="feature-copy" id="featureCopy">Every Flame Crown stays in your vault. Collect 18 to launch three sealed multiplier flights.</p>
-
-            <div class="scatter-tracker" id="featureVisual" data-meter="scatter">
-              <img class="scatter-meter-art" id="scatterMeterArt" src="./assets/factory/scatter-inferno-v1.png" alt="Inferno Scatter">
-              <div class="scatter-meter-copy"><span>Scatter</span><strong><b id="petalCountLarge">0</b><small id="meterThreshold">/18</small></strong></div>
-              <i class="scatter-meter-track" aria-hidden="true"><b></b></i>
-            </div>
-
-            <div class="petal-meter visually-hidden-progress" id="petalMeter" role="progressbar" aria-valuemin="0" aria-valuemax="18" aria-valuenow="0" aria-label="Scatter symbols stored"></div>
-            <p class="meter-message" id="meterMessage"><strong>18 Flame Crowns to go</strong><span>Progress carries between spins</span></p>
-
-            <div class="feature-steps" id="featureSteps" aria-label="Bonus journey"></div>
-          </aside>
-
           <section class="machine" aria-label="Slot machine">
             <div class="companion-stage" id="companionStage" aria-hidden="true"><img id="companionPortrait" src="./assets/factory/companion-dragon-cutout-v3.png" alt=""></div>
-            <div class="astral-feature-dock" id="astralFeatureDock" aria-label="Relic Vault feature controls">
-              <button class="astral-feature-button is-special" id="specialBetButton" type="button" aria-label="Open special bet options">
-                <span class="feature-button-orb" aria-hidden="true">✦</span><strong>Special bet</strong><small id="specialBetState">Standard · 1.00×</small>
-              </button>
-              <button class="astral-feature-button is-buy" id="buyFeatureButton" type="button" aria-label="Open buy bonus options">
-                <span class="feature-button-orb" aria-hidden="true">☾</span><strong>Buy bonus</strong><small>25× · 50× · 100×</small>
-              </button>
-            </div>
             <div class="reel-frame">
               <div class="reel-meta"><span id="reelCommitment">RTP 99%</span></div>
               <div class="reel-viewport">
@@ -99,6 +74,23 @@
             </div>
 
             <div class="control-deck">
+              <aside class="feature-card glass-panel" id="featureCard" data-game="astral" aria-labelledby="moonwellTitle">
+                <div class="eyebrow"><span class="eyebrow-dot"></span><span id="featureEyebrow">Persistent feature</span></div>
+                <h2 id="moonwellTitle">Fire Relic Vault</h2>
+                <p class="feature-copy" id="featureCopy">Every Flame Crown stays in your vault. Collect 18 to launch three sealed multiplier flights.</p>
+
+                <div class="scatter-tracker" id="featureVisual" data-meter="scatter">
+                  <img class="scatter-meter-art" id="scatterMeterArt" src="./assets/factory/scatter-inferno-v1.png" alt="Inferno Scatter">
+                  <div class="scatter-meter-copy"><span>Scatter</span><strong><b id="petalCountLarge">0</b><small id="meterThreshold">/18</small></strong></div>
+                  <i class="scatter-meter-track" aria-hidden="true"><b></b></i>
+                </div>
+
+                <div class="petal-meter visually-hidden-progress" id="petalMeter" role="progressbar" aria-valuemin="0" aria-valuemax="18" aria-valuenow="0" aria-label="Scatter symbols stored"></div>
+                <p class="meter-message" id="meterMessage"><strong>18 Flame Crowns to go</strong><span>Progress carries between spins</span></p>
+
+                <div class="feature-steps" id="featureSteps" aria-label="Bonus journey"></div>
+              </aside>
+
               <div class="bet-control">
                 <span class="control-label">Bet</span>
                 <div class="stepper">
@@ -119,6 +111,15 @@
                   </button>
                   <button class="speed-toggle-button" id="speedToggleButton" type="button" aria-label="Switch to Fast 3× spin"><span aria-hidden="true">SPEED</span><strong id="speedToggleValue">1×</strong></button>
                 </div>
+              </div>
+
+              <div class="astral-feature-dock" id="astralFeatureDock" aria-label="Relic Vault feature controls">
+                <button class="astral-feature-button is-special" id="specialBetButton" type="button" aria-label="Open special bet options">
+                  <span class="feature-button-orb" aria-hidden="true">✦</span><strong>Special bet</strong><small id="specialBetState">Standard · 1.00×</small>
+                </button>
+                <button class="astral-feature-button is-buy" id="buyFeatureButton" type="button" aria-label="Open buy bonus options">
+                  <span class="feature-button-orb" aria-hidden="true">☾</span><strong>Buy bonus</strong><small>25× · 50× · 100×</small>
+                </button>
               </div>
             </div>
             <div class="showcase-row" id="showcaseRow"></div>
@@ -357,6 +358,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.6.6"></script>
+    <script type="module" src="./app.js?v=4.6.7"></script>
   </body>
 </html>
