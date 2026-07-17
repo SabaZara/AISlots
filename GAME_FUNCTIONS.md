@@ -55,8 +55,9 @@ This file is the team-review checklist for the current simulated-credit build. R
 - Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed. The catalog module is versioned with the release so deployed browsers cannot reuse obsolete atlas mappings.
 - The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
 - Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
-- One static companion is layered independently from the selected background at the right edge, with only a small overlap against the restored earlier reel position.
-- Scatter progress, Bet, Auto, Spin, Speed, Special Bet, and Buy Bonus share one responsive bottom rail and float directly on the world art without a dark control-deck block.
+- One large static companion is layered independently from the selected background at the right edge and scales to approximately the reel grid's height.
+- The reel grid is horizontally centered. Scatter progress is enlarged, while Bet, Auto, Spin, Speed, Special Bet, and Buy Bonus share one responsive bottom rail without a dark control-deck block.
+- Special Bet and Buy Bonus option cards inherit the selected world's accent, secondary color, environment, and bonus artwork.
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
