@@ -19,7 +19,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
     "astralFlightPlane", "astralDistanceValue", "astralDistanceBar", "astralAltitudeValue",
     "astralAltitudeBar", "astralMultiplierLadder", "bonusExit",
     "specialBetButton", "buyFeatureButton", "featureMarketOverlay", "autoplayOverlay",
-    "reels", "spinButton", "spinCenter", "fairnessButton", "companionStage", "companionPortrait",
+    "reels", "spinButton", "spinCenter", "speedToggleButton", "speedToggleValue", "fairnessButton", "companionStage", "companionPortrait",
     "scatterMeterArt", "featureVisual"
   ]) {
     assert.match(html, new RegExp(`id=["']${id}["']`));
@@ -95,6 +95,7 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(app, /stopSpinReelColumn\(reel\)/);
   assert.match(app, /strip\.style\.transform = `translateY\(\$\{startY\}px\)`/);
   assert.match(app, /velocityMatch = 0\.30 \/ 0\.18/);
+  assert.match(app, /orderedLandingGap = speed\.id === "fast" \? 130 : 225/);
   assert.match(app, /easing: "cubic-bezier\(\.18,\.30,\.42,1\)"/);
   assert.doesNotMatch(app, /endY \+ overshoot|reelStripLand/);
   assert.match(css, /@keyframes continuousReelStrip/);
@@ -167,15 +168,17 @@ test("transparent symbols fuse while reel tiles remain stationary", async () => 
   assert.match(css, /mix-blend-mode: normal/);
 });
 
-test("autoplay, Normal/Fast spin, and every positive payout remain visible", async () => {
+test("separate autoplay and speed buttons plus every positive payout remain visible", async () => {
   const [html, app, css] = await Promise.all([
     readFile(new URL("index.html", root), "utf8"),
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("styles.css", root), "utf8")
   ]);
   assert.match(html, /id="autoplayOverlay"[\s\S]*?id="autoplayMenu"[\s\S]*?aria-modal="true"/);
-  assert.match(html, /id="spinCenter"[\s\S]*?id="spinButton"[\s\S]*?id="autoButton"/);
+  assert.match(html, /id="spinCenter"[\s\S]*?id="spinButton"[\s\S]*?id="autoButton"[\s\S]*?id="speedToggleButton"/);
+  assert.doesNotMatch(html, /spin-speed-selector|data-spin-speed/);
   assert.match(app, /function setAutoplayMenuOpen/);
+  assert.match(app, /speedToggleButton\.addEventListener/);
   assert.match(css, /\.autoplay-overlay \{[\s\S]*?position: fixed;[\s\S]*?inset: 0/);
   for (const speed of ["normal", "fast"]) assert.match(app, new RegExp(`id: ["']${speed}["']`));
   assert.match(app, /SPIN_SPEED_STORAGE_KEY/);

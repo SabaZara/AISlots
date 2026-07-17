@@ -25,9 +25,9 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Reel grid | Implemented | Six reels × five rows remain visible throughout a spin on one uninterrupted reel bed. Normal cells have only quiet neutral reel dividers; colored outlines are reserved for wins, Scatters, and special hits. |
 | Paylines | Implemented | 25 fixed lines; three or more identical paying symbols connect from reel one. Lines are calculated but not drawn over the art. |
 | Bet controls | Implemented | Minus, plus, and Max with balance-aware limits. |
-| Spin | Implemented | Wager is sealed before the presentation begins; symbols travel downward continuously and reels settle in six visible phases. |
-| Normal/Fast | Implemented | Separate 1× and 3× presentation choices next to Spin; neither changes the result. |
-| Autoplay | Implemented | Finite 10, 25, or 50 spins. The button sits directly beside Spin, becomes Stop while active, and stops on insufficient free-play balance. |
+| Spin | Implemented | Wager is sealed before the presentation begins; symbols travel downward continuously and the result lands strictly from reel one through reel six. |
+| Normal/Fast | Implemented | One standalone Speed button toggles between 1× and 3× presentation timing; it never changes the result. |
+| Autoplay | Implemented | Finite 10, 25, or 50 spins. Its standalone button is visually separate from Speed, becomes Stop while active, and stops on insufficient free-play balance. |
 | Positive-return display | Implemented | Every positive payout receives an animated numeric result, even when it is smaller than the wager. |
 | Win celebrations | Implemented | Win, Nice, Big, Mega, and Epic tiers scale the banner, particles, cabinet reaction, audio, and cinematic treatment. |
 | Winner animation | Implemented | Winning symbol art pulls toward a shared energy core, connects with themed light threads, bursts, and settles into a readable pulse. Reel tiles never move or stretch; only transparent art animates. |

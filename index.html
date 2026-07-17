@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="AISlots World Forge — 1,152 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4.5.1" />
+    <link rel="stylesheet" href="./styles.css?v=4.5.2" />
     <title>AISlots World Forge · 1,152 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -138,12 +138,7 @@
                 </button>
                 <div class="spin-center-row">
                   <button class="auto-button" id="autoButton" type="button" aria-label="Open autoplay options" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">AUTO</span><strong>10 · 25 · 50</strong></button>
-                  <div class="spin-options" id="spinOptions">
-                    <div class="spin-speed-selector" role="group" aria-label="Spin speed">
-                      <button class="speed-choice is-selected" type="button" data-spin-speed="normal" aria-pressed="true"><strong>Normal</strong><small>1×</small></button>
-                      <button class="speed-choice" type="button" data-spin-speed="fast" aria-pressed="false"><strong><span aria-hidden="true">⚡</span> Fast</strong><small>3×</small></button>
-                    </div>
-                  </div>
+                  <button class="speed-toggle-button" id="speedToggleButton" type="button" aria-label="Switch to Fast 3× spin"><span aria-hidden="true">SPEED</span><strong id="speedToggleValue">1×</strong></button>
                 </div>
               </div>
 
@@ -412,6 +407,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.5.1"></script>
+    <script type="module" src="./app.js?v=4.5.2"></script>
   </body>
 </html>

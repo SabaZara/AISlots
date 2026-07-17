@@ -20,9 +20,9 @@ Only one companion is displayed in a game. The eight supplied green-screen maste
 ## Play features
 
 - six uninterrupted reels, five rows, one continuous reel bed, and 25 fixed left-to-right paylines;
-- continuous downward reel travel followed by six sequential stops, with Normal 1× or Fast 3× presentation speed;
+- continuous downward reel travel followed by strictly ordered reel-one-to-reel-six stops, with a standalone Speed button toggling Normal 1× or Fast 3× presentation timing;
 - every positive return is shown, including returns smaller than the wager;
-- finite 10, 25, or 50-spin autoplay directly beside Spin, with an always-accessible Stop state;
+- finite 10, 25, or 50-spin autoplay on its own button beside Spin, visually separated from Speed and with an always-accessible Stop state;
 - persistent 18-Scatter feature progress shown by a compact themed Scatter-art tracker with no circular counter or dot field;
 - theme-art Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
 - theme-art 25×, 50×, and 100× free-play Buy Bonus choices calibrated to the same 99.00% return;

@@ -23,7 +23,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.5.1";
+} from "./asset-catalog.js?v=4.5.2";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -104,10 +104,10 @@ const ui = {
   bonusMechanicBar: $("bonusMechanicBar"),
   autoButton: $("autoButton"),
   spinCenter: $("spinCenter"),
-  spinOptions: $("spinOptions"),
   spinLabel: $("spinLabel"),
   showcaseRow: $("showcaseRow"),
-  speedButtons: document.querySelectorAll("[data-spin-speed]"),
+  speedToggleButton: $("speedToggleButton"),
+  speedToggleValue: $("speedToggleValue"),
   autoplayOverlay: $("autoplayOverlay"),
   autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
@@ -622,12 +622,10 @@ function updateUi() {
   ui.autoButton.innerHTML = state.autoActive
     ? `<span aria-hidden="true">STOP</span><strong>${state.autoRemaining}</strong>`
     : `<span aria-hidden="true">AUTO</span><strong>10 · 25 · 50</strong>`;
-  ui.speedButtons.forEach((button) => {
-    const selected = button.dataset.spinSpeed === speed.id;
-    button.classList.toggle("is-selected", selected);
-    button.setAttribute("aria-pressed", String(selected));
-    button.disabled = controlsLocked;
-  });
+  ui.speedToggleButton.disabled = controlsLocked;
+  ui.speedToggleButton.classList.toggle("is-fast", speed.id === "fast");
+  ui.speedToggleButton.setAttribute("aria-label", speed.id === "fast" ? "Switch to Normal 1× spin" : "Switch to Fast 3× spin");
+  ui.speedToggleValue.textContent = speed.label;
   $("game").dataset.speed = speed.id;
   document.querySelectorAll(".game-choice").forEach((button) => { button.disabled = controlsLocked; });
 
@@ -1359,7 +1357,11 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
 async function settleOutcome(outcome) {
   const game = currentGame();
   const speed = currentSpinSpeed();
-  const reelGap = Math.max(20, Math.round(game.reelStopGap * speed.settleScale));
+  // A later reel must never finish before an earlier one. The landing duration is
+  // offset-dependent, so this gap is intentionally larger than its maximum variance
+  // while the six decelerations still overlap like a physical slot cabinet.
+  const orderedLandingGap = speed.id === "fast" ? 130 : 225;
+  const reelGap = Math.max(orderedLandingGap, Math.round(game.reelStopGap * speed.settleScale));
   const settleTail = Math.max(140, Math.round(620 * speed.settleScale));
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-spinning");
@@ -2325,8 +2327,8 @@ function bindEvents() {
     button.addEventListener("click", () => buyAstralFeature(Number(button.dataset.buyFeature)));
   });
   ui.spinButton.addEventListener("click", () => spin());
-  ui.speedButtons.forEach((button) => {
-    button.addEventListener("click", () => selectSpinSpeed(button.dataset.spinSpeed));
+  ui.speedToggleButton.addEventListener("click", () => {
+    selectSpinSpeed(currentSpinSpeed().id === "fast" ? "normal" : "fast");
   });
   ui.autoButton.addEventListener("click", () => {
     if (state.autoActive) {
