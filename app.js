@@ -20,10 +20,9 @@ import {
   MOODS,
   SYMBOL_SETS,
   THEMES,
-  VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.5.5";
+} from "./asset-catalog.js?v=4.6.4";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -33,10 +32,10 @@ const AUDIO_PREFERENCE_STORAGE_KEY = "aislots-audio-preference";
 const VISUAL_CONFIG_STORAGE_KEY = "aislots-visual-config";
 const ASTRAL_FLIGHT_PROGRESS_PER_MS = 0.00038;
 const FACTORY_STEPS = Object.freeze([
-  Object.freeze({ key: "theme", label: "World", prompt: "Choose your world" }),
-  Object.freeze({ key: "companion", label: "Character", prompt: "Choose your character" }),
-  Object.freeze({ key: "mood", label: "Mood", prompt: "Choose the atmosphere" }),
-  Object.freeze({ key: "symbols", label: "Relics", prompt: "Choose your symbols" })
+  Object.freeze({ key: "theme", label: "World", prompt: "World" }),
+  Object.freeze({ key: "companion", label: "Character", prompt: "Character" }),
+  Object.freeze({ key: "mood", label: "Atmosphere", prompt: "Atmosphere" }),
+  Object.freeze({ key: "symbols", label: "Relics", prompt: "Relics" })
 ]);
 const SPIN_SPEEDS = Object.freeze([
   Object.freeze({ id: "normal", name: "Normal", label: "1×", resultDisplayMs: MIN_RESULT_DISPLAY_MS, settleScale: 1, shuffleScale: 1, autoplayGapMs: 650 }),
@@ -121,6 +120,7 @@ const ui = {
   celebrationGame: $("celebrationGame"),
   celebrationKicker: $("celebrationKicker"),
   celebrationCollect: $("celebrationCollect"),
+  celebrationBottomAmount: $("celebrationBottomAmount"),
   cinematicOverlay: $("cinematicOverlay"),
   cinematicTitle: $("cinematicTitle"),
   cinematicCopy: $("cinematicCopy"),
@@ -175,7 +175,7 @@ const state = {
   lastReceipt: null
 };
 
-const audio = new SlotAudioEngine(() => state.visualConfig.mood);
+const audio = new SlotAudioEngine(() => state.visualConfig);
 
 function currentGame() {
   return getGame(state.gameId);
@@ -259,6 +259,16 @@ function waitForSpinDelay(milliseconds) {
   return delay(Math.max(0, milliseconds));
 }
 
+async function waitForAutoplayResult(milliseconds, fromAuto) {
+  let remaining = Math.max(0, milliseconds);
+  if (!fromAuto) return waitForSpinDelay(remaining);
+  while (remaining > 0 && !state.autoStopRequested) {
+    const slice = Math.min(32, remaining);
+    await delay(slice);
+    remaining -= slice;
+  }
+}
+
 function saveSpinSpeed() {
   try { window.localStorage.setItem(SPIN_SPEED_STORAGE_KEY, currentSpinSpeed().id); } catch { /* local storage is optional */ }
 }
@@ -281,7 +291,7 @@ function selectSpinSpeed(speedId) {
   updateUi();
   const speed = currentSpinSpeed();
   setStatus(`${speed.name} reel speed selected`);
-  playTone(speed.id === "fast" ? 1120 : 620, .12, "triangle");
+  audio.uiToggle(speed.id === "fast");
 }
 
 function jumpText(element) {
@@ -341,7 +351,7 @@ function symbolGlow(id) {
 function symbolGraphic(id) {
   const index = SYMBOL_SHEET_INDEX[id];
   const game = currentGame();
-  if (id === "petal" && game.scatterAsset && !game.symbolSheet?.includes("transparent-v")) {
+  if (id === "petal" && game.scatterAsset) {
     return `<img class="scatter-symbol" src="${game.scatterAsset}" alt="" aria-hidden="true">`;
   }
   if (game.symbolSheet && Number.isInteger(index)) {
@@ -513,10 +523,15 @@ async function stopSpinReelColumn(reel) {
   const startY = fraction - itemHeight;
   const endY = columnHeight;
   strip.style.animation = "none";
-  strip.style.transform = `translateY(${startY}px)`;
+  strip.style.transform = `translate3d(0, ${startY}px, 0)`;
   strip.style.height = `${rebuilt.length * itemHeight}px`;
   strip.style.gridTemplateRows = `repeat(${rebuilt.length}, ${itemHeight}px)`;
   strip.replaceChildren(...rebuilt.map((id) => makeReelSpinItem(id)));
+
+  // Give the browser one frame to promote and lay out the rebuilt strip before
+  // its compositor-only deceleration begins. This avoids a main-thread layout
+  // hitch on the first stopping frame without changing the visible position.
+  await new Promise((resolve) => window.requestAnimationFrame(resolve));
 
   const fast = currentSpinSpeed().id === "fast";
   const loopDuration = fast ? 235 : 420;
@@ -528,10 +543,10 @@ async function stopSpinReelColumn(reel) {
   column.classList.add("is-decelerating");
   const landing = strip.animate(
     [
-      { transform: `translateY(${startY}px)` },
-      { transform: `translateY(${endY}px)` }
+      { transform: `translate3d(0, ${startY}px, 0)` },
+      { transform: `translate3d(0, ${endY}px, 0)` }
     ],
-    { duration: landDuration, easing: "cubic-bezier(.18,.30,.42,1)", fill: "forwards" }
+    { duration: landDuration, easing: "cubic-bezier(.18,.30,.38,1)", fill: "forwards" }
   );
 
   await Promise.race([
@@ -605,21 +620,29 @@ function updateUi() {
   const speed = currentSpinSpeed();
   ui.balance.textContent = formatCredits(state.balance);
   ui.betAmount.textContent = formatCredits(bet);
-  ui.spinButton.setAttribute("aria-label", `${currentGame().actionLabel} spin for ${formatMoney(spinWager)}${state.gameId === "astral" && state.specialBetBoost ? ` with ${state.specialBetBoost} bonus meter boost` : ""}`);
+  const autoplayStopping = state.autoActive && state.autoStopRequested;
+  ui.spinButton.setAttribute("aria-label", state.autoActive
+    ? autoplayStopping ? "Autoplay stopping now" : "Stop autoplay now"
+    : `${currentGame().actionLabel} spin for ${formatMoney(spinWager)}${state.gameId === "astral" && state.specialBetBoost ? ` with ${state.specialBetBoost} bonus meter boost` : ""}`);
   const controlsLocked = state.isSpinning || state.autoActive;
   ui.betDown.disabled = controlsLocked || state.betIndex === 0;
   ui.betUp.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.maxBetButton.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
-  ui.spinButton.disabled = controlsLocked;
-  ui.spinLabel.textContent = currentGame().actionLabel;
+  ui.spinButton.disabled = (state.isSpinning && !state.autoActive) || autoplayStopping;
+  ui.spinButton.classList.toggle("is-autoplay-stop", state.autoActive);
+  ui.spinLabel.textContent = state.autoActive ? "Stop" : currentGame().actionLabel;
+  const spinIcon = ui.spinButton.querySelector(".spin-icon");
+  if (spinIcon) spinIcon.textContent = state.autoActive ? "■" : "↻";
   updateAstralFeatureUi(controlsLocked);
   ui.saveClientSeed.disabled = controlsLocked;
   ui.clientSeedInput.disabled = controlsLocked;
-  ui.autoButton.disabled = state.isSpinning && !state.autoActive;
+  ui.autoButton.disabled = (state.isSpinning && !state.autoActive) || autoplayStopping;
   ui.autoButton.classList.toggle("is-running", state.autoActive);
-  ui.autoButton.setAttribute("aria-label", state.autoActive ? "Stop infinite autoplay after the current spin" : "Start infinite autoplay");
+  ui.autoButton.setAttribute("aria-label", state.autoActive
+    ? autoplayStopping ? "Autoplay stopping now" : "Stop infinite autoplay now"
+    : "Start infinite autoplay");
   ui.autoButton.innerHTML = state.autoActive
-    ? `<span aria-hidden="true">STOP</span><strong>∞</strong>`
+    ? `<span aria-hidden="true">STOP</span>`
     : `<span aria-hidden="true">AUTO</span><strong>∞</strong>`;
   ui.speedToggleButton.disabled = controlsLocked;
   ui.speedToggleButton.classList.toggle("is-fast", speed.id === "fast");
@@ -705,10 +728,12 @@ function buildLobby() {
       <div class="factory-group-head"><strong id="factory-${key}-label">${label}</strong><span>${items.length}</span></div>
       <div class="factory-options" style="--option-count:${items.length}" role="group" aria-label="Choose ${label.toLowerCase()}">
         ${items.map((item) => {
-          const art = item.asset ? ` style="--choice-art:url('${item.asset}')"` : "";
+          const art = item.asset ? ` style="--choice-art:url('${item.asset}')${item.scatterAsset ? `;--scatter-choice-art:url('${item.scatterAsset}')` : ""}"` : "";
           const artMarkup = key === "symbols"
-            ? `<i class="factory-symbol-showcase"${art} aria-hidden="true">${Array.from({ length: 7 }, (_, index) => `<b class="symbol-sheet-${index}"></b>`).join("")}</i>`
-            : `<i class="factory-option-art"${art} aria-hidden="true"></i>`;
+            ? `<i class="factory-symbol-showcase"${art} aria-hidden="true"><b class="symbol-sheet-0"></b><b class="symbol-sheet-3"></b><b class="factory-scatter-choice"></b></i>`
+            : key === "mood"
+              ? `<i class="factory-option-art factory-mood-showcase"${art} aria-hidden="true"><small>${item.description}</small></i>`
+              : `<i class="factory-option-art"${art} aria-hidden="true"></i>`;
           return `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}">${artMarkup}<span>${item.name}</span></button>`;
         }).join("")}
       </div>
@@ -728,22 +753,17 @@ function buildLobby() {
       </div>
       ${group("World", "theme", THEMES, 0)}
       ${group("Character", "companion", COMPANIONS, 1)}
-      ${group("Mood", "mood", MOODS, 2)}
+      ${group("Atmosphere", "mood", MOODS, 2)}
       ${group("Relics", "symbols", SYMBOL_SETS, 3)}
       <div class="factory-actions">
         <button class="primary-button" type="button" data-factory-next disabled>Next →</button>
       </div>
     </div>
-    <section class="factory-preview" id="factoryPreview" aria-label="Selected world preview">
+    <section class="factory-preview" id="factoryPreview" aria-label="Visual preview">
       <div class="factory-preview-world" id="factoryPreviewWorld"></div>
       <div class="factory-preview-mood" id="factoryPreviewMood"></div>
       <img class="factory-preview-companion" id="factoryPreviewCompanion" alt="" hidden>
-      <div class="factory-preview-copy">
-        <span>Live world · ${VISUAL_COMBINATION_COUNT.toLocaleString()} combinations</span>
-        <strong id="factoryPreviewName"></strong>
-        <small id="factoryPreviewMeta"></small>
-      </div>
-      <div class="factory-preview-mood-badge" id="factoryPreviewMoodBadge" hidden><i aria-hidden="true"></i><span>Mood</span><strong id="factoryPreviewMoodName"></strong></div>
+      <div class="factory-preview-mood-badge" id="factoryPreviewMoodBadge" hidden><i aria-hidden="true"></i><strong id="factoryPreviewMoodName"></strong><small id="factoryPreviewMoodDescription"></small></div>
     </section>`;
   updateLobbyPreview();
   updateLobbyStep();
@@ -802,8 +822,7 @@ function updateLobbyPreview() {
     $("factoryPreviewCompanion").hidden = true;
     $("factoryPreviewMoodBadge").hidden = true;
     $("factoryPreviewMoodName").textContent = "";
-    $("factoryPreviewName").textContent = "Choose your world";
-    $("factoryPreviewMeta").textContent = "Nothing is selected yet";
+    $("factoryPreviewMoodDescription").textContent = "";
     ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
       button.classList.remove("is-selected");
       button.setAttribute("aria-pressed", "false");
@@ -832,16 +851,8 @@ function updateLobbyPreview() {
   }
   $("factoryPreviewMoodBadge").hidden = !state.lobbyChoices.mood;
   $("factoryPreviewMoodName").textContent = state.lobbyChoices.mood ? visuals.mood.name : "";
-  const chosenName = [
-    visuals.theme.name,
-    state.lobbyChoices.companion ? visuals.companion.name : ""
-  ].filter(Boolean).join(" ");
-  const activeStep = FACTORY_STEPS[Math.min(state.lobbyStep, FACTORY_STEPS.length - 1)];
+  $("factoryPreviewMoodDescription").textContent = state.lobbyChoices.mood ? visuals.mood.description : "";
   const allChosen = FACTORY_STEPS.every((step) => state.lobbyChoices[step.key]);
-  $("factoryPreviewName").textContent = chosenName;
-  $("factoryPreviewMeta").textContent = state.lobbyChoices[activeStep.key]
-    ? state.lobbyStep === FACTORY_STEPS.length - 1 ? "Ready to play" : `${activeStep.label} selected · click Next`
-    : `Choose ${activeStep.label}`;
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
     const selected = state.lobbyChoices[button.dataset.configGroup]
       && state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
@@ -851,7 +862,7 @@ function updateLobbyPreview() {
   const next = ui.lobbyGames.querySelector("[data-factory-next]");
   if (next) {
     next.disabled = !state.lobbyChoices[FACTORY_STEPS[state.lobbyStep].key];
-    next.textContent = state.lobbyStep === FACTORY_STEPS.length - 1 && allChosen ? "Play →" : "Next →";
+    next.textContent = state.lobbyStep === FACTORY_STEPS.length - 1 && allChosen ? "Start →" : "Next →";
   }
 }
 
@@ -886,6 +897,8 @@ function restoreVisualConfig() {
   try {
     const stored = JSON.parse(window.localStorage.getItem(VISUAL_CONFIG_STORAGE_KEY) || "null");
     if (stored && typeof stored === "object") {
+      // The Mystic and Dark atmospheres became Arcane and Shadow.
+      stored.mood = { mystic: "arcane", dark: "shadow" }[stored.mood] ?? stored.mood;
       const resolved = resolveVisualConfig(stored);
       state.visualConfig = {
         theme: resolved.theme.id,
@@ -994,6 +1007,10 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.featureMarketOverlay.style.setProperty("--game-accent", game.accent);
   ui.featureMarketOverlay.style.setProperty("--game-secondary", game.secondary);
   ui.celebrationOverlay.style.setProperty("--game-accent", game.accent);
+  ui.celebrationOverlay.style.setProperty("--celebration-bg", `url("${game.bonusLoadingArt}")`);
+  ui.celebrationOverlay.style.setProperty("--celebration-mood", `url("${visuals.mood.asset}")`);
+  ui.winBanner.style.setProperty("--win-world-art", `url("${game.background}")`);
+  ui.winBanner.style.setProperty("--win-mood-art", `url("${visuals.mood.asset}")`);
   ui.bonusOverlay.style.setProperty("--game-accent", game.accent);
   ui.bonusOverlay.style.setProperty("--game-secondary", game.secondary);
   ui.bonusOverlay.style.setProperty("--bonus-bg", `url("${game.bonusLoadingArt}")`);
@@ -1005,8 +1022,6 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.astralFlightPlaneImage.src = game.planeAsset;
   ui.companionPortrait.src = visuals.companion.asset;
   document.title = `${visualConfigLabel(state.visualConfig)} · AISlots`;
-  $("brandName").textContent = game.name;
-  $("brandSubtitle").textContent = game.subtitle;
   $("featureEyebrow").textContent = game.featureEyebrow;
   $("moonwellTitle").textContent = game.featureName;
   $("featureCopy").textContent = game.featureCopy;
@@ -1249,12 +1264,14 @@ function animateCreditValue(element, amount, duration = 900, { sound = false, ti
 function showWinBanner(amount, bet, { outcomeClass = outcomeClassFor(amount, bet), total = false } = {}) {
   const tier = winTierFor(amount, bet);
   ui.winBanner.dataset.tier = tier.id;
-  if (outcomeClass === "partial-return") ui.winBannerLabel.textContent = `${currentGame().shortName} payout`;
-  else if (outcomeClass === "break-even") ui.winBannerLabel.textContent = `${currentGame().shortName} bet returned`;
+  if (outcomeClass === "partial-return") ui.winBannerLabel.textContent = `${currentGame().shortName} win`;
+  else if (outcomeClass === "break-even") ui.winBannerLabel.textContent = `${currentGame().shortName} win`;
   else if (total) ui.winBannerLabel.textContent = `${currentGame().shortName} total win`;
   else ui.winBannerLabel.textContent = tier.id === "nice" ? `Nice ${currentGame().shortName} win` : `${currentGame().shortName} win`;
   ui.winBannerMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
   ui.winBannerAmount.textContent = "$0.00";
+  ui.lastWin.textContent = formatCredits(amount);
+  ui.lastMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
   ui.winBanner.classList.add("is-visible");
   jumpText(ui.winBannerLabel);
   jumpText(ui.winBannerAmount);
@@ -1273,12 +1290,12 @@ function hideReturnChip() {
 }
 
 function showReturnChip(amount, wager) {
-  if (state.gameId !== "astral" || amount <= 0 || wager <= 0) {
+  if (amount <= 0 || wager <= 0) {
     hideReturnChip();
     return;
   }
   ui.returnAmount.textContent = formatMoney(amount);
-  ui.returnComparison.textContent = `${(amount / wager).toFixed(2)}× · ${formatMoney(amount)} of ${formatMoney(wager)} bet`;
+  ui.returnComparison.textContent = `${(amount / wager).toFixed(2)}× bet`;
   ui.returnChip.classList.toggle("is-partial", amount < wager);
   ui.returnChip.classList.toggle("is-profit", amount > wager);
   ui.returnChip.hidden = false;
@@ -1307,6 +1324,9 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
     ui.celebrationTitle.textContent = game.winLabels[tier.id];
     ui.celebrationKicker.textContent = tier.id === "big" ? "10× bet or more" : tier.id === "mega" ? "25× bet or more" : "50× bet or more";
     ui.celebrationAmount.textContent = "$0.00";
+    ui.celebrationBottomAmount.textContent = formatMoney(amount);
+    ui.lastWin.textContent = formatCredits(amount);
+    ui.lastMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
     ui.celebrationMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
     ui.celebrationGame.textContent = game.name;
     ui.celebrationCollect.textContent = `Collect ${formatMoney(amount)}`;
@@ -1614,7 +1634,7 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
   ui.astralFreeSpinLabel.textContent = "Flight " + (roundIndex + 1) + " / " + totalRounds;
   ui.astralCascadeLabel.textContent = "Climbing";
   ui.astralRoundAward.textContent = "0.01×";
-  ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · land when ready";
+  ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · press Play when ready";
   ui.astralFlightWorld.dataset.rarity = astralFlightRarity(multiplier);
   ui.astralFlightWorld.dataset.flightTarget = profile.progress.toFixed(2);
   setAstralFlightPosition(currentProgress);
@@ -1641,7 +1661,7 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     window.clearTimeout(automaticLand);
     window.cancelAnimationFrame(frame);
     ui.bonusAction.disabled = true;
-    ui.astralCascadeLabel.textContent = multiplier >= 5 ? "Afterburner" : "Landing";
+    ui.astralCascadeLabel.textContent = multiplier >= 5 ? "Afterburner" : "Revealing";
     ui.astralMultiplierDial.classList.remove("is-flying");
     ui.astralMultiplierDial.classList.add("is-landing");
     const remainingDistance = Math.max(0, profile.progress - currentProgress);
@@ -1656,10 +1676,10 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     });
     ui.astralMultiplierDial.classList.remove("is-landing");
     ui.astralMultiplierDial.classList.add("is-landed");
-    ui.astralCascadeLabel.textContent = "Landed";
+    ui.astralCascadeLabel.textContent = "Revealed";
     ui.astralRoundAward.textContent = formatMultiplier(multiplier);
     updateAstralFlightHud(profile.progress, multiplier);
-    ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · landed";
+    ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + totalRounds + " · revealed";
     ui.astralChoiceBar.style.width = (roundIndex + 1) / totalRounds * 100 + "%";
     const lock = ui.astralLockedMultipliers.children[roundIndex];
     if (lock) {
@@ -1685,6 +1705,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
   const game = currentGame();
   const picks = bonusRounds.flat();
   await runAstralCinematicTransition({ preview, multiplierCount: picks.length });
+  audio.bonusSceneStart();
   return new Promise((resolve) => {
     ui.bonusOverlay.dataset.mode = "astral-aviator";
     ui.bonusEyebrow.textContent = preview ? "Demo" : purchased ? "Feature buy" : "Bonus";
@@ -1707,7 +1728,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     updateAstralFlightHud(.04, 0);
     ui.constellationPicks.hidden = true;
     ui.constellationPicks.replaceChildren();
-    ui.bonusAction.textContent = preview ? "Take off" : "Take off · flight 1 / " + picks.length;
+    ui.bonusAction.textContent = preview ? "Play" : "Play · flight 1 / " + picks.length;
     ui.bonusAction.disabled = false;
     ui.bonusExit.hidden = true;
     ui.bonusOverlay.hidden = false;
@@ -1723,6 +1744,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     let activeRound = null;
 
     const close = () => {
+      audio.bonusSceneEnd();
       ui.bonusOverlay.classList.remove("is-entering", "is-playing", "is-resolved");
       ui.bonusOverlay.hidden = true;
       ui.bonusOverlay.setAttribute("aria-hidden", "true");
@@ -1753,7 +1775,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.astralMultiplierDial.classList.remove("is-flying", "is-landing", "is-landed");
       ui.bonusOverlay.classList.remove("is-playing", "is-resolved");
       ui.bonusOverlay.classList.add("is-entering");
-      ui.bonusAction.textContent = "Take off";
+      ui.bonusAction.textContent = "Play";
       ui.bonusAction.disabled = false;
       ui.bonusExit.hidden = true;
       setAstralFlightPosition(.04);
@@ -1777,7 +1799,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       animating = true;
       ui.bonusOverlay.classList.remove("is-entering");
       ui.bonusOverlay.classList.add("is-playing");
-      ui.bonusAction.textContent = "LAND NOW";
+      ui.bonusAction.textContent = "PLAY";
       ui.bonusAction.classList.add("is-stop");
       ui.bonusAction.disabled = false;
       const nextTotal = multiplierTotal + picks[roundIndex];
@@ -1793,7 +1815,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
         ui.astralFreeSpinLabel.textContent = "Flight " + (roundIndex + 1) + " / " + picks.length;
         ui.astralCascadeLabel.textContent = "Ready";
         ui.astralChoiceProgress.textContent = "Flight " + (roundIndex + 1) + " of " + picks.length;
-        ui.bonusAction.textContent = "Take off · flight " + (roundIndex + 1) + " / " + picks.length;
+        ui.bonusAction.textContent = "Play · flight " + (roundIndex + 1) + " / " + picks.length;
         ui.bonusAction.disabled = false;
         ui.bonusAction.focus();
         return;
@@ -1802,7 +1824,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.bonusOverlay.classList.remove("is-playing");
       ui.bonusOverlay.classList.add("is-resolved");
       ui.astralCascadeLabel.textContent = preview ? "Done" : "Complete";
-      ui.astralChoiceProgress.textContent = picks.length + " flights landed";
+      ui.astralChoiceProgress.textContent = picks.length + " flights revealed";
       ui.astralChoiceBar.style.width = "100%";
       jumpText(ui.astralCascadeLabel);
       playWinChord();
@@ -1860,11 +1882,13 @@ function showCardBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
     $("appShell").inert = true;
     ui.bonusAction.focus();
     playBonusSting();
+    audio.bonusSceneStart();
     burstParticles(28, 1.15);
     let revealed = false;
 
     ui.bonusAction.onclick = async () => {
       if (revealed) {
+        audio.bonusSceneEnd();
         ui.bonusOverlay.classList.remove("is-entering", "is-playing", "is-resolved");
         ui.bonusOverlay.hidden = true;
         ui.bonusOverlay.setAttribute("aria-hidden", "true");
@@ -1928,7 +1952,7 @@ function openFeatureMarket(panel = "special") {
   ui.featureMarketOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;
   document.body.classList.add("is-feature-market-open");
-  playTone(panel === "buy" ? 392 : 523.25, .18, "triangle");
+  audio.uiOpen();
   const focusTarget = panel === "buy"
     ? ui.featureMarketOverlay.querySelector("[data-buy-feature]")
     : ui.featureMarketOverlay.querySelector(`[data-progress-boost="${state.specialBetBoost}"]`);
@@ -1937,6 +1961,7 @@ function openFeatureMarket(panel = "special") {
 
 function closeFeatureMarket({ returnFocus = true } = {}) {
   const returnTarget = ui.featureMarketOverlay.dataset.panel === "buy" ? ui.buyFeatureButton : ui.specialBetButton;
+  if (!ui.featureMarketOverlay.hidden) audio.uiBack();
   ui.featureMarketOverlay.hidden = true;
   ui.featureMarketOverlay.setAttribute("aria-hidden", "true");
   $("appShell").inert = false;
@@ -2001,7 +2026,7 @@ async function buyAstralFeature(costMultiplier) {
   await rotateServerSeed();
   state.isSpinning = false;
   updateUi();
-  setStatus(`${costMultiplier}× feature · ${formatMultiplier(outcome.bonusMultiplier)} · ${formatMoney(outcome.totalWin)} returned`);
+  setStatus(`${costMultiplier}× feature · ${formatMultiplier(outcome.bonusMultiplier)} · won ${formatMoney(outcome.totalWin)}`);
   ui.buyFeatureButton.focus();
 }
 
@@ -2012,7 +2037,7 @@ async function spin({ fromAuto = false } = {}) {
   const wager = currentSpinWager();
   if (state.balance < wager) {
     setStatus("Balance too low. Reset it below.");
-    playTone(170, .2, "square");
+    audio.uiDeny();
     state.autoStopRequested = true;
     return false;
   }
@@ -2059,14 +2084,16 @@ async function spin({ fromAuto = false } = {}) {
   const resultDisplayMs = currentSpinSpeed().resultDisplayMs;
   const remainingDelay = Math.max(0, resultDisplayMs - (performance.now() - startedAt));
   const anticipation = outcome.bonusRounds.length > 0;
-  if (anticipation && remainingDelay > 760) {
-    await waitForSpinDelay(remainingDelay - 760);
-    setAnticipationUi(true, game.anticipationCopy);
-    setStatus(game.anticipationCopy);
-    playAnticipationSound();
-    await waitForSpinDelay(760);
+  if (anticipation && remainingDelay > 760 && !state.autoStopRequested) {
+    await waitForAutoplayResult(remainingDelay - 760, fromAuto);
+    if (!state.autoStopRequested) {
+      setAnticipationUi(true, game.anticipationCopy);
+      setStatus(game.anticipationCopy);
+      playAnticipationSound();
+      await waitForAutoplayResult(760, fromAuto);
+    }
   } else {
-    await waitForSpinDelay(remainingDelay);
+    await waitForAutoplayResult(remainingDelay, fromAuto);
   }
   window.clearInterval(shuffleTimer);
 
@@ -2086,9 +2113,9 @@ async function spin({ fromAuto = false } = {}) {
   } else if (baseOutcomeClass === "net-win") {
     setStatus(`${outcome.wins.length} payout${outcome.wins.length === 1 ? "" : "s"} illuminated`);
   } else if (baseOutcomeClass === "break-even") {
-    setStatus(`Bet returned exactly · ${formatMoney(outcome.baseWin)} returned on ${formatMoney(wager)} bet`);
+    setStatus(`Won ${formatMoney(outcome.baseWin)} · ${formatMoney(wager)} bet`);
   } else if (baseOutcomeClass === "partial-return") {
-    setStatus(`${formatMoney(outcome.baseWin)} returned on ${formatMoney(wager)} bet`);
+    setStatus(`Won ${formatMoney(outcome.baseWin)} · ${formatMoney(wager)} bet`);
   } else {
     setStatus(`No win this spin. ${game.featureName} keeps your progress.`);
   }
@@ -2143,17 +2170,17 @@ async function spin({ fromAuto = false } = {}) {
   state.isSpinning = false;
   updateUi();
 
-  if (totalOutcomeClass === "net-win") setStatus(`${formatMoney(outcome.totalWin)} returned on ${formatMoney(wager)} bet · receipt ready`);
-  else if (totalOutcomeClass === "break-even") setStatus(`Break-even result · ${formatMoney(outcome.totalWin)} returned · receipt ready`);
-  else if (totalOutcomeClass === "partial-return") setStatus(`${formatMoney(outcome.totalWin)} returned on ${formatMoney(wager)} bet · receipt ready`);
-  else setStatus("No return · receipt ready");
+  if (totalOutcomeClass === "net-win") setStatus(`Won ${formatMoney(outcome.totalWin)} · ${formatMoney(wager)} bet · receipt ready`);
+  else if (totalOutcomeClass === "break-even") setStatus(`Won ${formatMoney(outcome.totalWin)} · receipt ready`);
+  else if (totalOutcomeClass === "partial-return") setStatus(`Won ${formatMoney(outcome.totalWin)} · ${formatMoney(wager)} bet · receipt ready`);
+  else setStatus("No win · receipt ready");
   if (!fromAuto) ui.spinButton.focus();
   return true;
 }
 
 function stopAutoplay(message = "Autoplay stopped") {
   state.autoStopRequested = true;
-  state.autoActive = false;
+  if (!state.isSpinning) state.autoActive = false;
   updateUi();
   if (!state.isSpinning) setStatus(message);
 }
@@ -2163,7 +2190,7 @@ async function startAutoplay() {
   state.autoActive = true;
   state.autoStopRequested = false;
   updateUi();
-  setStatus("Infinite autoplay started · press Stop at any time");
+  setStatus("Infinite autoplay started · press either red Stop at any time");
 
   while (state.autoActive && !state.autoStopRequested) {
     const completed = await spin({ fromAuto: true });
@@ -2215,6 +2242,19 @@ function enableSoundFromGesture() {
 }
 
 function bindEvents() {
+  // Subtle premium hover feedback on every interactive control. The engine
+  // throttles and randomizes it so it never becomes noise.
+  let lastHoveredButton = null;
+  document.addEventListener("pointerover", (event) => {
+    const button = event.target.closest("button");
+    if (!button || button.disabled) {
+      lastHoveredButton = null;
+      return;
+    }
+    if (button === lastHoveredButton) return;
+    lastHoveredButton = button;
+    audio.uiHover();
+  });
   $("brandLink").addEventListener("click", (event) => {
     event.preventDefault();
     openLobby();
@@ -2223,7 +2263,7 @@ function bindEvents() {
     const option = event.target.closest("[data-config-group]");
     if (option) {
       setVisualConfigChoice(option.dataset.configGroup, option.dataset.configId);
-      playTone(520 + [...option.parentElement.children].indexOf(option) * 55, .08, "triangle");
+      audio.uiSelect([...option.parentElement.children].indexOf(option));
       return;
     }
     if (event.target.closest("[data-factory-next]")) {
@@ -2235,7 +2275,7 @@ function bindEvents() {
           updateLobbyStep();
           updateLobbyPreview();
         }
-        playTone(620, .08, "triangle");
+        audio.uiConfirm();
       }
       return;
     }
@@ -2243,12 +2283,12 @@ function bindEvents() {
       state.lobbyStep = Math.max(0, state.lobbyStep - 1);
       updateLobbyStep();
       updateLobbyPreview();
-      playTone(420, .07, "triangle");
+      audio.uiBack();
       return;
     }
     if (event.target.closest("[data-randomize-world]")) {
       randomizeVisualConfig();
-      playTone(880, .14, "triangle");
+      audio.uiSurprise();
       return;
     }
   });
@@ -2263,7 +2303,7 @@ function bindEvents() {
   ui.maxBetButton.addEventListener("click", () => {
     state.betIndex = BET_OPTIONS.length - 1;
     updateUi();
-    playTone(520, .14, "triangle");
+    audio.uiConfirm();
   });
   ui.specialBetButton.addEventListener("click", () => openFeatureMarket("special"));
   ui.buyFeatureButton.addEventListener("click", () => openFeatureMarket("buy"));
@@ -2279,19 +2319,25 @@ function bindEvents() {
       setStatus(state.specialBetBoost
         ? `Special bet active · +${state.specialBetBoost} guaranteed ${state.specialBetBoost === 1 ? game.collectionName : game.collectionPlural}`
         : "Standard bet active");
-      playTone(state.specialBetBoost ? 880 + state.specialBetBoost * 160 : 520, .18, "triangle");
+      audio.uiConfirm();
     });
   });
   document.querySelectorAll("[data-buy-feature]").forEach((button) => {
     button.addEventListener("click", () => buyAstralFeature(Number(button.dataset.buyFeature)));
   });
-  ui.spinButton.addEventListener("click", () => spin());
+  ui.spinButton.addEventListener("click", () => {
+    if (state.autoActive) {
+      stopAutoplay("Stopping autoplay…");
+      return;
+    }
+    spin();
+  });
   ui.speedToggleButton.addEventListener("click", () => {
     selectSpinSpeed(currentSpinSpeed().id === "fast" ? "normal" : "fast");
   });
   ui.autoButton.addEventListener("click", () => {
     if (state.autoActive) {
-      stopAutoplay("Autoplay will stop after the current spin");
+      stopAutoplay("Stopping autoplay…");
       return;
     }
     startAutoplay();
@@ -2300,15 +2346,25 @@ function bindEvents() {
     setSoundEnabled(!state.soundEnabled, { remember: true, cue: true });
   });
 
-  $("rulesButton").addEventListener("click", () => openDialog("rulesDialog"));
-  $("fairnessButton").addEventListener("click", () => openDialog("fairnessDialog"));
+  $("rulesButton").addEventListener("click", () => {
+    audio.uiOpen();
+    openDialog("rulesDialog");
+  });
+  $("fairnessButton").addEventListener("click", () => {
+    audio.uiOpen();
+    openDialog("fairnessDialog");
+  });
   ui.lastWinButton.addEventListener("click", () => {
     renderWinDetails();
+    audio.uiOpen();
     openDialog("winDetailsDialog");
   });
 
   document.querySelectorAll("[data-close-dialog]").forEach((button) => {
-    button.addEventListener("click", () => $(button.dataset.closeDialog)?.close());
+    button.addEventListener("click", () => {
+      audio.uiBack();
+      $(button.dataset.closeDialog)?.close();
+    });
   });
   document.querySelectorAll("dialog").forEach((dialog) => {
     dialog.addEventListener("click", (event) => {

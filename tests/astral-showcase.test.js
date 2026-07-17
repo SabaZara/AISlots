@@ -39,7 +39,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /factory-option-art/);
   assert.match(app, /factory-symbol-showcase/);
   assert.match(app, /factory-preview-mood-badge/);
-  assert.match(app, /Play →/);
+  assert.match(app, /Start →/);
   assert.doesNotMatch(app, /factoryReview|data-build-play|is-reviewing|Review →/);
   assert.doesNotMatch(app, /data-world-prompt-form|function applyVisualPrompt|Describe your world/);
   assert.match(app, /resolveVisualConfig/);
@@ -71,6 +71,15 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.doesNotMatch(html, /id="gameTitle"|class="machine-title"/);
   assert.match(css, /factory-step-track \{ grid-template-columns: repeat\(4/);
   assert.match(css, /\.factory-symbol-showcase b[\s\S]*?background-size: 400% 200%/);
+  assert.match(app, /symbol-sheet-0[\s\S]*?symbol-sheet-3[\s\S]*?factory-scatter-choice/);
+  assert.match(app, /if \(id === "petal" && game\.scatterAsset\)/);
+  assert.doesNotMatch(app, /game\.scatterAsset && !game\.symbolSheet/);
+  assert.match(css, /\.factory-symbol-showcase \.factory-scatter-choice[\s\S]*?var\(--scatter-choice-art\)/);
+  assert.doesNotMatch(app, /factoryPreviewName|factoryPreviewMeta|brandName"\)\.textContent/);
+  assert.doesNotMatch(html, /brandSubtitle|Create your slot world|Exact 99\.00% RTP|Returned/i);
+  assert.match(app, /--celebration-bg/);
+  assert.match(css, /var\(--celebration-bg\) center \/ cover no-repeat/);
+  assert.match(html, /celebrationBottomAmount/);
   assert.match(css, /\.factory-preview-mood-badge/);
   assert.match(css, /\.lobby-overlay\.is-awaiting-theme[\s\S]*?background-image: none/);
   assert.doesNotMatch(app + css, /factory-preview-sparkles|worldSparkle/);
@@ -104,12 +113,14 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(css, /\.symbol-cell\[data-col="5"\] \{ border-right: 0/);
   assert.match(app, /function startSpinReelLayer/);
   assert.match(app, /stopSpinReelColumn\(reel\)/);
-  assert.match(app, /strip\.style\.transform = `translateY\(\$\{startY\}px\)`/);
+  assert.match(app, /strip\.style\.transform = `translate3d\(0, \$\{startY\}px, 0\)`/);
   assert.match(app, /velocityMatch = 0\.30 \/ 0\.18/);
   assert.match(app, /orderedLandingGap = speed\.id === "fast" \? 130 : 225/);
   assert.match(app, /column\?\.classList\.add\("is-landed"\)/);
   assert.doesNotMatch(app, /column\?\.remove\(\)/);
-  assert.match(app, /easing: "cubic-bezier\(\.18,\.30,\.42,1\)"/);
+  assert.match(app, /requestAnimationFrame\(resolve\)/);
+  assert.match(app, /easing: "cubic-bezier\(\.18,\.30,\.38,1\)"/);
+  assert.match(css, /@keyframes continuousReelStrip[\s\S]*?translate3d/);
   assert.doesNotMatch(app, /endY \+ overshoot|reelStripLand/);
   assert.match(css, /@keyframes continuousReelStrip/);
   assert.match(css, /reel-spin-column\.is-decelerating/);
@@ -140,7 +151,8 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.doesNotMatch(app, /Math\.pow\(1 - time, 3\)/);
   assert.match(app, /setAstralFlightPosition\(progress\)/);
   assert.match(app, /activeRound = beginAstralFlight/);
-  assert.match(app, /ui\.bonusAction\.textContent = "LAND NOW"/);
+  assert.match(app, /ui\.bonusAction\.textContent = "PLAY"/);
+  assert.doesNotMatch(app, /LAND NOW/);
   assert.match(app, /ui\.bonusOverlay\.dataset\.mode = "astral-aviator"/);
   assert.match(app, /ui\.cinematicOverlay\.dataset\.mode = "world-awakening"/);
   assert.doesNotMatch(app, /--cinematic-companion/);
@@ -177,7 +189,7 @@ test("transparent symbols fuse while reel tiles remain stationary", async () => 
   assert.match(css, /@keyframes fusionCoreBurst/);
   assert.match(css, /\.symbol-cell\.is-fusing \.generated-symbol/);
   assert.match(css, /\.symbol-cell\.is-winner[\s\S]*?transform: none/);
-  assert.match(app, /transparent-v/);
+  assert.match(app, /return `<img class="scatter-symbol" src="\$\{game\.scatterAsset\}"/);
   assert.match(css, /mix-blend-mode: normal/);
 });
 
@@ -192,7 +204,20 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
   assert.doesNotMatch(html, /spin-speed-selector|data-spin-speed|autoplayOverlay|data-auto-count/);
   assert.match(app, /async function startAutoplay\(\)/);
   assert.match(app, /while \(state\.autoActive && !state\.autoStopRequested\)/);
-  assert.match(app, /Stop infinite autoplay after the current spin/);
+  assert.match(app, /Stop infinite autoplay now/);
+  assert.match(app, /async function waitForAutoplayResult\(milliseconds, fromAuto\)/);
+  assert.match(app, /while \(remaining > 0 && !state\.autoStopRequested\)/);
+  assert.match(app, /spinButton\.classList\.toggle\("is-autoplay-stop", state\.autoActive\)/);
+  assert.match(app, /if \(state\.autoActive\)[\s\S]*?stopAutoplay\("Stopping autoplay…"\)/);
+  assert.match(app, /state\.autoActive \? "■" : "↻"/);
+  assert.match(app, /state\.autoActive[\s\S]*?`<span aria-hidden="true">STOP<\/span>`/);
+  assert.doesNotMatch(app, /STOP<\/span><strong[^>]*>■/);
+  assert.match(css, /spin-button\.is-autoplay-stop \.spin-icon[\s\S]*?color: #ff3347/);
+  assert.doesNotMatch(css, /spin-button\.is-autoplay-stop \{[\s\S]*?background:/);
+  assert.match(css, /companionCinematicIdle/);
+  assert.match(css, /machine > \.companion-stage[\s\S]*?width: min\(62%, 760px\)/);
+  assert.match(app, /--win-world-art/);
+  assert.match(css, /var\(--win-world-art\) center \/ cover no-repeat/);
   assert.doesNotMatch(app, /autoRemaining|setAutoplayMenuOpen/);
   assert.match(app, /speedToggleButton\.addEventListener/);
   assert.match(app, /const settleTail = speed\.id === ["']fast["'] \? 40 : 90/);
@@ -205,6 +230,8 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
   assert.match(app, /if \(outcome\.baseWin > 0\)/);
   assert.match(app, /await showWinBanner\(outcome\.baseWin/);
   assert.match(app, /outcomeClass === "partial-return"/);
+  assert.match(html, /<span>Won<\/span>/);
+  assert.doesNotMatch(app, /returned on|No return|bet returned/i);
 });
 
 test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iPad", async () => {
@@ -224,16 +251,18 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(JSON.parse(packageJson).version, /^\d+\.\d+\.\d+$/);
 });
 
-test("four mood profiles provide distinct music identities and licensed files stay local", async () => {
+test("four atmosphere profiles provide distinct adaptive music identities and licensed files stay local", async () => {
   const [engine, licenses] = await Promise.all([
     readFile(new URL("experience-engine.js", root), "utf8"),
     readFile(new URL("assets/audio/LICENSES.md", root), "utf8")
   ]);
-  assert.match(engine, /playMusicStep\(\)/);
+  assert.match(engine, /scheduleMusic\(\)/);
   assert.match(engine, /startMusic\(\)/);
   assert.match(engine, /restartMusic\(\)/);
-  for (const percussion of ["moonpulse", "bubble", "forge", "arena"]) {
-    assert.match(engine, new RegExp(`percussion: ["']${percussion}["']`));
+  assert.match(engine, /startAmbience\(\)/);
+  assert.match(engine, /characterMoment\(/);
+  for (const percussion of ["warDrum", "bellTick", "toyPop", "darkMetal"]) {
+    assert.match(engine, new RegExp(`perc: ["']${percussion}["']`));
   }
   for (const path of [
     "assets/audio/wow-astral-background-modern-edgy.ogg",

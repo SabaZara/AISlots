@@ -12,9 +12,9 @@ This file is the team-review checklist for the current simulated-credit build. R
 | Explicit layer choices | Implemented | World, Character, Mood, and Relics are four ordered steps. A selection stays on its current step until the player clicks Next; Back revisits the previous step. The fourth button starts the game directly, with no review page. |
 | Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
 | One companion | Implemented | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, or Arcane Sorceress; exactly one transparent standalone cutout is displayed. |
-| Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. The live preview shows a dedicated color-coded Mood badge and matching light treatment. |
-| Symbol selection | Implemented | Six newly generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, feathers, eggs/orbs, weapons, temples, wings, and rebirth crests. Creator cards crop all seven relics individually instead of shrinking the complete atlas into one picture. |
-| Surprise me | Implemented | Randomly chooses all four player-facing visual layers, updates the preview, and moves to the final Relics step ready to play. |
+| Atmosphere selection | Implemented | Epic, Arcane, Playful, or Shadow swaps the entire layered soundscape (music, ambience, spin, rewards, UI) and complements it with a matching lighting treatment. The live preview shows a dedicated color-coded Mood badge and matching light treatment. |
+| Symbol selection | Implemented | Six generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, weapons, and scatter crests. Creator cards enlarge three representative isolated relics instead of shrinking the complete atlas into one picture. |
+| Surprise me | Implemented | Randomly chooses all four player-facing visual layers, updates the preview, and moves to the final Relics step ready to start. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
 | Combination count | Implemented | 6 × 8 × 4 × 6 = 1,152 configurations. |
 
@@ -38,7 +38,7 @@ This file is the team-review checklist for the current simulated-credit build. R
 | Function | Status | Behavior |
 |---|---|---|
 | Scatter tracker | Implemented | Every Scatter anywhere on the board advances persistent 18-step progress. Overflow carries into the next tracker. The old circular counter and dot field are removed. |
-| Dynamic Scatter art | Implemented | Each selected family supplies a transparent rebirth/Scatter crest in its reel atlas plus a dedicated transparent tracker cutout. |
+| Dynamic Scatter art | Implemented | Each selected family supplies one dedicated transparent Scatter cutout shared by the reel cells, creator card, collection tracker, and feature panels. |
 | Special Bet | Implemented | The selected world image and Scatter art theme both the cabinet control and market panel. Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters remain calibrated to 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | The selected launch scene and plane art theme both the cabinet control and market panel. 25×, 50×, or 100× purchases use separately calibrated 99.00% prize tables. |
 | World-connected opening | Implemented | Fire, Ice, Nature, Void, Storm, and Abyss each use a separately generated launch-gate loading scene. The loading cinematic shows only the environment—no companion layer. The opening runs once. |

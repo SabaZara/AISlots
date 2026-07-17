@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="AISlots World Forge — 1,152 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4.5.5" />
+    <link rel="stylesheet" href="./styles.css?v=4.6.4" />
     <title>AISlots World Forge · 1,152 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -15,8 +15,7 @@
         <a class="brand" id="brandLink" href="#game" aria-label="Open game lobby">
           <span class="brand-mark" aria-hidden="true">✦</span>
           <span>
-            <strong id="brandName">Fire Dragon</strong>
-            <small id="brandSubtitle">Epic · Inferno Relics</small>
+            <strong id="brandName">AISlots</strong>
           </span>
         </a>
 
@@ -89,16 +88,16 @@
                   <strong id="anticipationCopy">Final reel in motion</strong>
                   <i><b></b></i>
                 </div>
-              </div>
-              <div class="win-banner" id="winBanner" aria-hidden="true">
-                <span id="winBannerLabel">Celestial win</span>
-                <strong id="winBannerAmount">$0.00</strong>
-                <small id="winBannerMultiplier">0.00× bet</small>
+                <div class="win-banner" id="winBanner" aria-hidden="true">
+                  <span id="winBannerLabel">Win</span>
+                  <strong id="winBannerAmount">$0.00</strong>
+                  <small id="winBannerMultiplier">0.00× bet</small>
+                </div>
               </div>
               <div class="return-chip" id="returnChip" hidden aria-live="polite" aria-hidden="true">
-                <span>Returned</span>
+                <span>Won</span>
                 <strong id="returnAmount">$0.00</strong>
-                <small id="returnComparison">0.00× · $0.00 bet</small>
+                <small id="returnComparison">0.00× bet</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">
@@ -253,6 +252,7 @@
         <p><span id="celebrationMultiplier">0.00× bet</span> · <span id="celebrationGame">Fire Dragon</span></p>
         <button class="primary-button celebration-collect" id="celebrationCollect" type="button">Collect win</button>
       </section>
+      <div class="celebration-bottom-win" aria-live="polite"><span>Won</span><strong id="celebrationBottomAmount">$0.00</strong></div>
     </div>
 
     <div class="cinematic-overlay" id="cinematicOverlay" hidden aria-hidden="true" data-phase="sleeping">
@@ -334,7 +334,7 @@
         <div class="constellation-picks" id="constellationPicks"></div>
         <div class="bonus-total"><span id="bonusTotalLabel">Bonus win</span><strong id="bonusTotal">$0.00</strong></div>
         <button class="secondary-button bonus-exit" id="bonusExit" type="button" hidden>Back to game</button>
-        <button class="primary-button bonus-action" id="bonusAction" type="button">Take off</button>
+        <button class="primary-button bonus-action" id="bonusAction" type="button">Play</button>
       </div>
     </div>
 
@@ -371,15 +371,11 @@
     </div>
 
     <div class="lobby-overlay" id="lobbyOverlay" aria-hidden="false">
-      <section class="lobby-shell" role="dialog" aria-modal="true" aria-labelledby="lobbyTitle">
-        <div class="lobby-heading">
-          <div><span class="eyebrow">18+</span><h2 id="lobbyTitle">Create your slot world</h2></div>
-        </div>
+      <section class="lobby-shell" role="dialog" aria-modal="true" aria-label="Configure slot">
         <div class="lobby-games" id="lobbyGames" aria-label="Choose slot world layers"></div>
-        <div class="lobby-foot"><span>Exact 99.00% RTP</span></div>
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.5.5"></script>
+    <script type="module" src="./app.js?v=4.6.4"></script>
   </body>
 </html>

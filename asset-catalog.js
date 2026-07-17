@@ -19,10 +19,10 @@ export const COMPANIONS = Object.freeze([
 ]);
 
 export const MOODS = Object.freeze([
-  Object.freeze({ id: "epic", name: "Epic", description: "Heroic gold", asset: "./assets/factory/mood-epic-v1.jpg" }),
-  Object.freeze({ id: "mystic", name: "Mystic", description: "Ethereal violet", asset: "./assets/factory/mood-mystic-v1.jpg" }),
-  Object.freeze({ id: "playful", name: "Playful", description: "Bright energy", asset: "./assets/factory/mood-playful-v1.jpg" }),
-  Object.freeze({ id: "dark", name: "Dark", description: "Ominous shadow", asset: "./assets/factory/mood-dark-v1.jpg" })
+  Object.freeze({ id: "epic", name: "Epic", description: "Legendary adventure", asset: "./assets/factory/mood-epic-v1.jpg" }),
+  Object.freeze({ id: "arcane", name: "Arcane", description: "Ancient magic", asset: "./assets/factory/mood-mystic-v1.jpg" }),
+  Object.freeze({ id: "playful", name: "Playful", description: "Joyful energy", asset: "./assets/factory/mood-playful-v1.jpg" }),
+  Object.freeze({ id: "shadow", name: "Shadow", description: "Dangerous ancient power", asset: "./assets/factory/mood-dark-v1.jpg" })
 ]);
 
 const SYMBOL_IDS = Object.freeze(["luma", "orbit", "nova", "comet", "dew", "leaf", "petal"]);
