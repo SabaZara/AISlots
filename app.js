@@ -22,7 +22,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.4.4";
+} from "./asset-catalog.js?v=4.4.5";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -641,7 +641,7 @@ function buildLobby() {
     <section class="factory-preview" id="factoryPreview" aria-label="Selected world preview">
       <div class="factory-preview-world" id="factoryPreviewWorld"></div>
       <div class="factory-preview-mood" id="factoryPreviewMood"></div>
-      <img class="factory-preview-companion" id="factoryPreviewCompanion" alt="">
+      <img class="factory-preview-companion" id="factoryPreviewCompanion" alt="" hidden>
       <div class="factory-preview-copy">
         <span>Live world · ${VISUAL_COMBINATION_COUNT.toLocaleString()} combinations</span>
         <strong id="factoryPreviewName"></strong>
@@ -710,6 +710,7 @@ function updateLobbyPreview() {
     $("factoryPreviewMood").style.backgroundImage = "none";
     $("factoryPreviewCompanion").removeAttribute("src");
     $("factoryPreviewCompanion").alt = "";
+    $("factoryPreviewCompanion").hidden = true;
     $("factoryPreviewName").textContent = "Choose your world";
     $("factoryPreviewMeta").textContent = "Nothing is selected yet";
     const reviewName = $("factoryReviewName");
@@ -736,9 +737,11 @@ function updateLobbyPreview() {
   if (state.lobbyChoices.companion) {
     $("factoryPreviewCompanion").src = visuals.companion.asset;
     $("factoryPreviewCompanion").alt = `${visuals.companion.name} companion`;
+    $("factoryPreviewCompanion").hidden = false;
   } else {
     $("factoryPreviewCompanion").removeAttribute("src");
     $("factoryPreviewCompanion").alt = "";
+    $("factoryPreviewCompanion").hidden = true;
   }
   const chosenName = [
     state.lobbyChoices.mood ? visuals.mood.name : "",

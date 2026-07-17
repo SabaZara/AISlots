@@ -10193,3 +10193,25 @@ input,
   72% { transform: translateY(4%) scale(1.018); opacity: 1; filter: brightness(1.1); }
   100% { transform: translateY(0) scale(1); opacity: 1; filter: none; }
 }
+
+/* 4.4.5 — the stopped result is stationary; titles and empty previews stay clean. */
+.game-stage[data-game="astral"] .reel-viewport.is-stopping .symbol-cell.is-settling .generated-symbol,
+.game-stage[data-game="astral"] .reel-viewport.is-stopping .symbol-cell.is-settling .scatter-symbol,
+.game-stage[data-game="astral"] .reel-viewport.is-stopping .symbol-cell.is-settling svg {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+  filter: drop-shadow(0 6px 7px rgba(0,0,0,.62)) drop-shadow(0 0 5px var(--symbol-glow)) !important;
+}
+
+.game-stage[data-game="astral"] .reels.is-cinematic-drop .symbol-cell.is-settling::after { display: none; }
+
+.game-stage[data-game="astral"] .machine-title h1 {
+  max-width: min(82vw, 820px);
+  white-space: nowrap;
+  font-size: clamp(18px, 3.7vw, 54px);
+  line-height: 1;
+}
+
+.factory-preview-companion[hidden],
+.factory-preview-companion:not([src]) { display: none !important; }

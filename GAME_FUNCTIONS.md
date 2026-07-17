@@ -61,7 +61,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
-- Spins use six continuous vertical reel strips. Symbols move together within each reel and clip only at the outer reel window; the previous independent per-tile block shuffle is not used. Reels stop left-to-right with a short, clean landing instead of a full-cell jump.
+- Spins use six continuous vertical reel strips. Symbols move together within each reel and clip only at the outer reel window; the previous independent per-tile block shuffle is not used. Reels stop left-to-right and the revealed symbols freeze immediately without a secondary landing movement.
 - Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.
 
 ## Fairness and return

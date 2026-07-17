@@ -13,8 +13,8 @@ export const COMPANIONS = Object.freeze([
   Object.freeze({ id: "direwolf", name: "Direwolf", asset: "./assets/factory/companion-direwolf-cutout-v3.png" }),
   Object.freeze({ id: "kraken", name: "Kraken", asset: "./assets/factory/companion-kraken-cutout-v3.png" }),
   Object.freeze({ id: "titan", name: "Titan", asset: "./assets/factory/companion-titan-cutout-v3.png" }),
-  Object.freeze({ id: "tiger", name: "Tiger Warrior", asset: "./assets/factory/companion-tiger-cutout-v3.png" }),
-  Object.freeze({ id: "gorilla", name: "Gorilla Warrior", asset: "./assets/factory/companion-gorilla-cutout-v3.png" }),
+  Object.freeze({ id: "tiger", name: "Tiger", asset: "./assets/factory/companion-tiger-cutout-v3.png" }),
+  Object.freeze({ id: "gorilla", name: "Gorilla", asset: "./assets/factory/companion-gorilla-cutout-v3.png" }),
   Object.freeze({ id: "sorceress", name: "Arcane Sorceress", asset: "./assets/factory/companion-sorceress-cutout-v3.png" })
 ]);
 
