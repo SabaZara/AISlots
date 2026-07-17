@@ -23,7 +23,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.5.4";
+} from "./asset-catalog.js?v=4.5.5";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -243,7 +243,7 @@ function updateAstralFeatureUi(controlsLocked = false) {
     const price = button.querySelector(`[data-buy-price="${costMultiplier}"]`);
     if (price) price.textContent = formatMoney(cost);
     button.disabled = controlsLocked || state.balance < cost;
-    button.setAttribute("aria-label", `Buy ${costMultiplier} times bet ${game.featureName} bonus for ${formatMoney(cost)} in free play`);
+    button.setAttribute("aria-label", `Buy ${costMultiplier} times bet ${game.featureName} bonus for ${formatMoney(cost)}`);
   });
 }
 
@@ -706,7 +706,10 @@ function buildLobby() {
       <div class="factory-options" style="--option-count:${items.length}" role="group" aria-label="Choose ${label.toLowerCase()}">
         ${items.map((item) => {
           const art = item.asset ? ` style="--choice-art:url('${item.asset}')"` : "";
-          return `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}"><i class="factory-option-art"${art} aria-hidden="true"></i><span>${item.name}</span></button>`;
+          const artMarkup = key === "symbols"
+            ? `<i class="factory-symbol-showcase"${art} aria-hidden="true">${Array.from({ length: 7 }, (_, index) => `<b class="symbol-sheet-${index}"></b>`).join("")}</i>`
+            : `<i class="factory-option-art"${art} aria-hidden="true"></i>`;
+          return `<button type="button" data-config-group="${key}" data-config-id="${item.id}" aria-pressed="false" aria-label="${item.name}">${artMarkup}<span>${item.name}</span></button>`;
         }).join("")}
       </div>
     </section>`;
@@ -727,12 +730,8 @@ function buildLobby() {
       ${group("Character", "companion", COMPANIONS, 1)}
       ${group("Mood", "mood", MOODS, 2)}
       ${group("Relics", "symbols", SYMBOL_SETS, 3)}
-      <section class="factory-review" id="factoryReview" hidden>
-        <span>World complete</span><strong id="factoryReviewName"></strong><small>Review the preview, then enter your game.</small>
-      </section>
       <div class="factory-actions">
         <button class="primary-button" type="button" data-factory-next disabled>Next →</button>
-        <button class="primary-button" type="button" data-build-play hidden>Create &amp; play</button>
       </div>
     </div>
     <section class="factory-preview" id="factoryPreview" aria-label="Selected world preview">
@@ -744,48 +743,40 @@ function buildLobby() {
         <strong id="factoryPreviewName"></strong>
         <small id="factoryPreviewMeta"></small>
       </div>
-      <div class="factory-preview-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="factory-preview-mood-badge" id="factoryPreviewMoodBadge" hidden><i aria-hidden="true"></i><span>Mood</span><strong id="factoryPreviewMoodName"></strong></div>
     </section>`;
   updateLobbyPreview();
   updateLobbyStep();
 }
 
 function updateLobbyStep() {
-  const stepIndex = Math.max(0, Math.min(FACTORY_STEPS.length, state.lobbyStep));
-  const isReview = stepIndex === FACTORY_STEPS.length;
-  const step = FACTORY_STEPS[Math.min(stepIndex, FACTORY_STEPS.length - 1)];
+  const stepIndex = Math.max(0, Math.min(FACTORY_STEPS.length - 1, state.lobbyStep));
+  const step = FACTORY_STEPS[stepIndex];
   state.lobbyStep = stepIndex;
-  ui.lobbyGames.dataset.factoryStep = isReview ? "review" : step.key;
+  ui.lobbyGames.dataset.factoryStep = step.key;
   ui.lobbyGames.querySelectorAll("[data-factory-step]").forEach((group) => {
     group.hidden = Number(group.dataset.factoryStep) !== stepIndex;
   });
   ui.lobbyGames.querySelectorAll("[data-factory-progress]").forEach((marker) => {
     const markerIndex = Number(marker.dataset.factoryProgress);
     marker.classList.toggle("is-current", markerIndex === stepIndex);
-    marker.classList.toggle("is-complete", markerIndex < stepIndex || isReview);
+    marker.classList.toggle("is-complete", markerIndex < stepIndex);
   });
   const counter = $("factoryStepCount");
   const prompt = $("factoryStepPrompt");
-  const review = $("factoryReview");
   const actions = ui.lobbyGames.querySelector(".factory-actions");
   const back = ui.lobbyGames.querySelector("[data-factory-back]");
-  if (counter) counter.textContent = isReview ? "Ready to play" : `Step ${stepIndex + 1} of ${FACTORY_STEPS.length}`;
-  if (prompt) prompt.textContent = isReview ? "Your world is ready" : step.prompt;
-  if (review) review.hidden = !isReview;
+  if (counter) counter.textContent = `Step ${stepIndex + 1} of ${FACTORY_STEPS.length}`;
+  if (prompt) prompt.textContent = step.prompt;
   if (actions) actions.hidden = false;
   if (back) back.disabled = stepIndex === 0;
   const next = ui.lobbyGames.querySelector("[data-factory-next]");
-  const play = ui.lobbyGames.querySelector("[data-build-play]");
   if (next) {
-    next.hidden = isReview;
-    next.disabled = isReview || !state.lobbyChoices[step.key];
+    next.hidden = false;
+    next.disabled = !state.lobbyChoices[step.key];
   }
-  if (play) play.hidden = !isReview;
-  ui.lobbyGames.classList.toggle("is-reviewing", isReview);
   window.requestAnimationFrame(() => {
-    const focusTarget = isReview
-      ? ui.lobbyGames.querySelector("[data-build-play]")
-      : ui.lobbyGames.querySelector(`[data-factory-step="${stepIndex}"] [data-config-group]`);
+    const focusTarget = ui.lobbyGames.querySelector(`[data-factory-step="${stepIndex}"] [data-config-group]`);
     focusTarget?.focus({ preventScroll: true });
   });
 }
@@ -795,6 +786,7 @@ function updateLobbyPreview() {
   if (!preview) return;
   const hasTheme = state.lobbyChoices.theme;
   ui.lobbyGames.classList.toggle("is-awaiting-theme", !hasTheme);
+  ui.lobbyOverlay.classList.toggle("is-awaiting-theme", !hasTheme);
 
   if (!hasTheme) {
     ui.lobbyGames.style.setProperty("--builder-accent", "#8fa7c7");
@@ -808,16 +800,14 @@ function updateLobbyPreview() {
     $("factoryPreviewCompanion").removeAttribute("src");
     $("factoryPreviewCompanion").alt = "";
     $("factoryPreviewCompanion").hidden = true;
+    $("factoryPreviewMoodBadge").hidden = true;
+    $("factoryPreviewMoodName").textContent = "";
     $("factoryPreviewName").textContent = "Choose your world";
     $("factoryPreviewMeta").textContent = "Nothing is selected yet";
-    const reviewName = $("factoryReviewName");
-    if (reviewName) reviewName.textContent = "Choose a world first";
     ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
       button.classList.remove("is-selected");
       button.setAttribute("aria-pressed", "false");
     });
-    const play = ui.lobbyGames.querySelector("[data-build-play]");
-    if (play) play.textContent = "Choose a world first";
     return;
   }
 
@@ -840,33 +830,28 @@ function updateLobbyPreview() {
     $("factoryPreviewCompanion").alt = "";
     $("factoryPreviewCompanion").hidden = true;
   }
+  $("factoryPreviewMoodBadge").hidden = !state.lobbyChoices.mood;
+  $("factoryPreviewMoodName").textContent = state.lobbyChoices.mood ? visuals.mood.name : "";
   const chosenName = [
-    state.lobbyChoices.mood ? visuals.mood.name : "",
     visuals.theme.name,
     state.lobbyChoices.companion ? visuals.companion.name : ""
   ].filter(Boolean).join(" ");
   const activeStep = FACTORY_STEPS[Math.min(state.lobbyStep, FACTORY_STEPS.length - 1)];
   const allChosen = FACTORY_STEPS.every((step) => state.lobbyChoices[step.key]);
   $("factoryPreviewName").textContent = chosenName;
-  $("factoryPreviewMeta").textContent = state.lobbyStep >= FACTORY_STEPS.length
-    ? `${visuals.symbols.name} · Ready`
-    : state.lobbyChoices[activeStep.key]
-      ? `${activeStep.label} selected · click Next`
-      : `Choose ${activeStep.label}`;
-  const reviewName = $("factoryReviewName");
-  if (reviewName) reviewName.textContent = chosenName;
+  $("factoryPreviewMeta").textContent = state.lobbyChoices[activeStep.key]
+    ? state.lobbyStep === FACTORY_STEPS.length - 1 ? "Ready to play" : `${activeStep.label} selected · click Next`
+    : `Choose ${activeStep.label}`;
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
     const selected = state.lobbyChoices[button.dataset.configGroup]
       && state.visualConfig[button.dataset.configGroup] === button.dataset.configId;
     button.classList.toggle("is-selected", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
-  const play = ui.lobbyGames.querySelector("[data-build-play]");
-  if (play) play.textContent = `Create ${visuals.theme.name} ${visuals.companion.name}`;
   const next = ui.lobbyGames.querySelector("[data-factory-next]");
-  if (next && state.lobbyStep < FACTORY_STEPS.length) {
+  if (next) {
     next.disabled = !state.lobbyChoices[FACTORY_STEPS[state.lobbyStep].key];
-    next.textContent = state.lobbyStep === FACTORY_STEPS.length - 1 && allChosen ? "Review →" : "Next →";
+    next.textContent = state.lobbyStep === FACTORY_STEPS.length - 1 && allChosen ? "Play →" : "Next →";
   }
 }
 
@@ -888,7 +873,7 @@ function randomizeVisualConfig() {
     animation: DEFAULT_VISUAL_CONFIG.animation
   };
   Object.keys(state.lobbyChoices).forEach((group) => { state.lobbyChoices[group] = true; });
-  state.lobbyStep = FACTORY_STEPS.length;
+  state.lobbyStep = FACTORY_STEPS.length - 1;
   updateLobbyPreview();
   updateLobbyStep();
 }
@@ -977,8 +962,6 @@ function applyGameTheme({ resetGrid = false } = {}) {
   game.bonusCopy = `${game.bonusDraws} flight multipliers are sealed into your fairness receipt. Landing changes reveal timing only.`;
   game.bonusMechanicName = `${visuals.theme.name} Sky Runner`;
   game.symbols.forEach((symbol) => { symbol.name = visuals.symbols.names[symbol.id]; });
-  const titleParts = game.name.split(" ");
-  const firstWord = titleParts.shift();
   const gameStage = $("game");
   gameStage.dataset.game = game.id;
   gameStage.dataset.theme = visuals.theme.id;
@@ -1028,8 +1011,6 @@ function applyGameTheme({ resetGrid = false } = {}) {
   $("moonwellTitle").textContent = game.featureName;
   $("featureCopy").textContent = game.featureCopy;
   $("meterThreshold").textContent = `/${game.threshold}`;
-  $("gameIntro").textContent = game.intro;
-  $("gameTitle").innerHTML = `${firstWord} <span>${titleParts.join(" ")}</span>`;
   $("spinLabel").textContent = game.actionLabel;
   ui.winBannerLabel.textContent = `${game.shortName} win`;
   ui.winBanner.dataset.tier = "win";
@@ -1500,7 +1481,7 @@ async function runAstralCinematicTransition({ preview = false, multiplierCount =
   ui.cinematicOverlay.dataset.mode = "world-awakening";
   ui.cinematicOverlay.dataset.phase = "sleeping";
   ui.cinematicTitle.textContent = game.name;
-  ui.cinematicCopy.textContent = preview ? "Your world opens · no wager" : `${game.featureName} awakens`;
+  ui.cinematicCopy.textContent = preview ? "Your world opens" : `${game.featureName} awakens`;
   ui.cinematicAward.textContent = `${multiplierCount} FLIGHTS`;
   ui.cinematicOverlay.hidden = false;
   ui.cinematicOverlay.setAttribute("aria-hidden", "false");
@@ -1511,7 +1492,7 @@ async function runAstralCinematicTransition({ preview = false, multiplierCount =
   await cinematicDelay(1050);
   ui.cinematicOverlay.dataset.phase = "awakened";
   ui.cinematicTitle.textContent = game.featureName;
-  ui.cinematicCopy.textContent = preview ? "World preview · no payout" : "Three sealed multiplier flights";
+  ui.cinematicCopy.textContent = preview ? "World preview" : "Three sealed multiplier flights";
   ui.cinematicAward.textContent = `${multiplierCount} FLIGHTS`;
   jumpText(ui.cinematicTitle);
   jumpText(ui.cinematicAward);
@@ -1708,7 +1689,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     ui.bonusOverlay.dataset.mode = "astral-aviator";
     ui.bonusEyebrow.textContent = preview ? "Demo" : purchased ? "Feature buy" : "Bonus";
     $("bonusTitle").textContent = game.featureName;
-    ui.bonusCopy.textContent = preview ? "No wager · no payout" : picks.length + " sealed multiplier flights";
+    ui.bonusCopy.textContent = preview ? "Preview flight" : picks.length + " sealed multiplier flights";
     ui.bonusTotalLabel.textContent = preview ? "Demo" : "Win";
     ui.bonusTotal.textContent = "$0.00";
     ui.bonusMechanicName.textContent = game.bonusMechanicName;
@@ -2030,7 +2011,7 @@ async function spin({ fromAuto = false } = {}) {
   const bet = currentBaseBet();
   const wager = currentSpinWager();
   if (state.balance < wager) {
-    setStatus("Not enough free-play balance. Reset it below.");
+    setStatus("Balance too low. Reset it below.");
     playTone(170, .2, "square");
     state.autoStopRequested = true;
     return false;
@@ -2248,9 +2229,12 @@ function bindEvents() {
     if (event.target.closest("[data-factory-next]")) {
       const step = FACTORY_STEPS[state.lobbyStep];
       if (step && state.lobbyChoices[step.key]) {
-        state.lobbyStep = Math.min(FACTORY_STEPS.length, state.lobbyStep + 1);
-        updateLobbyStep();
-        updateLobbyPreview();
+        if (state.lobbyStep === FACTORY_STEPS.length - 1) chooseLobbyGame();
+        else {
+          state.lobbyStep += 1;
+          updateLobbyStep();
+          updateLobbyPreview();
+        }
         playTone(620, .08, "triangle");
       }
       return;
@@ -2267,7 +2251,6 @@ function bindEvents() {
       playTone(880, .14, "triangle");
       return;
     }
-    if (event.target.closest("[data-build-play]")) chooseLobbyGame();
   });
   ui.betDown.addEventListener("click", () => {
     if (state.betIndex > 0) state.betIndex -= 1;
@@ -2361,7 +2344,7 @@ function bindEvents() {
     setAnticipationUi(false);
     ui.reelViewport.classList.remove("is-spinning", "is-stopping");
     ui.reelImpactLayer.replaceChildren();
-    setStatus("Demo balance reset. All four feature meters start anew.");
+    setStatus("Balance reset. All four feature meters start anew.");
     updateUi();
   });
 

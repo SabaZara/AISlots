@@ -1,6 +1,6 @@
 # AISlots World Forge
 
-AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player chooses a background world, one companion, a mood, and a symbol family in a guided four-step creator.
+AISlots is a dependency-free simulated-credit slot prototype built around one configurable game. Before entering the cabinet, the player chooses a background world, one companion, a mood, and a symbol family in a guided four-step creator.
 
 `6 themes × 8 companions × 4 moods × 6 symbol sets = 1,152 configurations`
 
@@ -15,7 +15,7 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 | Moods | Epic, Mystic, Playful, Dark |
 | Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
 
-Only one companion is displayed in a game. The eight supplied green-screen masters are converted into edge-cleaned transparent RGBA foreground cutouts with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every symbol family is also a true-alpha 4×2 atlas: seven isolated, consistently occupied world-specific silhouettes and one empty cell, with no square artwork background or cross-cell artifacts. During a spin, each of the six reels moves as one continuous vertical strip, without independent tile/block motion; each strip preserves its live offset, decelerates smoothly without a bounce, stops left-to-right, and freezes exactly on its sealed result. The versioned catalog import prevents deployed browsers from retaining obsolete atlas mappings. The opening creator fills the viewport, presents one graphical choice group at a time, waits for an explicit Next click after every selection, keeps a cinematic preview below, hides an unselected companion element completely, and completely hides the cabinet until the player creates the world. Phones show every choice without internal scrolling; the Character step uses a fixed 4×2 grid. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+Only one companion is displayed in a game. The eight supplied green-screen masters are converted into edge-cleaned transparent RGBA foreground cutouts with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every symbol family is also a true-alpha 4×2 atlas: seven isolated, consistently occupied world-specific silhouettes and one empty cell, with no square artwork background or cross-cell artifacts. During a spin, each of the six reels moves as one continuous vertical strip, without independent tile/block motion; each strip preserves its live offset, decelerates smoothly without a bounce, stops left-to-right, and freezes exactly on its sealed result. The opening creator presents one graphical choice group at a time and starts the game directly from the fourth step without a review page. Its neutral state contains no default light dots, the live preview gives Mood a color-coded badge and matching light treatment, and every Relic card crops the atlas into seven individually readable symbols. Phones show every choice without internal scrolling; the Character step uses a fixed 4×2 grid. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
 ## Play features
 
@@ -25,12 +25,12 @@ Only one companion is displayed in a game. The eight supplied green-screen maste
 - a single Auto–Spin–Speed control row, with direct infinite Auto/Stop on the left and the standalone Normal 1× / Fast 3× toggle on the right;
 - persistent 18-Scatter feature progress shown by a compact themed Scatter-art tracker with no circular counter or dot field;
 - theme-art Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
-- theme-art 25×, 50×, and 100× free-play Buy Bonus choices calibrated to the same 99.00% return;
+- theme-art 25×, 50×, and 100× Buy Bonus choices calibrated to the same 99.00% return;
 - three themed Sky Runner multiplier flights per bonus; every world has a separately generated launch scene and matching transparent plane livery, with multiplier-scaled destination distance, layered parallax depth, and one constant-speed path without a pause or final jump;
 - visible distance, altitude, 10,000 m ceiling, multiplier ladder, running multiplier total, and round progress;
 - animated win tiers, symbol-to-core fusion threads and bursts, transparent Scatter breakout, particles, cabinet reactions, and large-win cinematics;
 - four distinct procedural music/event-sound profiles, with a local high-energy sample layer for Epic;
-- persistent demo balance, bonus progress, visual configuration, audio preference, and spin-speed preference;
+- persistent session balance, bonus progress, visual configuration, audio preference, and spin-speed preference;
 - game rules, paytable, last-win detail, and a compact top-bar fairness verifier;
 - no payline overlay, near-miss copy, loss display, session timer, or reality-check dialog.
 
@@ -83,4 +83,4 @@ The root [`render.yaml`](./render.yaml) defines a Render static site. Connect th
 
 ## Production gate
 
-This build is an **18+ free-play prototype** with no deposits, cash value, or prizes. A regulated real-money launch still requires jurisdiction-specific licensing, independent math/RNG certification, backend-controlled balances and seeds, secure identity/account services, responsible-gambling controls, approved wallet/payment systems, accessibility review, asset and audio rights review, privacy/security review, telemetry, and operational monitoring.
+This build is an **18+ simulated-credit prototype**. A regulated real-money launch still requires jurisdiction-specific licensing, independent math/RNG certification, backend-controlled balances and seeds, secure identity/account services, responsible-gambling controls, approved wallet/payment systems, accessibility review, asset and audio rights review, privacy/security review, telemetry, and operational monitoring.

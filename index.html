@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="AISlots World Forge — 1,152 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4.5.4" />
+    <link rel="stylesheet" href="./styles.css?v=4.5.5" />
     <title>AISlots World Forge · 1,152 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -26,7 +26,6 @@
             <strong>$<span id="balance">1,000.00</span></strong>
           </div>
           <span class="rtp-pill">RTP 99.00%</span>
-          <span class="demo-pill">Free play</span>
         </div>
 
         <nav class="utility-nav" aria-label="Game tools">
@@ -69,7 +68,7 @@
             </div>
           </aside>
 
-          <section class="machine" aria-labelledby="gameTitle">
+          <section class="machine" aria-label="Slot machine">
             <div class="companion-stage" id="companionStage" aria-hidden="true"><img id="companionPortrait" src="./assets/factory/companion-dragon-cutout-v3.png" alt=""></div>
             <div class="astral-feature-dock" id="astralFeatureDock" aria-label="Relic Vault feature controls">
               <button class="astral-feature-button is-special" id="specialBetButton" type="button" aria-label="Open special bet options">
@@ -79,15 +78,6 @@
                 <span class="feature-button-orb" aria-hidden="true">☾</span><strong>Buy bonus</strong><small>25× · 50× · 100×</small>
               </button>
             </div>
-            <div class="machine-title">
-              <div class="title-flourish" aria-hidden="true"></div>
-              <div>
-                <p id="gameIntro">Build a world, then ignite the reels</p>
-                <h1 id="gameTitle">Fire <span>Dragon</span></h1>
-              </div>
-              <div class="title-flourish title-flourish-right" aria-hidden="true"></div>
-            </div>
-
             <div class="reel-frame">
               <div class="reel-meta"><span id="reelCommitment">RTP 99%</span></div>
               <div class="reel-viewport">
@@ -150,9 +140,7 @@
                 </div>
               </div>
             </div>
-            <div class="showcase-row" id="showcaseRow">
-              <p class="keyboard-hint">Press <kbd>Space</kbd> to spin · Finite autoplay · Result shown for at least 2.5 seconds</p>
-            </div>
+            <div class="showcase-row" id="showcaseRow"></div>
           </section>
 
           <aside class="game-switcher glass-panel" aria-labelledby="collectionTitle">
@@ -167,8 +155,7 @@
 
       <footer class="responsibility-bar">
         <span class="age-mark">18+</span>
-          <p><strong>Free-play prototype.</strong> No deposits, payments, or cash prizes. Play for entertainment.</p>
-        <button id="resetSession" type="button">Reset demo balance</button>
+        <button id="resetSession" type="button">Reset balance</button>
       </footer>
     </div>
 
@@ -207,7 +194,6 @@
           <p>The combined long-run theoretical return is exactly 99.00% for every visual configuration. Actual sessions vary. The model uses fixed symbol and prize weights; it never adapts to balance, wins, losses, mood, theme, or play history.</p>
         </section>
 
-        <section class="plain-note"><strong>Free-play only.</strong> Dollar amounts are a demo balance and have no cash value. A real-money release requires jurisdiction-specific licensing, certified game mathematics and RNG testing, age and identity checks, responsible-gambling controls, secure account services, and an approved wallet integration.</section>
         <section class="plain-note audio-credit">Epic, Mystic, Playful, and Dark audio profiles use distinct background motifs and event-sound treatments. The optional Epic sample layer retains its source record in <code>assets/audio/LICENSES.md</code>.</section>
       </div>
     </dialog>
@@ -356,7 +342,7 @@
       <section class="feature-market-scene" role="dialog" aria-modal="true" aria-labelledby="featureMarketTitle">
         <button class="feature-market-close" id="closeFeatureMarket" type="button" aria-label="Close feature options">×</button>
         <div class="feature-market-heading">
-          <span>✦</span><h2 id="featureMarketTitle">Relic Vault features</h2><small>99% RTP · Free play</small>
+          <span>✦</span><h2 id="featureMarketTitle">Relic Vault features</h2><small>99% RTP</small>
         </div>
         <div class="feature-market-grid">
           <article class="feature-market-card is-special-card" id="specialBetPanel">
@@ -373,28 +359,27 @@
             <div class="market-card-emblem" aria-hidden="true">☾</div>
             <h3>Buy bonus</h3>
             <p class="market-card-copy">Pay 25×, 50×, or 100× the bet to launch three sealed multiplier flights now. Land changes reveal timing only. RTP stays 99%.</p>
-            <div class="buy-feature-options" role="group" aria-label="Buy a sealed Relic Vault bonus with free-play dollars">
+            <div class="buy-feature-options" role="group" aria-label="Buy a sealed Relic Vault bonus">
               <button type="button" data-buy-feature="25"><span>Vault</span><strong>25×</strong><small data-buy-price="25">$50.00</small></button>
               <button type="button" data-buy-feature="50"><span>Super</span><strong>50×</strong><small data-buy-price="50">$100.00</small></button>
               <button type="button" data-buy-feature="100"><span>Grand</span><strong>100×</strong><small data-buy-price="100">$200.00</small></button>
             </div>
           </article>
         </div>
-        <p class="feature-market-note">Feature prizes are sealed before animation. All dollar amounts are free-play only.</p>
+        <p class="feature-market-note">Feature prizes are sealed before animation.</p>
       </section>
     </div>
 
     <div class="lobby-overlay" id="lobbyOverlay" aria-hidden="false">
       <section class="lobby-shell" role="dialog" aria-modal="true" aria-labelledby="lobbyTitle">
         <div class="lobby-heading">
-          <div><span class="eyebrow">18+ · Free play</span><h2 id="lobbyTitle">Create your slot world</h2></div>
-          <p>Choose a world, character, mood, and relic set.</p>
+          <div><span class="eyebrow">18+</span><h2 id="lobbyTitle">Create your slot world</h2></div>
         </div>
         <div class="lobby-games" id="lobbyGames" aria-label="Choose slot world layers"></div>
-        <div class="lobby-foot"><span>One math model · exact 99.00% theoretical RTP</span><span>18+ · Free play · no cash value</span></div>
+        <div class="lobby-foot"><span>Exact 99.00% RTP</span></div>
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.5.4"></script>
+    <script type="module" src="./app.js?v=4.5.5"></script>
   </body>
 </html>

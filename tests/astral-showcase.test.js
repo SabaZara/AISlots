@@ -37,6 +37,10 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /function updateLobbyStep\(\)/);
   assert.match(app, /data-factory-step/);
   assert.match(app, /factory-option-art/);
+  assert.match(app, /factory-symbol-showcase/);
+  assert.match(app, /factory-preview-mood-badge/);
+  assert.match(app, /Play →/);
+  assert.doesNotMatch(app, /factoryReview|data-build-play|is-reviewing|Review →/);
   assert.doesNotMatch(app, /data-world-prompt-form|function applyVisualPrompt|Describe your world/);
   assert.match(app, /resolveVisualConfig/);
   assert.match(app, /--game-characters/);
@@ -63,6 +67,13 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.doesNotMatch(app, /group\("Motion", "animation"/);
   assert.doesNotMatch(html, /astralShowcaseButton|Bonus demo/i);
   assert.doesNotMatch(app, /astralShowcaseButton|runAstralShowcasePreview/);
+  assert.doesNotMatch(html, /Free play|Free-play|no cash value|No deposits/i);
+  assert.doesNotMatch(html, /id="gameTitle"|class="machine-title"/);
+  assert.match(css, /factory-step-track \{ grid-template-columns: repeat\(4/);
+  assert.match(css, /\.factory-symbol-showcase b[\s\S]*?background-size: 400% 200%/);
+  assert.match(css, /\.factory-preview-mood-badge/);
+  assert.match(css, /\.lobby-overlay\.is-awaiting-theme[\s\S]*?background-image: none/);
+  assert.doesNotMatch(app + css, /factory-preview-sparkles|worldSparkle/);
 });
 
 test("runtime contains no payline, near-miss, or reality-check UI", async () => {
@@ -106,7 +117,6 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(css, /real reel strips replace independent tile\/block shuffling/);
   assert.match(css, /the stopped result is stationary/);
   assert.match(css, /reel-viewport\.is-stopping[\s\S]*?animation: none !important/);
-  assert.match(css, /machine-title h1 \{[\s\S]*?white-space: nowrap/);
 });
 
 test("Sky Runner Land continuously follows the sealed flight result", async () => {
