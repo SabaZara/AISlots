@@ -4,6 +4,7 @@ import {
   COLS,
   DEFAULT_GAME_ID,
   GAMES,
+  PAYLINES,
   ROWS,
   cellIndex,
   getGame,
@@ -22,7 +23,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.4.5";
+} from "./asset-catalog.js?v=4.5.0";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -225,7 +226,8 @@ function updateAstralFeatureUi(controlsLocked = false) {
   const boostLabel = state.specialBetBoost > 0
     ? `+${state.specialBetBoost} ${state.specialBetBoost === 1 ? game.collectionName : game.collectionPlural}`
     : "Standard";
-  ui.specialBetState.textContent = `${boostLabel} · ${multiplier.toFixed(2)}×`;
+  const costPart = state.specialBetBoost > 0 ? ` · ${formatMoney(currentBaseBet() * multiplier)}/spin` : "";
+  ui.specialBetState.textContent = `${boostLabel} · ${multiplier.toFixed(2)}×${costPart}`;
   ui.specialBetButton.classList.toggle("is-active", state.specialBetBoost > 0);
   ui.specialBetButton.setAttribute("aria-pressed", String(state.specialBetBoost > 0));
   ui.specialBetButton.disabled = controlsLocked || state.gameId !== "astral";
@@ -235,6 +237,8 @@ function updateAstralFeatureUi(controlsLocked = false) {
     const selected = Number(button.dataset.progressBoost) === state.specialBetBoost;
     button.classList.toggle("is-selected", selected);
     button.setAttribute("aria-pressed", String(selected));
+    const price = button.querySelector("[data-boost-price]");
+    if (price) price.textContent = `${specialBetCostMultiplier("astral", Number(button.dataset.progressBoost)).toFixed(2)}×`;
   });
 
   document.querySelectorAll("[data-buy-feature]").forEach((button) => {
@@ -394,6 +398,10 @@ function renderGrid(grid, {
   ui.reels.replaceChildren(fragment);
 }
 
+// Set by settleOutcome() before each column lands so stopSpinReelColumn(reel) can read
+// the sealed outcome grid for its column without widening its pinned single-arg call.
+let settlingOutcomeGrid = null;
+
 function clearSpinReelLayer() {
   ui.reelViewport.querySelector(".reel-spin-layer")?.remove();
   ui.reelViewport.classList.remove("has-spin-reels");
@@ -431,16 +439,99 @@ function startSpinReelLayer(seed = 0) {
   ui.reelViewport.classList.add("has-spin-reels");
 }
 
-function stopSpinReelColumn(col) {
-  ui.reelViewport.querySelector(`.reel-spin-column[data-col="${col}"]`)?.remove();
+// Mutates only the target column's 5 existing .symbol-cell elements in place with the
+// sealed outcome for that reel — no full-grid rebuild, so the other five columns' cells
+// (and any animation state on them) are left completely untouched.
+function renderReelStopFrame(outcomeGrid, reel) {
+  const symbolName = (id) => currentSymbols().find((symbol) => symbol.id === id)?.name ?? id;
+  ui.reels.querySelectorAll(`.symbol-cell[data-col="${reel}"]`).forEach((cell) => {
+    const row = Number(cell.dataset.row);
+    const index = cellIndex(reel, row);
+    const id = outcomeGrid[index];
+    cell.dataset.symbol = id;
+    cell.classList.toggle("is-scatter", id === "petal");
+    cell.classList.remove("is-shuffling", "is-settling");
+    cell.classList.add("is-reel-settled");
+    cell.style.setProperty("--symbol-glow", symbolGlow(id));
+    const name = symbolName(id);
+    cell.setAttribute("aria-label", name);
+    cell.innerHTML = `${symbolGraphic(id)}<span class="symbol-name-tag">${name}</span>`;
+  });
 }
 
-function renderReelStopFrame(outcomeGrid, reel, shuffleTick) {
-  const cosmetic = cosmeticGrid(shuffleTick);
-  const frameGrid = outcomeGrid.map((id, index) => Math.floor(index / ROWS) <= reel ? id : cosmetic[index]);
-  const shufflingColumns = new Set(Array.from({ length: COLS - reel - 1 }, (_, index) => reel + index + 1));
-  const settledColumns = new Set(Array.from({ length: reel }, (_, index) => index));
-  renderGrid(frameGrid, { shufflingColumns, settlingColumn: reel, settledColumns });
+// Waits for the strip's next pixel-identical wrap frame (animationiteration on the
+// continuous loop), then switches it to a one-shot decelerating "land" animation that
+// starts exactly where the loop was — seamless, no visual jump. Falls back to an
+// instant swap if the animation event never fires (hidden tab, reduced motion, etc.)
+// or if the wait times out.
+function waitForReelWrap(strip, timeoutMs = 700) {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      strip.removeEventListener("animationiteration", onIteration);
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const onIteration = () => finish();
+    strip.addEventListener("animationiteration", onIteration);
+    const timer = window.setTimeout(finish, timeoutMs);
+  });
+}
+
+function waitForAnimationEnd(element, timeoutMs) {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      element.removeEventListener("animationend", onEnd);
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const onEnd = () => finish();
+    element.addEventListener("animationend", onEnd);
+    const timer = window.setTimeout(finish, timeoutMs);
+  });
+}
+
+async function stopSpinReelColumn(reel) {
+  const outcomeGrid = settlingOutcomeGrid;
+  const column = ui.reelViewport.querySelector(`.reel-spin-column[data-col="${reel}"]`);
+  const finalize = () => {
+    renderReelStopFrame(outcomeGrid, reel);
+    column?.remove();
+  };
+  const strip = column?.querySelector(".reel-spin-strip");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!strip || reducedMotion) {
+    finalize();
+    return;
+  }
+
+  await waitForReelWrap(strip);
+
+  // Replace the first-half items (indices 0..ROWS-1) with the sealed outcome for this
+  // column so that when the land animation scrolls them into the viewport, the real
+  // symbols are what land — the wrap frame is pixel-identical to translateY(0), so this
+  // swap is invisible.
+  const items = strip.querySelectorAll(".reel-spin-item");
+  for (let row = 0; row < ROWS; row += 1) {
+    const item = items[row];
+    if (!item) continue;
+    const id = outcomeGrid[cellIndex(reel, row)];
+    item.dataset.symbol = id;
+    item.style.setProperty("--symbol-glow", symbolGlow(id));
+    item.innerHTML = symbolGraphic(id);
+  }
+
+  strip.style.animation = "";
+  strip.classList.add("is-landing");
+  const landDuration = currentSpinSpeed().id === "fast" ? 320 : 560;
+  await waitForAnimationEnd(strip, landDuration + 200);
+
+  finalize();
 }
 
 function revealWinningCells(winnerCells) {
@@ -564,12 +655,14 @@ function createPips() {
 }
 
 function buildPaytable() {
+  $("rulesPaylineCount").textContent = String(PAYLINES.length);
+  $("rulesPaylineCopyCount").textContent = String(PAYLINES.length);
   const payingSymbols = currentSymbols().filter((symbol) => symbol.id !== "petal");
   const fragment = document.createDocumentFragment();
   payingSymbols.forEach((symbol) => {
     const row = document.createElement("div");
     row.className = "paytable-row";
-    row.innerHTML = `${symbolGraphic(symbol.id)}<div><strong>${symbol.name} · ${(symbol.weight / 100).toFixed(1)}% per cell</strong><div class="paytable-values"><span>3× <b>${Number(symbol.payouts[3].toFixed(2))}</b></span><span>4× <b>${symbol.payouts[4]}</b></span><span>5× <b>${symbol.payouts[5]}</b></span></div></div>`;
+    row.innerHTML = `${symbolGraphic(symbol.id)}<div><strong>${symbol.name} · ${(symbol.weight / 100).toFixed(1)}% per cell</strong><div class="paytable-values"><span>3× <b>${Number(symbol.payouts[3].toFixed(2))}</b></span><span>4× <b>${symbol.payouts[4]}</b></span><span>5× <b>${symbol.payouts[5]}</b></span><span>6× <b>${symbol.payouts[6]}</b></span></div></div>`;
     fragment.append(row);
   });
   $("paytable").replaceChildren(fragment);
@@ -887,7 +980,8 @@ function applyGameTheme({ resetGrid = false } = {}) {
   gameStage.dataset.theme = visuals.theme.id;
   gameStage.dataset.mood = visuals.mood.id;
   gameStage.dataset.animation = visuals.animation.id;
-  if (ui.autoButton.parentElement !== ui.spinCenter) ui.spinCenter.append(ui.autoButton);
+  const spinCenterRow = ui.spinCenter.querySelector(".spin-center-row");
+  if (spinCenterRow && ui.autoButton.parentElement !== spinCenterRow) spinCenterRow.prepend(ui.autoButton);
   setAutoplayMenuOpen(false);
   ui.featureCard.dataset.game = game.id;
   ui.featureVisual.dataset.meter = game.meterMode;
@@ -1264,14 +1358,23 @@ async function settleOutcome(outcome) {
   ui.reelViewport.classList.remove("is-spinning");
   ui.reelViewport.classList.add("is-stopping");
   if (state.gameId === "astral") ui.reels.classList.add("is-cinematic-drop");
+  settlingOutcomeGrid = outcome.grid;
+  const landings = [];
   for (let reel = 0; reel < COLS; reel += 1) {
     if (reel > 0) await waitForSpinDelay(reelGap);
-    renderReelStopFrame(outcome.grid, reel, reel * 7 + 3);
-    stopSpinReelColumn(reel);
+    // stopSpinReelColumn() awaits the strip's landing animation, then calls
+    // renderReelStopFrame() to mutate this column's cells to the sealed outcome
+    // before removing the spin-layer column on the same frame. Initiations are
+    // staggered by reelGap while the decelerations overlap, so reels land
+    // left-to-right at a real-slot cadence instead of one full landing at a time.
     const collector = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).includes("petal");
-    playReelStopSound(reel);
-    flashReelStop(reel, { collector, final: reel === COLS - 1 });
+    landings.push(stopSpinReelColumn(reel).then(() => {
+      playReelStopSound(reel);
+      flashReelStop(reel, { collector, final: reel === COLS - 1 });
+    }));
   }
+  await Promise.all(landings);
+  settlingOutcomeGrid = null;
   clearSpinReelLayer();
   audio.stopSpinLoop();
   await waitForSpinDelay(settleTail);
@@ -1348,7 +1451,7 @@ async function verifyLastSpin() {
   ui.verifyResult.textContent = valid
     ? receipt.mode === "feature-buy"
       ? `✓ Verified. The pre-purchase hash matches and all three sealed multiplier prizes replay exactly.`
-      : `✓ Verified. The pre-spin hash matches, and all 20 symbols, base-game wins, feature progress, and bonus prizes replay exactly.`
+      : `✓ Verified. The pre-spin hash matches, and all ${COLS * ROWS} symbols, base-game wins, feature progress, and bonus prizes replay exactly.`
     : `Verification failed. ${hashMatches ? "The commitment matches, but the outcome differs." : "The revealed seed does not match the pre-spin commitment."}`;
   ui.receiptStatus.textContent = valid ? "Cryptographically verified" : "Verification failed";
   ui.receiptStatus.classList.toggle("is-valid", valid);

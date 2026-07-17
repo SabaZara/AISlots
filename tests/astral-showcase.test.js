@@ -5,11 +5,14 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 
 test("World Forge markup, controls, and one-companion presentation stay connected", async () => {
-  const [html, app, css] = await Promise.all([
+  const [html, app, css, packageJson] = await Promise.all([
     readFile(new URL("index.html", root), "utf8"),
     readFile(new URL("app.js", root), "utf8"),
-    readFile(new URL("styles.css", root), "utf8")
+    readFile(new URL("styles.css", root), "utf8"),
+    readFile(new URL("package.json", root), "utf8")
   ]);
+  const version = JSON.parse(packageJson).version;
+  const versionPattern = version.replaceAll(".", "\\.");
 
   for (const id of [
     "astralShowcaseButton", "cinematicOverlay", "astralBonusStage", "astralFlightWorld",
@@ -51,8 +54,9 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
   assert.match(html, /1,152 combinations/);
-  assert.match(html, /app\.js\?v=4\.4\.5/);
-  assert.match(app, /asset-catalog\.js\?v=4\.4\.5/);
+  assert.match(html, new RegExp(`app\\.js\\?v=${versionPattern}`));
+  assert.match(html, new RegExp(`styles\\.css\\?v=${versionPattern}`));
+  assert.match(app, new RegExp(`asset-catalog\\.js\\?v=${versionPattern}`));
   assert.match(app, /factoryPreviewCompanion"\)\.hidden = true/);
   assert.match(app, /factoryPreviewCompanion"\)\.hidden = false/);
   assert.match(css, /\.factory-preview-companion:not\(\[src\]\) \{ display: none !important; \}/);
@@ -77,7 +81,7 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
     readFile(new URL("styles.css", root), "utf8")
   ]);
   assert.match(app, /function renderReelStopFrame/);
-  assert.match(app, /Math\.floor\(index \/ ROWS\) <= reel \? id : cosmetic\[index\]/);
+  assert.match(app, /\.symbol-cell\[data-col="\$\{reel\}"\]/);
   assert.match(app, /for \(let reel = 0; reel < COLS; reel \+= 1\)[\s\S]*?renderReelStopFrame/);
   assert.match(app, /revealWinningCells\(winningCells\(outcome\)\)/);
   assert.match(css, /symbol-cell\.is-reel-settled/);
@@ -190,7 +194,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "4.4.5");
+  assert.match(JSON.parse(packageJson).version, /^\d+\.\d+\.\d+$/);
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

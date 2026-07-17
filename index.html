@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="AISlots World Forge — 1,152 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4.4.5" />
+    <link rel="stylesheet" href="./styles.css?v=4.5.0" />
     <title>AISlots World Forge · 1,152 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -71,15 +71,16 @@
 
           <section class="machine" aria-labelledby="gameTitle">
             <div class="companion-stage" id="companionStage" aria-hidden="true"><img id="companionPortrait" src="./assets/factory/companion-dragon-cutout-v3.png" alt=""></div>
-            <div class="machine-top-actions" id="machineTopActions">
-              <button class="showcase-button" id="astralShowcaseButton" type="button" aria-label="Play the no-wager relic vault bonus demo" title="Shows the bonus animation without changing your balance or progress."><span>✦</span> Bonus demo</button>
-            </div>
+            <div class="machine-top-actions" id="machineTopActions"></div>
             <div class="astral-feature-dock" id="astralFeatureDock" aria-label="Relic Vault feature controls">
               <button class="astral-feature-button is-special" id="specialBetButton" type="button" aria-label="Open special bet options">
                 <span class="feature-button-orb" aria-hidden="true">✦</span><strong>Special bet</strong><small id="specialBetState">Standard · 1.00×</small>
               </button>
               <button class="astral-feature-button is-buy" id="buyFeatureButton" type="button" aria-label="Open buy bonus options">
                 <span class="feature-button-orb" aria-hidden="true">☾</span><strong>Buy bonus</strong><small>25× · 50× · 100×</small>
+              </button>
+              <button class="astral-feature-button is-showcase" id="astralShowcaseButton" type="button" aria-label="Play the no-wager relic vault bonus demo" title="Shows the bonus animation without changing your balance or progress.">
+                <span class="feature-button-orb" aria-hidden="true">✦</span><strong>Bonus demo</strong><small>No wager · preview only</small>
               </button>
             </div>
             <div class="machine-title">
@@ -129,8 +130,8 @@
                   <button id="betDown" type="button" aria-label="Decrease bet">−</button>
                   <strong>$<span id="betAmount">2.00</span></strong>
                   <button id="betUp" type="button" aria-label="Increase bet">+</button>
+                  <button class="mini-action" id="maxBetButton" type="button">MAX</button>
                 </div>
-                <button class="mini-action" id="maxBetButton" type="button">MAX</button>
               </div>
 
               <div class="spin-center" id="spinCenter">
@@ -139,7 +140,15 @@
                   <span class="spin-icon" aria-hidden="true">↻</span>
                   <span class="spin-label" id="spinLabel">Spin</span>
                 </button>
-                <button class="auto-button" id="autoButton" type="button" aria-label="Open autoplay options" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">AUTO</span><strong>10 · 25 · 50</strong></button>
+                <div class="spin-center-row">
+                  <button class="auto-button" id="autoButton" type="button" aria-label="Open autoplay options" aria-expanded="false" aria-controls="autoplayMenu" aria-haspopup="true"><span aria-hidden="true">AUTO</span><strong>10 · 25 · 50</strong></button>
+                  <div class="spin-options" id="spinOptions">
+                    <div class="spin-speed-selector" role="group" aria-label="Spin speed">
+                      <button class="speed-choice is-selected" type="button" data-spin-speed="normal" aria-pressed="true"><strong>Normal</strong><small>1×</small></button>
+                      <button class="speed-choice" type="button" data-spin-speed="fast" aria-pressed="false"><strong><span aria-hidden="true">⚡</span> Fast</strong><small>3×</small></button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="win-panel">
@@ -147,12 +156,6 @@
                   <span class="control-label">Win</span>
                   <strong>$<span id="lastWin">0.00</span></strong>
                   <span id="lastMultiplier">—</span>
-                </div>
-                <div class="spin-options" id="spinOptions">
-                  <div class="spin-speed-selector" role="group" aria-label="Spin speed">
-                    <button class="speed-choice is-selected" type="button" data-spin-speed="normal" aria-pressed="true"><strong>Normal</strong><small>1×</small></button>
-                    <button class="speed-choice" type="button" data-spin-speed="fast" aria-pressed="false"><strong><span aria-hidden="true">⚡</span> Fast</strong><small>3×</small></button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -198,13 +201,13 @@
       <div class="modal-scroll">
         <section class="rules-hero">
           <div><span>99.00%</span><small>Theoretical RTP</small></div>
-          <div><span>20</span><small>Fixed paylines</small></div>
+          <div><span id="rulesPaylineCount">25</span><small>Fixed paylines</small></div>
           <div><span id="rulesThreshold">12</span><small id="rulesCollectorLabel">Collectors to bonus</small></div>
         </section>
 
         <section>
           <h3>Win on the lines</h3>
-          <p>Match three or more identical symbols on adjacent reels, beginning on the leftmost reel. Your total bet is divided equally across 20 fixed lines. More than one line may win on the same spin.</p>
+          <p>Match three or more identical symbols on adjacent reels, beginning on the leftmost reel. Your total bet is divided equally across <span id="rulesPaylineCopyCount">25</span> fixed lines. More than one line may win on the same spin.</p>
           <div class="paytable" id="paytable"></div>
         </section>
 
@@ -382,9 +385,9 @@
             <h3>Special bets</h3>
             <p class="market-card-copy">Pay a calibrated amount to guarantee +1 or +2 Scatter symbols every spin. RTP stays exactly 99%.</p>
             <div class="special-bet-options" role="group" aria-label="Choose a special bet">
-              <button type="button" data-progress-boost="0" aria-pressed="true"><span>Standard</span><strong>1.00×</strong><small>Normal meter</small></button>
-              <button type="button" data-progress-boost="1" aria-pressed="false"><span>Scatter charge</span><strong>1.30×</strong><small>+1 Scatter every spin</small></button>
-              <button type="button" data-progress-boost="2" aria-pressed="false"><span>Power charge</span><strong>1.60×</strong><small>+2 Scatters every spin</small></button>
+              <button type="button" data-progress-boost="0" aria-pressed="true"><span>Standard</span><strong data-boost-price="0">1.00×</strong><small>Normal meter</small></button>
+              <button type="button" data-progress-boost="1" aria-pressed="false"><span>Scatter charge</span><strong data-boost-price="1">1.20×</strong><small>+1 Scatter every spin</small></button>
+              <button type="button" data-progress-boost="2" aria-pressed="false"><span>Power charge</span><strong data-boost-price="2">1.40×</strong><small>+2 Scatters every spin</small></button>
             </div>
           </article>
           <article class="feature-market-card is-buy-card" id="buyFeaturePanel">
@@ -413,6 +416,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.4.5"></script>
+    <script type="module" src="./app.js?v=4.5.0"></script>
   </body>
 </html>
