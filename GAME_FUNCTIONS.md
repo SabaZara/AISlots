@@ -11,9 +11,9 @@ This file is the team-review checklist for the current simulated-credit build. R
 | First-screen game creator | Implemented | The site opens on a true edge-to-edge guided creator. One graphical choice group appears at a time and a cinematic preview stays centered below. The cabinet remains hidden until play starts. |
 | Explicit layer choices | Implemented | World, Character, Mood, and Relics are four ordered steps. A selection stays on its current step until the player clicks Next; Back revisits the previous step. The fourth button starts the game directly, with no review page. |
 | Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
-| One companion | Implemented | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, or Arcane Sorceress; exactly one transparent standalone cutout is displayed. |
+| One companion | Implemented | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, or Arcane Sorceress; exactly one static transparent cutout is displayed to the left of the board. |
 | Atmosphere selection | Implemented | Epic, Arcane, Playful, or Shadow swaps the entire layered soundscape (music, ambience, spin, rewards, UI) and complements it with a matching lighting treatment. The live preview shows a dedicated color-coded Mood badge and matching light treatment. |
-| Symbol selection | Implemented | Six generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, weapons, and scatter crests. Creator cards enlarge three representative isolated relics instead of shrinking the complete atlas into one picture. |
+| Symbol selection | Implemented | Six generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, weapons, and scatter crests. Creator cards show all six paying relics plus the dedicated Scatter cutout. |
 | Surprise me | Implemented | Randomly chooses all four player-facing visual layers, updates the preview, and moves to the final Relics step ready to start. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
 | Combination count | Implemented | 6 × 8 × 4 × 6 = 1,152 configurations. |
@@ -28,10 +28,10 @@ This file is the team-review checklist for the current simulated-credit build. R
 | Spin | Implemented | Wager is sealed before the presentation begins; symbols travel downward continuously and the result lands strictly from reel one through reel six. |
 | Normal/Fast | Implemented | One standalone Speed button toggles between 1× and 3× presentation timing immediately to the right of Spin; it never changes the result. |
 | Autoplay | Implemented | One click starts continuous infinite autoplay. The same standalone button immediately becomes Stop; clicking it ends the sequence after the active spin. Insufficient balance also stops it safely. |
-| Positive-return display | Implemented | Every positive payout receives an animated numeric result, even when it is smaller than the wager. |
+| Positive-return display | Implemented | Every positive payout receives one centered animated numeric result, even when it is smaller than the wager. Duplicate reel-bottom, big-win-bottom, and control-deck readouts are removed. |
 | Win celebrations | Implemented | Win, Nice, Big, Mega, and Epic tiers scale the banner, particles, cabinet reaction, audio, and cinematic treatment. |
 | Winner animation | Implemented | Winning symbol art pulls toward a shared energy core, connects with themed light threads, bursts, and settles into a readable pulse. Reel tiles never move or stretch; only transparent art animates. |
-| Result history | Implemented | Total won, spins, best win, and last-win details are available without showing session loss. |
+| Result history | Implemented | Last-win details remain available from the information control without a permanent statistics block in the cabinet. |
 
 ## Persistent feature and bonus
 
@@ -55,7 +55,7 @@ This file is the team-review checklist for the current simulated-credit build. R
 - Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed. The catalog module is versioned with the release so deployed browsers cannot reuse obsolete atlas mappings.
 - The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
 - Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
-- One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.
+- One larger static companion is layered independently from the selected background, anchored to the left, and given dedicated cabinet space so the reel board does not hide it.
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.

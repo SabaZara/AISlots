@@ -71,7 +71,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.doesNotMatch(html, /id="gameTitle"|class="machine-title"/);
   assert.match(css, /factory-step-track \{ grid-template-columns: repeat\(4/);
   assert.match(css, /\.factory-symbol-showcase b[\s\S]*?background-size: 400% 200%/);
-  assert.match(app, /symbol-sheet-0[\s\S]*?symbol-sheet-3[\s\S]*?factory-scatter-choice/);
+  assert.match(app, /Array\.from\(\{ length: 6 \}[\s\S]*?symbol-sheet-\$\{index\}[\s\S]*?factory-scatter-choice/);
   assert.match(app, /if \(id === "petal" && game\.scatterAsset\)/);
   assert.doesNotMatch(app, /game\.scatterAsset && !game\.symbolSheet/);
   assert.match(css, /\.factory-symbol-showcase \.factory-scatter-choice[\s\S]*?var\(--scatter-choice-art\)/);
@@ -79,7 +79,8 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.doesNotMatch(html, /brandSubtitle|Create your slot world|Exact 99\.00% RTP|Returned/i);
   assert.match(app, /--celebration-bg/);
   assert.match(css, /var\(--celebration-bg\) center \/ cover no-repeat/);
-  assert.match(html, /celebrationBottomAmount/);
+  assert.doesNotMatch(html, /return-chip|class="win-panel"|celebration-bottom-win|game-performance/);
+  assert.doesNotMatch(app, /showReturnChip|hideReturnChip|celebrationBottomAmount|ui\.lastWin\b|ui\.lastMultiplier\b/);
   assert.match(css, /\.factory-preview-mood-badge/);
   assert.match(css, /\.lobby-overlay\.is-awaiting-theme[\s\S]*?background-image: none/);
   assert.doesNotMatch(app + css, /factory-preview-sparkles|worldSparkle/);
@@ -214,8 +215,12 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
   assert.doesNotMatch(app, /STOP<\/span><strong[^>]*>■/);
   assert.match(css, /spin-button\.is-autoplay-stop \.spin-icon[\s\S]*?color: #ff3347/);
   assert.doesNotMatch(css, /spin-button\.is-autoplay-stop \{[\s\S]*?background:/);
-  assert.match(css, /companionCinematicIdle/);
-  assert.match(css, /machine > \.companion-stage[\s\S]*?width: min\(62%, 760px\)/);
+  assert.doesNotMatch(css, /companionCinematicIdle/);
+  assert.match(css, /machine > \.companion-stage[\s\S]*?left: -2%[\s\S]*?right: auto[\s\S]*?width: min\(34%, 480px\)/);
+  assert.match(css, /\.companion-stage img[\s\S]*?animation: none !important/);
+  assert.match(css, /\.factory-symbol-showcase \{[\s\S]*?grid-template-columns: repeat\(4[\s\S]*?grid-template-rows: repeat\(2/);
+  assert.match(css, /factory-group-symbols \.factory-options[\s\S]*?repeat\(3[\s\S]*?repeat\(2/);
+  assert.match(css, /max-width: 820px[\s\S]*?control-deck[\s\S]*?grid-template-columns: minmax\(0, 1fr\) clamp\(128px, 32vw, 184px\)/);
   assert.match(app, /--win-world-art/);
   assert.match(css, /var\(--win-world-art\) center \/ cover no-repeat/);
   assert.doesNotMatch(app, /autoRemaining|setAutoplayMenuOpen/);
@@ -230,7 +235,8 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
   assert.match(app, /if \(outcome\.baseWin > 0\)/);
   assert.match(app, /await showWinBanner\(outcome\.baseWin/);
   assert.match(app, /outcomeClass === "partial-return"/);
-  assert.match(html, /<span>Won<\/span>/);
+  assert.match(html, /class="win-banner" id="winBanner"/);
+  assert.doesNotMatch(html, /<span>Won<\/span>|id="lastWin"|id="returnAmount"/);
   assert.doesNotMatch(app, /returned on|No return|bet returned/i);
 });
 

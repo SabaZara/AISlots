@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.6.4";
+} from "./asset-catalog.js?v=4.6.5";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -50,8 +50,6 @@ const ui = {
   betDown: $("betDown"),
   betUp: $("betUp"),
   spinButton: $("spinButton"),
-  lastWin: $("lastWin"),
-  lastMultiplier: $("lastMultiplier"),
   reels: $("reels"),
   reelViewport: document.querySelector(".reel-viewport"),
   reelImpactLayer: $("reelImpactLayer"),
@@ -62,9 +60,6 @@ const ui = {
   winBannerAmount: $("winBannerAmount"),
   winBannerLabel: $("winBannerLabel"),
   winBannerMultiplier: $("winBannerMultiplier"),
-  returnChip: $("returnChip"),
-  returnAmount: $("returnAmount"),
-  returnComparison: $("returnComparison"),
   featureCard: $("featureCard"),
   companionStage: $("companionStage"),
   companionPortrait: $("companionPortrait"),
@@ -110,9 +105,6 @@ const ui = {
   maxBetButton: $("maxBetButton"),
   lobbyOverlay: $("lobbyOverlay"),
   lobbyGames: $("lobbyGames"),
-  currentGameWon: $("currentGameWon"),
-  currentGameSpins: $("currentGameSpins"),
-  currentGameBest: $("currentGameBest"),
   celebrationOverlay: $("celebrationOverlay"),
   celebrationTitle: $("celebrationTitle"),
   celebrationAmount: $("celebrationAmount"),
@@ -120,7 +112,6 @@ const ui = {
   celebrationGame: $("celebrationGame"),
   celebrationKicker: $("celebrationKicker"),
   celebrationCollect: $("celebrationCollect"),
-  celebrationBottomAmount: $("celebrationBottomAmount"),
   cinematicOverlay: $("cinematicOverlay"),
   cinematicTitle: $("cinematicTitle"),
   cinematicCopy: $("cinematicCopy"),
@@ -595,12 +586,6 @@ function renderPetalMeter() {
 }
 
 function renderGameStats() {
-  const stats = state.gameStats[state.gameId];
-  ui.currentGameWon.textContent = formatMoney(stats.totalWon);
-  ui.currentGameSpins.textContent = String(stats.spins);
-  ui.currentGameBest.textContent = formatMoney(stats.biggestWin);
-  ui.lastWin.textContent = formatCredits(stats.lastWin);
-  ui.lastMultiplier.textContent = stats.lastWin > 0 ? `${stats.lastMultiplier.toFixed(2)}× bet` : "—";
   document.querySelectorAll("[data-game-won]").forEach((item) => {
     item.textContent = formatCredits(state.gameStats[item.dataset.gameWon].totalWon);
   });
@@ -730,7 +715,7 @@ function buildLobby() {
         ${items.map((item) => {
           const art = item.asset ? ` style="--choice-art:url('${item.asset}')${item.scatterAsset ? `;--scatter-choice-art:url('${item.scatterAsset}')` : ""}"` : "";
           const artMarkup = key === "symbols"
-            ? `<i class="factory-symbol-showcase"${art} aria-hidden="true"><b class="symbol-sheet-0"></b><b class="symbol-sheet-3"></b><b class="factory-scatter-choice"></b></i>`
+            ? `<i class="factory-symbol-showcase"${art} aria-hidden="true">${Array.from({ length: 6 }, (_, index) => `<b class="symbol-sheet-${index}"></b>`).join("")}<b class="factory-scatter-choice"></b></i>`
             : key === "mood"
               ? `<i class="factory-option-art factory-mood-showcase"${art} aria-hidden="true"><small>${item.description}</small></i>`
               : `<i class="factory-option-art"${art} aria-hidden="true"></i>`;
@@ -1067,7 +1052,6 @@ function switchGame(gameId) {
   state.lastOutcome = null;
   ui.lastWinButton.disabled = true;
   ui.winBanner.classList.remove("is-visible");
-  hideReturnChip();
   audio.stopSpinLoop({ immediate: true });
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-spinning", "is-stopping");
@@ -1270,8 +1254,6 @@ function showWinBanner(amount, bet, { outcomeClass = outcomeClassFor(amount, bet
   else ui.winBannerLabel.textContent = tier.id === "nice" ? `Nice ${currentGame().shortName} win` : `${currentGame().shortName} win`;
   ui.winBannerMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
   ui.winBannerAmount.textContent = "$0.00";
-  ui.lastWin.textContent = formatCredits(amount);
-  ui.lastMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
   ui.winBanner.classList.add("is-visible");
   jumpText(ui.winBannerLabel);
   jumpText(ui.winBannerAmount);
@@ -1281,26 +1263,6 @@ function showWinBanner(amount, bet, { outcomeClass = outcomeClassFor(amount, bet
     .then(() => jumpText(ui.winBannerAmount));
   window.setTimeout(() => ui.winBanner.classList.remove("is-visible"), tier.id === "nice" ? 2100 : 1650);
   return amountAnimation;
-}
-
-function hideReturnChip() {
-  ui.returnChip.hidden = true;
-  ui.returnChip.setAttribute("aria-hidden", "true");
-  ui.returnChip.classList.remove("is-partial", "is-profit");
-}
-
-function showReturnChip(amount, wager) {
-  if (amount <= 0 || wager <= 0) {
-    hideReturnChip();
-    return;
-  }
-  ui.returnAmount.textContent = formatMoney(amount);
-  ui.returnComparison.textContent = `${(amount / wager).toFixed(2)}× bet`;
-  ui.returnChip.classList.toggle("is-partial", amount < wager);
-  ui.returnChip.classList.toggle("is-profit", amount > wager);
-  ui.returnChip.hidden = false;
-  ui.returnChip.setAttribute("aria-hidden", "false");
-  jumpText(ui.returnAmount);
 }
 
 function showCelebration(amount, bet, { autoAdvance = false } = {}) {
@@ -1324,9 +1286,6 @@ function showCelebration(amount, bet, { autoAdvance = false } = {}) {
     ui.celebrationTitle.textContent = game.winLabels[tier.id];
     ui.celebrationKicker.textContent = tier.id === "big" ? "10× bet or more" : tier.id === "mega" ? "25× bet or more" : "50× bet or more";
     ui.celebrationAmount.textContent = "$0.00";
-    ui.celebrationBottomAmount.textContent = formatMoney(amount);
-    ui.lastWin.textContent = formatCredits(amount);
-    ui.lastMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
     ui.celebrationMultiplier.textContent = `${(amount / bet).toFixed(2)}× bet`;
     ui.celebrationGame.textContent = game.name;
     ui.celebrationCollect.textContent = `Collect ${formatMoney(amount)}`;
@@ -1982,7 +1941,6 @@ async function buyAstralFeature(costMultiplier) {
   const progressBefore = state.progress.astral;
   closeFeatureMarket({ returnFocus: false });
   state.isSpinning = true;
-  hideReturnChip();
   state.balance -= purchaseCost;
   updateUi();
 
@@ -2000,7 +1958,6 @@ async function buyAstralFeature(costMultiplier) {
   state.balance += outcome.totalWin;
   state.gameStats.astral = recordGameResult(state.gameStats.astral, outcome.totalWin, purchaseCost);
   updateUi();
-  showReturnChip(outcome.totalWin, purchaseCost);
 
   const outcomeClass = outcomeClassFor(outcome.totalWin, purchaseCost);
   if (outcome.totalWin > 0) await showWinBanner(outcome.totalWin, purchaseCost, { outcomeClass, total: true });
@@ -2051,7 +2008,6 @@ async function spin({ fromAuto = false } = {}) {
   ui.reelViewport.classList.add("is-spinning");
   ui.reelViewport.classList.remove("has-winners");
   ui.winBanner.classList.remove("is-visible");
-  hideReturnChip();
   ui.lastWinButton.disabled = true;
   setStatus(`${game.name} is aligning…`);
   playSpinSound();
@@ -2141,7 +2097,6 @@ async function spin({ fromAuto = false } = {}) {
 
   state.gameStats[state.gameId] = recordGameResult(state.gameStats[state.gameId], outcome.totalWin, wager);
   updateUi();
-  showReturnChip(outcome.totalWin, wager);
   const totalOutcomeClass = outcomeClassFor(outcome.totalWin, wager);
   if (outcome.bonusWin > 0 && outcome.totalWin > 0) {
     await showWinBanner(outcome.totalWin, wager, { outcomeClass: totalOutcomeClass, total: true });
@@ -2190,7 +2145,7 @@ async function startAutoplay() {
   state.autoActive = true;
   state.autoStopRequested = false;
   updateUi();
-  setStatus("Infinite autoplay started · press either red Stop at any time");
+  setStatus("Infinite autoplay started · press either Stop control at any time");
 
   while (state.autoActive && !state.autoStopRequested) {
     const completed = await spin({ fromAuto: true });
@@ -2395,7 +2350,6 @@ function bindEvents() {
     state.specialBetBoost = 0;
     state.lastOutcome = null;
     ui.lastWinButton.disabled = true;
-    hideReturnChip();
     audio.stopSpinLoop({ immediate: true });
     setAnticipationUi(false);
     ui.reelViewport.classList.remove("is-spinning", "is-stopping");

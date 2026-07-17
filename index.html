@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#071024" />
     <meta name="description" content="AISlots World Forge — 1,152 visual slot combinations powered by one published 99.00% theoretical RTP and SHA-256 fairness model." />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles.css?v=4.6.4" />
+    <link rel="stylesheet" href="./styles.css?v=4.6.5" />
     <title>AISlots World Forge · 1,152 combinations</title>
   </head>
   <body class="is-lobby-open">
@@ -60,11 +60,6 @@
             <p class="meter-message" id="meterMessage"><strong>18 Flame Crowns to go</strong><span>Progress carries between spins</span></p>
 
             <div class="feature-steps" id="featureSteps" aria-label="Bonus journey"></div>
-            <div class="game-performance" aria-label="Current game results">
-              <div><span>Total won</span><strong id="currentGameWon">$0.00</strong></div>
-              <div><span>Spins played</span><strong id="currentGameSpins">0</strong></div>
-              <div><span>Best win</span><strong id="currentGameBest">$0.00</strong></div>
-            </div>
           </aside>
 
           <section class="machine" aria-label="Slot machine">
@@ -93,11 +88,6 @@
                   <strong id="winBannerAmount">$0.00</strong>
                   <small id="winBannerMultiplier">0.00× bet</small>
                 </div>
-              </div>
-              <div class="return-chip" id="returnChip" hidden aria-live="polite" aria-hidden="true">
-                <span>Won</span>
-                <strong id="returnAmount">$0.00</strong>
-                <small id="returnComparison">0.00× bet</small>
               </div>
               <div class="reel-footer">
                 <div class="result-status" id="resultStatus" aria-live="polite">
@@ -128,14 +118,6 @@
                     <span class="spin-label" id="spinLabel">Spin</span>
                   </button>
                   <button class="speed-toggle-button" id="speedToggleButton" type="button" aria-label="Switch to Fast 3× spin"><span aria-hidden="true">SPEED</span><strong id="speedToggleValue">1×</strong></button>
-                </div>
-              </div>
-
-              <div class="win-panel">
-                <div class="win-readout">
-                  <span class="control-label">Win</span>
-                  <strong>$<span id="lastWin">0.00</span></strong>
-                  <span id="lastMultiplier">—</span>
                 </div>
               </div>
             </div>
@@ -252,7 +234,6 @@
         <p><span id="celebrationMultiplier">0.00× bet</span> · <span id="celebrationGame">Fire Dragon</span></p>
         <button class="primary-button celebration-collect" id="celebrationCollect" type="button">Collect win</button>
       </section>
-      <div class="celebration-bottom-win" aria-live="polite"><span>Won</span><strong id="celebrationBottomAmount">$0.00</strong></div>
     </div>
 
     <div class="cinematic-overlay" id="cinematicOverlay" hidden aria-hidden="true" data-phase="sleeping">
@@ -376,6 +357,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.6.4"></script>
+    <script type="module" src="./app.js?v=4.6.5"></script>
   </body>
 </html>
