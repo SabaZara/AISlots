@@ -59,7 +59,8 @@ This file is the team-review checklist for the current simulated-credit build. R
 - The reel grid is horizontally centered. Scatter progress is enlarged, while Bet, Auto, Spin, Speed, Special Bet, and Buy Bonus share one responsive bottom rail without a dark control-deck block.
 - Special Bet and Buy Bonus option cards inherit the selected world's accent, secondary color, environment, and bonus artwork.
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
-- Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
+- Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior. Their visual overlays remain subtle 11–16% tints so the selected world artwork stays dominant.
+- Reel symbols and relic-picker sprites use square, aspect-ratio-locked viewports so their artwork cannot stretch at different screen sizes.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
 - Spins use six continuous vertical reel strips. Symbols move together within each reel and clip only at the outer reel window; the previous independent per-tile block shuffle is not used. Every reel keeps its exact live pixel offset, continues at matched speed, decelerates monotonically without overshoot, and freezes on the sealed result before the next win effect begins.
 - Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.

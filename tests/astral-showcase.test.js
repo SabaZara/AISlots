@@ -228,6 +228,10 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
   assert.match(css, /grid-template-areas:[\s\S]*?"bet bet spin"[\s\S]*?"scatter features features"/);
   assert.match(css, /feature-market-overlay \.buy-feature-options button[\s\S]*?var\(--market-bonus-art\)/);
   assert.match(css, /--feature-option-color: var\(--game-secondary\)/);
+  assert.match(css, /game-stage\[data-mood="epic"\] \.mood-overlay \{ opacity: \.14/);
+  assert.match(css, /game-stage\[data-mood="shadow"\] \.mood-overlay \{ opacity: \.16/);
+  assert.match(css, /factory-preview-mood[\s\S]*?mix-blend-mode: soft-light; opacity: \.2/);
+  assert.match(css, /factory-symbol-showcase b,[\s\S]*?factory-symbol-showcase \.factory-scatter-choice[\s\S]*?aspect-ratio: 1 \/ 1 !important/);
   assert.match(css, /factory-group-symbols \.factory-options[\s\S]*?repeat\(3[\s\S]*?repeat\(2/);
   assert.match(css, /control-deck > \.feature-card,[\s\S]*?control-deck > \.astral-feature-dock[\s\S]*?position: relative !important/);
   assert.match(app, /--win-world-art/);

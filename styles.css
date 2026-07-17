@@ -6879,21 +6879,21 @@ body {
   background-image: var(--mood-overlay);
   background-position: center;
   background-size: cover;
-  mix-blend-mode: screen;
-  opacity: .5;
+  mix-blend-mode: soft-light;
+  opacity: .13;
   pointer-events: none;
   animation: moodOverlayDrift 12s ease-in-out infinite alternate;
 }
 
-.game-stage[data-mood="epic"] .mood-overlay { opacity: .54; filter: saturate(1.08); }
-.game-stage[data-mood="arcane"] .mood-overlay { opacity: .48; filter: saturate(1.2); }
-.game-stage[data-mood="playful"] .mood-overlay { opacity: .42; filter: saturate(1.25); }
-.game-stage[data-mood="shadow"] .mood-overlay { opacity: .58; filter: contrast(1.12); }
+.game-stage[data-mood="epic"] .mood-overlay { opacity: .14; filter: saturate(1.02); }
+.game-stage[data-mood="arcane"] .mood-overlay { opacity: .13; filter: saturate(1.04); }
+.game-stage[data-mood="playful"] .mood-overlay { opacity: .11; filter: saturate(1.05); }
+.game-stage[data-mood="shadow"] .mood-overlay { opacity: .16; filter: contrast(1.04); }
 .game-stage[data-game] .game-layout { z-index: 1; }
 
 @keyframes moodOverlayDrift {
-  from { transform: scale(1.015); filter: brightness(.9) saturate(1); }
-  to { transform: scale(1.045); filter: brightness(1.12) saturate(1.16); }
+  from { transform: scale(1.005); filter: brightness(.98) saturate(1); }
+  to { transform: scale(1.015); filter: brightness(1.02) saturate(1.03); }
 }
 
 @media (min-width: 821px) {
@@ -6985,7 +6985,7 @@ body {
 }
 
 .factory-preview-world { z-index: -3; background-position: center; background-size: cover; }
-.factory-preview-mood { z-index: -2; background-position: center; background-size: cover; mix-blend-mode: screen; opacity: .62; }
+.factory-preview-mood { z-index: -2; background-position: center; background-size: cover; mix-blend-mode: soft-light; opacity: .2; }
 .factory-preview-companion {
   z-index: -1;
   left: auto;
@@ -10455,14 +10455,17 @@ input,
   border-radius: 12px 4px;
   background: radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--choice-color) 12%, transparent), rgba(2, 6, 16, .8) 72%);
   box-shadow: inset 0 0 20px rgba(0,0,0,.22);
+  container-type: size;
 }
 
 .factory-symbol-showcase b {
-  width: 100%;
-  height: 100%;
+  width: min(22cqw, 42cqh);
+  height: min(22cqw, 42cqh);
   min-width: 0;
   min-height: 0;
   display: block;
+  place-self: center;
+  aspect-ratio: 1;
   background-image: var(--choice-art);
   background-repeat: no-repeat;
   background-size: 400% 200%;
@@ -11283,3 +11286,17 @@ input,
   color: color-mix(in srgb, var(--feature-option-color) 22%, #dbe9ff 78%);
   text-shadow: 0 2px 8px #000;
 }
+
+/* 4.6.9 — atmosphere remains a tint; all sprite viewports keep square proportions. */
+.game-stage[data-game="astral"] .generated-symbol,
+.game-stage[data-game="astral"] .scatter-symbol,
+.factory-symbol-showcase b,
+.factory-symbol-showcase .factory-scatter-choice {
+  aspect-ratio: 1 / 1 !important;
+  flex: 0 0 auto;
+}
+
+.factory-preview[data-mood="epic"] { box-shadow: inset 0 0 38px rgba(255, 200, 90, .07), 0 24px 64px rgba(0,0,0,.5); }
+.factory-preview[data-mood="arcane"] { box-shadow: inset 0 0 38px rgba(156, 124, 255, .08), 0 24px 64px rgba(0,0,0,.5); }
+.factory-preview[data-mood="playful"] { box-shadow: inset 0 0 38px rgba(255, 112, 198, .07), 0 24px 64px rgba(0,0,0,.5); }
+.factory-preview[data-mood="shadow"] { box-shadow: inset 0 0 42px rgba(96, 8, 51, .11), 0 24px 64px rgba(0,0,0,.56); }
