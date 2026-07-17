@@ -36,7 +36,7 @@ const GAME_TEMPLATES = {
     secondary: "#ff3d57",
     background: "./assets/factory/theme-fire-v1.jpg",
     characterLayer: "./assets/factory/companion-dragon-cutout-v3.png",
-    symbolSheet: "./assets/factory/symbols-inferno-v1.jpg",
+    symbolSheet: "./assets/factory/symbols-inferno-transparent-v3.png",
     scatterAsset: "./assets/factory/scatter-inferno-v1.png",
     bonusLoadingArt: "./assets/factory/bonus-loading-fire-v1.jpg",
     planeAsset: "./assets/factory/plane-fire-cutout-v1.png",

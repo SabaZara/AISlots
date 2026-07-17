@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **4.3.0**
+Version reviewed: **4.4.2**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -9,7 +9,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Function | Status | Behavior |
 |---|---|---|
 | First-screen game creator | Implemented | The site opens on a true edge-to-edge guided creator. One graphical choice group appears at a time and a cinematic preview stays centered below. The cabinet remains hidden until play starts. |
-| Explicit layer choices | Implemented | World, Character, Mood, and Relics are four ordered steps. Selecting an option automatically opens the next step; Back revisits the previous step. |
+| Explicit layer choices | Implemented | World, Character, Mood, and Relics are four ordered steps. A selection stays on its current step until the player clicks Next; Back revisits the previous step. |
 | Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
 | One companion | Implemented | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, or Arcane Sorceress; exactly one transparent standalone cutout is displayed. |
 | Mood selection | Implemented | Epic, Mystic, Playful, or Dark changes lighting treatment and audio profile. |
@@ -22,7 +22,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 
 | Function | Status | Behavior |
 |---|---|---|
-| Reel grid | Implemented | Six reels × five rows remain visible throughout a spin. |
+| Reel grid | Implemented | Six reels × five rows remain visible throughout a spin on one uninterrupted reel bed. Normal cells have only quiet neutral reel dividers; colored outlines are reserved for wins, Scatters, and special hits. |
 | Paylines | Implemented | 25 fixed lines; three or more identical paying symbols connect from reel one. Lines are calculated but not drawn over the art. |
 | Bet controls | Implemented | Minus, plus, and Max with balance-aware limits. |
 | Spin | Implemented | Wager is sealed before the presentation begins; symbols travel downward continuously and reels settle in six visible phases. |
@@ -54,7 +54,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 ## Visual and sound systems
 
 - 42 active project-local generated raster assets: six backgrounds, eight transparent companion cutouts, four mood overlays, six transparent symbol atlases, six transparent Scatter tracker cutouts, six bonus launch scenes, and six transparent themed planes.
-- Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency; symbol atlases use a fixed 4×2 layout with the last cell empty and no square art canvas.
+- Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed.
 - The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
 - Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
 - One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.

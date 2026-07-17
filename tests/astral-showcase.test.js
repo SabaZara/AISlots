@@ -26,6 +26,9 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /function buildLobby\(\)/);
   assert.match(app, /factory-group-/);
   assert.match(app, /data-randomize-world/);
+  assert.match(app, /data-factory-next/);
+  assert.match(app, /state\.lobbyChoices\[step\.key\]/);
+  assert.doesNotMatch(app, /choiceStep \+ 1/);
   assert.match(app, /factory-choice-intro/);
   assert.match(app, /FACTORY_STEPS/);
   assert.match(app, /function updateLobbyStep\(\)/);
@@ -48,7 +51,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
   assert.match(html, /1,152 combinations/);
-  assert.match(html, /app\.js\?v=4\.3\.0/);
+  assert.match(html, /app\.js\?v=4\.4\.2/);
   assert.doesNotMatch(app, /group\("Motion", "animation"/);
 });
 
@@ -76,6 +79,8 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(css, /symbol-cell\.is-reel-settled/);
   assert.match(css, /grid-template-columns: repeat\(6/);
   assert.match(css, /grid-template-rows: repeat\(5/);
+  assert.match(css, /continuous reel bed/);
+  assert.match(css, /\.symbol-cell\[data-col="5"\] \{ border-right: 0/);
   assert.match(css, /naturalReelRoll/);
 });
 
@@ -138,7 +143,7 @@ test("transparent symbols fuse while reel tiles remain stationary", async () => 
   assert.match(css, /@keyframes fusionCoreBurst/);
   assert.match(css, /\.symbol-cell\.is-fusing \.generated-symbol/);
   assert.match(css, /\.symbol-cell\.is-winner[\s\S]*?transform: none/);
-  assert.match(app, /transparent-v2/);
+  assert.match(app, /transparent-v/);
   assert.match(css, /mix-blend-mode: normal/);
 });
 
@@ -175,7 +180,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "4.3.0");
+  assert.equal(JSON.parse(packageJson).version, "4.4.2");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {

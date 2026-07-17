@@ -50,7 +50,7 @@ Generate against a pure black field so CSS screen blending preserves only the li
 
 ## Symbol atlases — exact 2:1 transparent sheet
 
-Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the first seven cells; bottom-right cell intentionally empty; every cell equal size; each icon centered and fully inside its cell; one flat chroma field for soft-matte removal; no shadows crossing cells; no text, labels, numbers, plaques, frames, or repeated icons. Every family deliberately varies silhouette, dominant hue, material, and value tier so it remains readable at reel size.
+Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the first seven cells; bottom-right cell intentionally empty; every cell equal size; each icon centered and fully inside its cell; one flat chroma field for soft-matte removal; no shadows or artwork crossing cells; no text, labels, numbers, plaques, frames, or repeated icons. Every family deliberately varies silhouette, dominant hue, material, and value tier while occupying a consistent 82% maximum cell dimension. Long weapons may be placed diagonally to remain substantial without stretching.
 
 - **Inferno Relics:** gold Phoenix Coin, long red Rebirth Feather, faceted purple Violet Egg, blue Skywing Blade, blue-flame Ashen Urn, dark architectural Ember Temple, white-winged Rebirth Scatter.
 - **Frostbound Treasures:** silver Snow Sun, slender Frost Key, radial Sapphire Flake, long Ice Spear, round Winter Globe, broad Winged Shield, horned Dragon Scatter.
@@ -64,7 +64,7 @@ Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the f
 - backgrounds: 1672 × 941 JPG;
 - companions: 1024 × 1536 transparent RGBA PNG cutouts;
 - mood overlays: 1672 × 941 JPG;
-- symbol atlases: 1774 × 887 transparent RGBA PNG;
+- symbol atlases: 1774 × 887 transparent RGBA PNG, normalized runtime revision `transparent-v3`;
 - runtime location: `assets/factory/`;
 - mapping and combination logic: `asset-catalog.js`.
 

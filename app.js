@@ -319,13 +319,13 @@ function symbolSvg(id) {
 
 function symbolGlow(id) {
   const base = {
-    luma: "rgba(255, 222, 132, .55)",
-    orbit: "rgba(103, 225, 255, .55)",
-    nova: "rgba(197, 137, 255, .58)",
-    comet: "rgba(255, 126, 201, .5)",
-    dew: "rgba(91, 214, 255, .5)",
-    leaf: "rgba(95, 226, 188, .45)",
-    petal: "rgba(198, 112, 255, .66)"
+    luma: "rgba(255, 222, 132, .34)",
+    orbit: "rgba(103, 225, 255, .34)",
+    nova: "rgba(197, 137, 255, .34)",
+    comet: "rgba(255, 126, 201, .34)",
+    dew: "rgba(91, 214, 255, .34)",
+    leaf: "rgba(95, 226, 188, .34)",
+    petal: "rgba(198, 112, 255, .48)"
   }[id];
   if (state.gameId === "neon") return id === "petal" ? "rgba(82, 242, 255, .72)" : base;
   if (state.gameId === "ember") return id === "petal" ? "rgba(255, 117, 61, .75)" : base;
@@ -341,7 +341,7 @@ function symbolGlow(id) {
 function symbolGraphic(id) {
   const index = SYMBOL_SHEET_INDEX[id];
   const game = currentGame();
-  if (id === "petal" && game.scatterAsset && !game.symbolSheet?.includes("transparent-v2")) {
+  if (id === "petal" && game.scatterAsset && !game.symbolSheet?.includes("transparent-v")) {
     return `<img class="scatter-symbol" src="${game.scatterAsset}" alt="" aria-hidden="true">`;
   }
   if (game.symbolSheet && Number.isInteger(index)) {
@@ -592,8 +592,9 @@ function buildLobby() {
       <section class="factory-review" id="factoryReview" hidden>
         <span>World complete</span><strong id="factoryReviewName"></strong><small>Review the preview, then enter your game.</small>
       </section>
-      <div class="factory-actions" hidden>
-        <button class="primary-button" type="button" data-build-play>Create &amp; play</button>
+      <div class="factory-actions">
+        <button class="primary-button" type="button" data-factory-next disabled>Next →</button>
+        <button class="primary-button" type="button" data-build-play hidden>Create &amp; play</button>
       </div>
     </div>
     <section class="factory-preview" id="factoryPreview" aria-label="Selected world preview">
@@ -633,8 +634,15 @@ function updateLobbyStep() {
   if (counter) counter.textContent = isReview ? "Ready to play" : `Step ${stepIndex + 1} of ${FACTORY_STEPS.length}`;
   if (prompt) prompt.textContent = isReview ? "Your world is ready" : step.prompt;
   if (review) review.hidden = !isReview;
-  if (actions) actions.hidden = !isReview;
+  if (actions) actions.hidden = false;
   if (back) back.disabled = stepIndex === 0;
+  const next = ui.lobbyGames.querySelector("[data-factory-next]");
+  const play = ui.lobbyGames.querySelector("[data-build-play]");
+  if (next) {
+    next.hidden = isReview;
+    next.disabled = isReview || !state.lobbyChoices[step.key];
+  }
+  if (play) play.hidden = !isReview;
   ui.lobbyGames.classList.toggle("is-reviewing", isReview);
   window.requestAnimationFrame(() => {
     const focusTarget = isReview
@@ -696,11 +704,14 @@ function updateLobbyPreview() {
     visuals.theme.name,
     state.lobbyChoices.companion ? visuals.companion.name : ""
   ].filter(Boolean).join(" ");
-  const nextUnchosen = FACTORY_STEPS.find((step) => !state.lobbyChoices[step.key]);
+  const activeStep = FACTORY_STEPS[Math.min(state.lobbyStep, FACTORY_STEPS.length - 1)];
+  const allChosen = FACTORY_STEPS.every((step) => state.lobbyChoices[step.key]);
   $("factoryPreviewName").textContent = chosenName;
-  $("factoryPreviewMeta").textContent = nextUnchosen
-    ? `Next · ${nextUnchosen.label}`
-    : `${visuals.symbols.name} · Ready`;
+  $("factoryPreviewMeta").textContent = state.lobbyStep >= FACTORY_STEPS.length
+    ? `${visuals.symbols.name} · Ready`
+    : state.lobbyChoices[activeStep.key]
+      ? `${activeStep.label} selected · click Next`
+      : `Choose ${activeStep.label}`;
   const reviewName = $("factoryReviewName");
   if (reviewName) reviewName.textContent = chosenName;
   ui.lobbyGames.querySelectorAll("[data-config-group]").forEach((button) => {
@@ -711,6 +722,11 @@ function updateLobbyPreview() {
   });
   const play = ui.lobbyGames.querySelector("[data-build-play]");
   if (play) play.textContent = `Create ${visuals.theme.name} ${visuals.companion.name}`;
+  const next = ui.lobbyGames.querySelector("[data-factory-next]");
+  if (next && state.lobbyStep < FACTORY_STEPS.length) {
+    next.disabled = !state.lobbyChoices[FACTORY_STEPS[state.lobbyStep].key];
+    next.textContent = state.lobbyStep === FACTORY_STEPS.length - 1 && allChosen ? "Review →" : "Next →";
+  }
 }
 
 function setVisualConfigChoice(group, id) {
@@ -731,8 +747,8 @@ function randomizeVisualConfig() {
     animation: DEFAULT_VISUAL_CONFIG.animation
   };
   Object.keys(state.lobbyChoices).forEach((group) => { state.lobbyChoices[group] = true; });
-  updateLobbyPreview();
   state.lobbyStep = FACTORY_STEPS.length;
+  updateLobbyPreview();
   updateLobbyStep();
 }
 
@@ -2109,16 +2125,22 @@ function bindEvents() {
     if (option) {
       setVisualConfigChoice(option.dataset.configGroup, option.dataset.configId);
       playTone(520 + [...option.parentElement.children].indexOf(option) * 55, .08, "triangle");
-      const choiceStep = FACTORY_STEPS.findIndex((step) => step.key === option.dataset.configGroup);
-      if (choiceStep >= 0) {
-        state.lobbyStep = Math.min(FACTORY_STEPS.length, choiceStep + 1);
+      return;
+    }
+    if (event.target.closest("[data-factory-next]")) {
+      const step = FACTORY_STEPS[state.lobbyStep];
+      if (step && state.lobbyChoices[step.key]) {
+        state.lobbyStep = Math.min(FACTORY_STEPS.length, state.lobbyStep + 1);
         updateLobbyStep();
+        updateLobbyPreview();
+        playTone(620, .08, "triangle");
       }
       return;
     }
     if (event.target.closest("[data-factory-back]")) {
       state.lobbyStep = Math.max(0, state.lobbyStep - 1);
       updateLobbyStep();
+      updateLobbyPreview();
       playTone(420, .07, "triangle");
       return;
     }
