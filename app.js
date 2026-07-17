@@ -23,7 +23,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.5.0";
+} from "./asset-catalog.js?v=4.5.1";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -127,7 +127,6 @@ const ui = {
   cinematicTitle: $("cinematicTitle"),
   cinematicCopy: $("cinematicCopy"),
   cinematicAward: $("cinematicAward"),
-  astralShowcaseButton: $("astralShowcaseButton"),
   specialBetButton: $("specialBetButton"),
   specialBetState: $("specialBetState"),
   buyFeatureButton: $("buyFeatureButton"),
@@ -407,6 +406,15 @@ function clearSpinReelLayer() {
   ui.reelViewport.classList.remove("has-spin-reels");
 }
 
+function makeReelSpinItem(id) {
+  const item = document.createElement("div");
+  item.className = "reel-spin-item";
+  item.dataset.symbol = id;
+  item.style.setProperty("--symbol-glow", symbolGlow(id));
+  item.innerHTML = symbolGraphic(id);
+  return item;
+}
+
 function startSpinReelLayer(seed = 0) {
   clearSpinReelLayer();
   const ids = currentSymbols().map((symbol) => symbol.id);
@@ -423,14 +431,7 @@ function startSpinReelLayer(seed = 0) {
     strip.className = "reel-spin-strip";
     const sequence = Array.from({ length: ROWS }, (_, row) => ids[(seed + col * 2 + row * 3) % ids.length]);
 
-    [...sequence, ...sequence].forEach((id) => {
-      const item = document.createElement("div");
-      item.className = "reel-spin-item";
-      item.dataset.symbol = id;
-      item.style.setProperty("--symbol-glow", symbolGlow(id));
-      item.innerHTML = symbolGraphic(id);
-      strip.append(item);
-    });
+    [...sequence, ...sequence].forEach((id) => strip.append(makeReelSpinItem(id)));
     column.append(strip);
     layer.append(column);
   }
@@ -459,43 +460,12 @@ function renderReelStopFrame(outcomeGrid, reel) {
   });
 }
 
-// Waits for the strip's next pixel-identical wrap frame (animationiteration on the
-// continuous loop), then switches it to a one-shot decelerating "land" animation that
-// starts exactly where the loop was — seamless, no visual jump. Falls back to an
-// instant swap if the animation event never fires (hidden tab, reduced motion, etc.)
-// or if the wait times out.
-function waitForReelWrap(strip, timeoutMs = 700) {
-  return new Promise((resolve) => {
-    let done = false;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      strip.removeEventListener("animationiteration", onIteration);
-      window.clearTimeout(timer);
-      resolve();
-    };
-    const onIteration = () => finish();
-    strip.addEventListener("animationiteration", onIteration);
-    const timer = window.setTimeout(finish, timeoutMs);
-  });
-}
-
-function waitForAnimationEnd(element, timeoutMs) {
-  return new Promise((resolve) => {
-    let done = false;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      element.removeEventListener("animationend", onEnd);
-      window.clearTimeout(timer);
-      resolve();
-    };
-    const onEnd = () => finish();
-    element.addEventListener("animationend", onEnd);
-    const timer = window.setTimeout(finish, timeoutMs);
-  });
-}
-
+// Stops a column the way a physical reel does: the strip is frozen at its exact
+// current pixel offset (no waiting for a loop boundary), its content is rebuilt in
+// place so the sealed outcome sits just above the currently visible symbols, and one
+// decelerating Web Animation scrolls the outcome into view without overshoot.
+// The rebuild reproduces the current frame pixel-for-pixel, so the stop begins the
+// instant it is requested with no jump and no extra full-speed rolling.
 async function stopSpinReelColumn(reel) {
   const outcomeGrid = settlingOutcomeGrid;
   const column = ui.reelViewport.querySelector(`.reel-spin-column[data-col="${reel}"]`);
@@ -505,32 +475,70 @@ async function stopSpinReelColumn(reel) {
   };
   const strip = column?.querySelector(".reel-spin-strip");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!strip || reducedMotion) {
+  if (!strip || reducedMotion || typeof strip.animate !== "function") {
     finalize();
     return;
   }
 
-  await waitForReelWrap(strip);
-
-  // Replace the first-half items (indices 0..ROWS-1) with the sealed outcome for this
-  // column so that when the land animation scrolls them into the viewport, the real
-  // symbols are what land — the wrap frame is pixel-identical to translateY(0), so this
-  // swap is invisible.
-  const items = strip.querySelectorAll(".reel-spin-item");
-  for (let row = 0; row < ROWS; row += 1) {
-    const item = items[row];
-    if (!item) continue;
-    const id = outcomeGrid[cellIndex(reel, row)];
-    item.dataset.symbol = id;
-    item.style.setProperty("--symbol-glow", symbolGlow(id));
-    item.innerHTML = symbolGraphic(id);
+  const columnHeight = column.clientHeight;
+  const itemHeight = columnHeight / ROWS;
+  if (!(itemHeight > 0)) {
+    finalize();
+    return;
   }
 
-  strip.style.animation = "";
-  strip.classList.add("is-landing");
-  const landDuration = currentSpinSpeed().id === "fast" ? 320 : 560;
-  await waitForAnimationEnd(strip, landDuration + 200);
+  // Freeze the loop at its exact current offset. The loop translates 0 → columnHeight
+  // and the two strip halves are identical, so the visual state is periodic in
+  // columnHeight — normalize into [0, columnHeight).
+  const computedTransform = getComputedStyle(strip).transform;
+  let rawY = 0;
+  if (computedTransform && computedTransform !== "none") {
+    const matrix = new DOMMatrix(computedTransform);
+    if (Number.isFinite(matrix.m42)) rawY = matrix.m42;
+  }
+  const offsetY = ((rawY % columnHeight) + columnHeight) % columnHeight;
+  const wholeItems = Math.floor(offsetY / itemHeight);
+  const fraction = offsetY - wholeItems * itemHeight;
 
+  const oldSymbols = Array.from(strip.children, (item) => item.dataset.symbol);
+  const oldAt = (index) => oldSymbols[((index % oldSymbols.length) + oldSymbols.length) % oldSymbols.length] ?? oldSymbols[0];
+
+  // Rebuild as 11 fixed-height rows: sealed outcome on top, then the six items that
+  // currently intersect the viewport (top partial first), preserving the fractional
+  // scroll offset so the swap frame matches the frozen frame exactly.
+  const rebuilt = [];
+  for (let row = 0; row < ROWS; row += 1) rebuilt.push(outcomeGrid[cellIndex(reel, row)]);
+  rebuilt.push(oldAt(4 - wholeItems));
+  for (let step = 0; step < ROWS; step += 1) rebuilt.push(oldAt(5 - wholeItems + step));
+
+  const startY = fraction - itemHeight;
+  const endY = columnHeight;
+  strip.style.animation = "none";
+  strip.style.transform = `translateY(${startY}px)`;
+  strip.style.height = `${rebuilt.length * itemHeight}px`;
+  strip.style.gridTemplateRows = `repeat(${rebuilt.length}, ${itemHeight}px)`;
+  strip.replaceChildren(...rebuilt.map((id) => makeReelSpinItem(id)));
+
+  const fast = currentSpinSpeed().id === "fast";
+  const loopDuration = fast ? 235 : 420;
+  const livePixelsPerMs = columnHeight / loopDuration;
+  const landingDistance = endY - startY;
+  const velocityMatch = 0.30 / 0.18;
+  const naturalDuration = landingDistance / livePixelsPerMs * velocityMatch;
+  const landDuration = Math.round(Math.max(fast ? 360 : 640, Math.min(fast ? 470 : 840, naturalDuration)));
+  column.classList.add("is-decelerating");
+  const landing = strip.animate(
+    [
+      { transform: `translateY(${startY}px)` },
+      { transform: `translateY(${endY}px)` }
+    ],
+    { duration: landDuration, easing: "cubic-bezier(.18,.30,.42,1)", fill: "forwards" }
+  );
+
+  await Promise.race([
+    landing.finished.catch(() => {}),
+    delay(landDuration + 250)
+  ]);
   finalize();
 }
 
@@ -605,7 +613,6 @@ function updateUi() {
   ui.maxBetButton.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
   ui.spinButton.disabled = controlsLocked;
   ui.spinLabel.textContent = currentGame().actionLabel;
-  ui.astralShowcaseButton.disabled = controlsLocked || state.gameId !== "astral";
   updateAstralFeatureUi(controlsLocked);
   ui.saveClientSeed.disabled = controlsLocked;
   ui.clientSeedInput.disabled = controlsLocked;
@@ -2017,23 +2024,6 @@ async function buyAstralFeature(costMultiplier) {
   ui.buyFeatureButton.focus();
 }
 
-async function runAstralShowcasePreview() {
-  if (state.gameId !== "astral" || state.isSpinning || state.autoActive || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
-  state.isSpinning = true;
-  ui.astralShowcaseButton.disabled = true;
-  updateUi();
-  setStatus(`${currentGame().featureName} demo · no wager · no payout`);
-  try {
-    await showAstralBonus([[0.25, 1, 10]], 1, { preview: true });
-    setStatus(`${currentGame().featureName} demo complete · balance and feature progress unchanged`);
-  } finally {
-    state.isSpinning = false;
-    ui.astralShowcaseButton.disabled = false;
-    updateUi();
-    ui.astralShowcaseButton.focus();
-  }
-}
-
 async function spin({ fromAuto = false } = {}) {
   if (state.isSpinning || (state.autoActive && !fromAuto)) return false;
   const game = currentGame();
@@ -2314,7 +2304,6 @@ function bindEvents() {
     updateUi();
     playTone(520, .14, "triangle");
   });
-  ui.astralShowcaseButton.addEventListener("click", runAstralShowcasePreview);
   ui.specialBetButton.addEventListener("click", () => openFeatureMarket("special"));
   ui.buyFeatureButton.addEventListener("click", () => openFeatureMarket("buy"));
   ui.closeFeatureMarket.addEventListener("click", () => closeFeatureMarket());

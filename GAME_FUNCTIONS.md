@@ -41,7 +41,6 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Dynamic Scatter art | Implemented | Each selected family supplies a transparent rebirth/Scatter crest in its reel atlas plus a dedicated transparent tracker cutout. |
 | Special Bet | Implemented | The selected world image and Scatter art theme both the cabinet control and market panel. Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters remain calibrated to 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | The selected launch scene and plane art theme both the cabinet control and market panel. 25×, 50×, or 100× free-play purchases use separately calibrated 99.00% prize tables. |
-| Bonus demo | Implemented | Top-of-machine no-wager preview. It does not change balance, progress, or create a fairness receipt. |
 | World-connected opening | Implemented | Fire, Ice, Nature, Void, Storm, and Abyss each use a separately generated launch-gate loading scene. The loading cinematic shows only the environment—no companion layer. The opening runs once. |
 | Sky Runner flights | Implemented | Each world uses its own transparent plane livery. Multiplier determines destination distance: 0.25× lands just beyond takeoff, then 0.5×, 1×, 2×, 5×, and 10× stop at increasingly distant route points. The aircraft keeps one linear speed with no pause or last-frame jump. |
 | Flight depth | Implemented | Generated launch scenery, far haze, midground motes, near silhouettes, speed streaks, aircraft scale, and three parallax rates create visible foreground/midground/background separation. |
@@ -49,7 +48,6 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Theme matching | Implemented | The selected environment artwork, accent, and secondary color also style the bonus sky, trail, frame, route, and multiplier locks. |
 | Flight telemetry | Implemented | Distance in kilometres, altitude in metres, a 10,000 m ceiling, route bars, and a 0.25×–10× multiplier ladder update continuously. |
 | Round clarity | Implemented | Current flight, live X, labelled landed multipliers, total X, flight progress, and final dollar award stay visible. |
-| Preview replay | Implemented | The no-wager Bonus Demo ends with Play Again and Back to game controls. |
 
 ## Visual and sound systems
 
@@ -61,7 +59,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
-- Spins use six continuous vertical reel strips. Symbols move together within each reel and clip only at the outer reel window; the previous independent per-tile block shuffle is not used. Reels stop left-to-right and the revealed symbols freeze immediately without a secondary landing movement.
+- Spins use six continuous vertical reel strips. Symbols move together within each reel and clip only at the outer reel window; the previous independent per-tile block shuffle is not used. Every reel keeps its exact live pixel offset, continues at matched speed, decelerates monotonically without overshoot, and freezes on the sealed result before the next win effect begins.
 - Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.
 
 ## Fairness and return
@@ -83,7 +81,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - Phone Spin, bet, win, and feature controls use larger responsive gaps to reduce accidental taps.
 - `100dvh` sizing and safe-area insets account for mobile browser chrome and notches.
 - Mobile controls are rearranged rather than reduced into overlapping desktop positions.
-- Spin, bet, Normal/Fast, Autoplay, Special Bet, Buy Bonus, and Bonus Demo remain clickable.
+- Spin, bet, Normal/Fast, Autoplay, Special Bet, and Buy Bonus remain clickable.
 - Autoplay opens as a viewport-level dialog that cannot be clipped by the cabinet.
 - The 6×5 board and transparent companion are resized/repositioned on narrow screens without covering interactive controls.
 - Winning transparent art can pull inward and pulse beyond its tile during the fusion effect. Tiles remain stationary; controls stay inside their safe regions.

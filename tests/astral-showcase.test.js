@@ -15,7 +15,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   const versionPattern = version.replaceAll(".", "\\.");
 
   for (const id of [
-    "astralShowcaseButton", "cinematicOverlay", "astralBonusStage", "astralFlightWorld",
+    "cinematicOverlay", "astralBonusStage", "astralFlightWorld",
     "astralFlightPlane", "astralDistanceValue", "astralDistanceBar", "astralAltitudeValue",
     "astralAltitudeBar", "astralMultiplierLadder", "bonusExit",
     "specialBetButton", "buyFeatureButton", "featureMarketOverlay", "autoplayOverlay",
@@ -61,6 +61,8 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(app, /factoryPreviewCompanion"\)\.hidden = false/);
   assert.match(css, /\.factory-preview-companion:not\(\[src\]\) \{ display: none !important; \}/);
   assert.doesNotMatch(app, /group\("Motion", "animation"/);
+  assert.doesNotMatch(html, /astralShowcaseButton|Bonus demo/i);
+  assert.doesNotMatch(app, /astralShowcaseButton|runAstralShowcasePreview/);
 });
 
 test("runtime contains no payline, near-miss, or reality-check UI", async () => {
@@ -91,7 +93,12 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(css, /\.symbol-cell\[data-col="5"\] \{ border-right: 0/);
   assert.match(app, /function startSpinReelLayer/);
   assert.match(app, /stopSpinReelColumn\(reel\)/);
+  assert.match(app, /strip\.style\.transform = `translateY\(\$\{startY\}px\)`/);
+  assert.match(app, /velocityMatch = 0\.30 \/ 0\.18/);
+  assert.match(app, /easing: "cubic-bezier\(\.18,\.30,\.42,1\)"/);
+  assert.doesNotMatch(app, /endY \+ overshoot|reelStripLand/);
   assert.match(css, /@keyframes continuousReelStrip/);
+  assert.match(css, /reel-spin-column\.is-decelerating/);
   assert.match(css, /real reel strips replace independent tile\/block shuffling/);
   assert.match(css, /the stopped result is stationary/);
   assert.match(css, /reel-viewport\.is-stopping[\s\S]*?animation: none !important/);
@@ -112,7 +119,6 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.match(app, /multiplier >= 1\) return \{ progress: \.53 \}/);
   assert.match(app, /multiplier >= \.5\) return \{ progress: \.38 \}/);
   assert.match(app, /return \{ progress: \.22 \}/);
-  assert.match(app, /showAstralBonus\(\[\[0\.25, 1, 10\]\]/);
   assert.match(app, /function animateAstralFlightLanding/);
   assert.match(app, /const progress = fromProgress \+ \(toProgress - fromProgress\) \* time/);
   assert.match(app, /remainingDistance \/ ASTRAL_FLIGHT_PROGRESS_PER_MS/);

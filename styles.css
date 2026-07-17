@@ -5970,7 +5970,7 @@ body {
     bottom: 38px;
     width: auto;
     height: 38px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
   }
   .game-stage[data-game="astral"] .astral-feature-button {
@@ -6129,14 +6129,6 @@ body {
   background:
     radial-gradient(circle at 50% 7%, rgba(255,220,102,.25), transparent 48%),
     linear-gradient(145deg, rgba(72,45,112,.95), rgba(12,10,36,.98));
-}
-
-/* 4.4.6 — Bonus demo card joins Special bet / Buy bonus in the left rail dock. */
-.astral-feature-button.is-showcase {
-  border-color: rgba(107,228,255,.46);
-  background:
-    radial-gradient(circle at 50% 7%, rgba(106,220,255,.22), transparent 48%),
-    linear-gradient(145deg, rgba(19,38,72,.94), rgba(8,11,35,.97));
 }
 
 .astral-feature-button:hover:not(:disabled),
@@ -6658,7 +6650,7 @@ body {
     right: max(7px, env(safe-area-inset-right));
     bottom: calc(38px + env(safe-area-inset-bottom));
     width: auto;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
   }
   .astral-feature-button {
@@ -6743,7 +6735,7 @@ body {
     left: calc(max(6px, env(safe-area-inset-left)) + 74px);
     bottom: max(4px, env(safe-area-inset-bottom));
     width: 320px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
   }
   .astral-feature-button {
@@ -8549,7 +8541,7 @@ body {
     left: 50%;
     width: 46vw;
     height: 34px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 3px;
     transform: translateX(-50%);
   }
@@ -10025,7 +10017,7 @@ input,
     bottom: 38px;
     width: auto;
     height: 43px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
   }
   .game-stage[data-game="astral"] .astral-feature-button {
@@ -10223,15 +10215,17 @@ input,
 .game-stage[data-game="astral"] .reel-spin-item .generated-symbol,
 .game-stage[data-game="astral"] .reel-spin-item .scatter-symbol,
 .game-stage[data-game="astral"] .reel-spin-item svg {
-  width: min(90cqw, 90cqh);
-  height: min(90cqw, 90cqh);
+  /* Reel strips include the shared column dividers in their query box. This
+     calibrated value renders at the same pixel size as the settled 90cqw art. */
+  width: min(89.375cqw, 89.375cqh);
+  height: min(89.375cqw, 89.375cqh);
   max-width: 92%;
   max-height: 92%;
   margin: 0;
   animation: none !important;
   opacity: 1;
   transform: none;
-  filter: drop-shadow(0 6px 7px rgba(0,0,0,.58)) drop-shadow(0 0 4px var(--symbol-glow));
+  filter: drop-shadow(0 6px 7px rgba(0,0,0,.62)) drop-shadow(0 0 5px var(--symbol-glow));
 }
 
 .game-stage[data-game="astral"] .reel-viewport.has-spin-reels .reels .symbol-cell.is-shuffling,
@@ -10261,23 +10255,9 @@ input,
   to { transform: translateY(50%); }
 }
 
-/* 4.4.6 — the strip decelerates onto the sealed outcome instead of vanishing mid-scroll. */
-@keyframes reelStripLand {
-  0% { transform: translateY(0); }
-  82% { transform: translateY(51.2%); }
-  100% { transform: translateY(50%); }
-}
-
-.reel-spin-strip.is-landing {
-  animation-name: reelStripLand;
-  animation-duration: 560ms;
-  animation-timing-function: cubic-bezier(.17,.67,.3,1);
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-  animation-delay: 0ms;
-}
-
-.game-stage[data-speed="fast"] .reel-spin-strip.is-landing { animation-duration: 320ms; }
+/* 4.5.1 — the live strip continues from its exact pixel offset, matches its incoming
+   speed, and decelerates monotonically onto the sealed outcome without a bounce. */
+.reel-spin-column.is-decelerating .reel-spin-strip { animation: none; }
 
 @keyframes naturalReelLandClean {
   0% { transform: translateY(-28%) scale(.98); opacity: .72; filter: brightness(1.22); }
