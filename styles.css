@@ -8163,10 +8163,11 @@ body {
 .factory-options [data-config-id="verdant"] { --choice-color: #6cf2a2; }
 .factory-options [data-config-id="void"],
 .factory-options [data-config-id="cosmic"] { --choice-color: #b987ff; }
-.factory-options [data-config-id="storm"],
 .factory-options [data-config-id="tempest"] { --choice-color: #73d8ff; }
-.factory-options [data-config-id="abyss"],
-.factory-options [data-config-id="abyssal"] { --choice-color: #56e1d1; }
+.factory-options [data-config-id="reef"],
+.factory-options [data-config-id="coral"] { --choice-color: #56e1d1; }
+.factory-options [data-config-id="temple"] { --choice-color: #f7c95a; }
+.factory-options [data-config-id="eclipse"] { --choice-color: #ffc85b; }
 .factory-options [data-config-id="epic"] { --choice-color: #ffc85a; }
 .factory-options [data-config-id="arcane"] { --choice-color: #9c7cff; }
 .factory-options [data-config-id="playful"] { --choice-color: #ff70c6; }

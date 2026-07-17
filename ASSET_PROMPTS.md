@@ -23,8 +23,9 @@ Shared constraints: reserve the central 55% as a low-detail, darker negative-spa
 - **Ice:** A monumental frozen sanctuary between translucent glacier walls, pale aurora across a cold sky, fine drifting snow, faceted ice ridges on the edges, icy blue and white illumination, dark calm central play area.
 - **Nature:** An ancient jungle temple swallowed by moss and roots, emerald bioluminescent plants, weathered stone ruins on the outer thirds, dense canopy and soft shafts of green light, dark calm central play area.
 - **Void:** A cosmic temple suspended above a deep black nebula, fractured floating rock shards at the edges, swirling violet gas and faint starlight, impossible depth, dark calm central play area.
-- **Storm:** A ruined sky citadel under churning thunderheads, distant fork lightning, wind-driven rain and mist, broken pillars on the outer thirds, dramatic gray and electric-blue illumination, dark calm central play area.
-- **Abyss:** A lost shrine in a deep-ocean trench, crushing dark water, faint bioluminescent glow rising from below, drifting marine particles, rock walls and coral silhouettes around the edges, deep teal and black, dark calm central play area.
+- **Coral Reef:** A bright submerged coral sanctuary with turquoise water, sun shafts, jewel-toned reefs, ancient ruins, and open blue depth around the central play area.
+- **Golden Temple:** Monumental golden jungle ruins, carved pillars and roots, warm god rays, dark foliage framing the sides, and a calm central stone stage.
+- **Eclipse:** An obsidian mountain realm beneath a black solar eclipse, molten-gold corona light, dark clouds, floating rock silhouettes, and restrained central detail.
 
 ## Companions — supplied 2:3 full-body cutouts
 
@@ -95,8 +96,9 @@ Shared loading prompt constraints: a new 16:9 launch-gate scene belonging unmist
 - **Ice:** translucent crystal runway across a blue chasm, near ice shards, silver pylons, aurora, circular frost portal.
 - **Nature:** vine-and-stone sky terrace above jungle canopy, foreground roots and leaves, misty ruins, waterfalls, circular leaf portal.
 - **Void:** fractured floating runway over a cosmic gulf, near amethyst shards, orbital structures, nebula depth, gravity portal.
-- **Storm:** rain-swept sky-citadel deck, foreground machinery and cables, lightning pylons, layered thunderclouds, electric portal.
-- **Abyss:** pearl-and-brass submerged bridge, near coral arches, bioluminescent towers, deep-water haze, teal current portal.
+- **Coral Reef:** luminous coral arches and submerged ruins, turquoise sun shafts, jewel-toned reef edges, circular current portal.
+- **Golden Temple:** elevated carved causeway over a misty jungle, golden glyphs, vines and pillars, circular temple portal.
+- **Eclipse:** suspended obsidian causeway through black mountains and clouds, gold energy seams, blazing eclipse portal.
 
 Shared plane prompt constraints: preserve the original biplane silhouette, front-right three-quarter view, geometry, propeller, landing gear, and padding; change only material and color identity; flat green chroma except magenta for green/teal liveries; no floor, shadow, reflection, text, logo, UI, border, or watermark.
 
@@ -104,7 +106,8 @@ Shared plane prompt constraints: preserve the original biplane silhouette, front
 - **Ice plane:** cobalt, frost white, cyan inlays, platinum, pale-blue engine crystal.
 - **Nature plane:** emerald, bronze-gold, leaf engraving, turquoise vines, amber-green engine.
 - **Void plane:** midnight black, royal violet, amethyst, dark chrome, singularity engine.
-- **Storm plane:** graphite, electric blue, lightning seams, platinum, blue-white engine.
-- **Abyss plane:** deep teal, midnight blue, cyan seams, pearl silver, antique brass, aquamarine engine.
+- **Coral Reef plane:** deep teal, midnight blue, cyan seams, pearl silver, antique brass, aquamarine engine.
+- **Golden Temple:** reuses the Nature plane's emerald, bronze-gold and vine identity.
+- **Eclipse:** reuses the Fire plane's obsidian, molten crimson and antique-gold identity.
 
-Runtime files are `assets/factory/bonus-loading-{theme}-v1.jpg` and `assets/factory/plane-{theme}-cutout-v1.png`. CSS uses `object-fit: contain`, while JavaScript selects the two files from the current theme and moves the aircraft on a linear distance/time path.
+Runtime loading files use `assets/factory/bonus-loading-{theme}-v1.{jpg,png}`; plane files use `assets/factory/plane-{theme}-cutout-v1.png` and can be shared by compatible themes. CSS uses `object-fit: contain`, while JavaScript selects the two files from the current theme and moves the aircraft on a linear distance/time path.

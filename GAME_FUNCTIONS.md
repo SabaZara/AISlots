@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **4.5.5**
+Version reviewed: **4.7.0**
 
 This file is the team-review checklist for the current simulated-credit build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -10,13 +10,13 @@ This file is the team-review checklist for the current simulated-credit build. R
 |---|---|---|
 | First-screen game creator | Implemented | The site opens on a true edge-to-edge guided creator. One graphical choice group appears at a time and a cinematic preview stays centered below. The cabinet remains hidden until play starts. |
 | Explicit layer choices | Implemented | World, Character, Mood, and Relics are four ordered steps. A selection stays on its current step until the player clicks Next; Back revisits the previous step. The fourth button starts the game directly, with no review page. |
-| Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
+| Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Coral Reef, Golden Temple, or Eclipse. The selected world immediately updates the preview and creator accent. |
 | One companion | Implemented | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, or Arcane Sorceress; exactly one static transparent cutout uses the original right-side cabinet layout. |
 | Atmosphere selection | Implemented | Epic, Arcane, Playful, or Shadow swaps the entire layered soundscape (music, ambience, spin, rewards, UI) and complements it with a matching lighting treatment. The live preview shows a dedicated color-coded Mood badge and matching light treatment. |
 | Symbol selection | Implemented | Six generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, weapons, and scatter crests. Creator cards show all six paying relics plus the dedicated Scatter cutout without dark artwork backing tiles. |
 | Surprise me | Implemented | Randomly chooses all four player-facing visual layers, updates the preview, and moves to the final Relics step ready to start. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
-| Combination count | Implemented | 6 × 8 × 4 × 6 = 1,152 configurations. |
+| Combination count | Implemented | 7 × 8 × 4 × 6 = 1,344 configurations. |
 
 ## Core play
 
@@ -41,8 +41,8 @@ This file is the team-review checklist for the current simulated-credit build. R
 | Dynamic Scatter art | Implemented | Each selected family supplies one dedicated transparent Scatter cutout shared by the reel cells, creator card, collection tracker, and feature panels. |
 | Special Bet | Implemented | The selected world image and Scatter art theme both the cabinet control and market panel. Standard, guaranteed +1 Scatter, or guaranteed +2 Scatters remain calibrated to 99.00% theoretical RTP. |
 | Buy Bonus | Implemented | The selected launch scene and plane art theme both the cabinet control and market panel. 25×, 50×, or 100× purchases use separately calibrated 99.00% prize tables. |
-| World-connected opening | Implemented | Fire, Ice, Nature, Void, Storm, and Abyss each use a separately generated launch-gate loading scene. The loading cinematic shows only the environment—no companion layer. The opening runs once. |
-| Sky Runner flights | Implemented | Each world uses its own transparent plane livery. Multiplier determines destination distance: 0.25× lands just beyond takeoff, then 0.5×, 1×, 2×, 5×, and 10× stop at increasingly distant route points. The aircraft keeps one linear speed with no pause or last-frame jump. |
+| World-connected opening | Implemented | Fire, Ice, Nature, Void, Coral Reef, Golden Temple, and Eclipse each use a dedicated launch-gate loading scene. The loading cinematic shows only the environment—no companion layer. The opening runs once. |
+| Sky Runner flights | Implemented | Each world uses a compatible transparent plane livery. Multiplier determines destination distance: 0.25× lands just beyond takeoff, then 0.5×, 1×, 2×, 5×, and 10× stop at increasingly distant route points. The aircraft keeps one linear speed with no pause or last-frame jump. |
 | Flight depth | Implemented | Generated launch scenery, far haze, midground motes, near silhouettes, speed streaks, aircraft scale, and three parallax rates create visible foreground/midground/background separation. |
 | Land integrity | Implemented | Land affects reveal timing only. It cannot reroll, improve, or worsen the precomputed result. Flight duration and destination reflect the sealed result. |
 | Theme matching | Implemented | The selected environment artwork, accent, and secondary color also style the bonus sky, trail, frame, route, and multiplier locks. |
@@ -51,7 +51,7 @@ This file is the team-review checklist for the current simulated-credit build. R
 
 ## Visual and sound systems
 
-- 42 active project-local generated raster assets: six backgrounds, eight transparent companion cutouts, four mood overlays, six transparent symbol atlases, six transparent Scatter tracker cutouts, six bonus launch scenes, and six transparent themed planes.
+- 44 active project-local generated raster assets: seven backgrounds, eight transparent companion cutouts, four mood overlays, six transparent symbol atlases, six transparent Scatter tracker cutouts, seven bonus launch scenes, and six transparent themed planes.
 - Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed. The catalog module is versioned with the release so deployed browsers cannot reuse obsolete atlas mappings.
 - The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
 - Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
@@ -63,7 +63,7 @@ This file is the team-review checklist for the current simulated-credit build. R
 - Reel symbols and relic-picker sprites use square, aspect-ratio-locked viewports so their artwork cannot stretch at different screen sizes.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.
 - Spins use six continuous vertical reel strips. Symbols move together within each reel and clip only at the outer reel window; the previous independent per-tile block shuffle is not used. Every reel keeps its exact live pixel offset, continues at matched speed, decelerates monotonically without overshoot, and freezes on the sealed result before the next win effect begins.
-- Epic can layer the local WOW Sound files documented in `assets/audio/LICENSES.md`; music and event sound are both controlled by the single top-bar sound button.
+- Music and event sound are fully procedural and controlled by the single top-bar sound button.
 
 ## Fairness and return
 

@@ -2,7 +2,7 @@
 
 AISlots is a dependency-free simulated-credit slot prototype built around one configurable game. Before entering the cabinet, the player chooses a background world, one companion, a mood, and a symbol family in a guided four-step creator.
 
-`6 themes × 8 companions × 4 moods × 6 symbol sets = 1,152 configurations`
+`7 themes × 8 companions × 4 moods × 6 symbol sets = 1,344 configurations`
 
 Every configuration uses the same deterministic outcome model, exact **99.00% theoretical RTP**, and SHA-256 commit/reveal receipt. Visual choices, sound choices, balance, and play history never change outcome probabilities.
 
@@ -10,10 +10,10 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 
 | Layer | Choices |
 |---|---|
-| Themes | Fire, Ice, Nature, Void, Storm, Abyss |
+| Themes | Fire, Ice, Nature, Void, Coral Reef, Golden Temple, Eclipse |
 | Companions | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, Arcane Sorceress |
 | Atmospheres | Epic, Arcane, Playful, Shadow |
-| Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
+| Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Coral |
 
 Only one companion is displayed in a game. The eight supplied green-screen masters are converted into edge-cleaned transparent RGBA foreground cutouts with no rectangular image canvas, while the background, atmosphere treatment, and seven-symbol family remain independent layers. Every symbol family is also a true-alpha 4×2 atlas: seven isolated, consistently occupied world-specific silhouettes and one empty cell, with no square artwork background or cross-cell artifacts. During a spin, each of the six reels moves as one continuous vertical strip, without independent tile/block motion; each strip preserves its live offset, decelerates smoothly without a bounce, stops left-to-right, and freezes exactly on its sealed result. The opening creator presents one graphical choice group at a time and starts the game directly from the fourth step without a review page. Its neutral state is completely empty, the live preview gives Atmosphere a full-image treatment and matching light card, and every Relic choice enlarges three representative isolated symbols for quick comparison. Phones show every choice without internal scrolling; the Character step uses a fixed 4×2 grid. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
@@ -26,10 +26,10 @@ Only one companion is displayed in a game. The eight supplied green-screen maste
 - persistent 18-Scatter feature progress shown by a compact themed Scatter-art tracker with no circular counter or dot field;
 - theme-art Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
 - theme-art 25×, 50×, and 100× Buy Bonus choices calibrated to the same 99.00% return;
-- three themed Sky Runner multiplier flights per bonus; every world has a separately generated launch scene and matching transparent plane livery, with multiplier-scaled destination distance, layered parallax depth, and one constant-speed path without a pause or final jump;
+- three themed Sky Runner multiplier flights per bonus; every world has a separately generated launch scene and a compatible transparent plane livery, with multiplier-scaled destination distance, layered parallax depth, and one constant-speed path without a pause or final jump;
 - visible distance, altitude, 10,000 m ceiling, multiplier ladder, running multiplier total, and round progress;
 - animated win tiers, symbol-to-core fusion threads and bursts, transparent Scatter breakout, particles, cabinet reactions, and large-win cinematics;
-- four distinct procedural music/event-sound profiles, with a local high-energy sample layer for Epic;
+- four distinct fully procedural music and event-sound profiles;
 - persistent session balance, bonus progress, visual configuration, audio preference, and spin-speed preference;
 - game rules, paytable, last-win detail, and a compact top-bar fairness verifier;
 - no payline overlay, near-miss copy, loss display, session timer, or reality-check dialog.

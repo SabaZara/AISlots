@@ -169,8 +169,9 @@ export const WORLD_AMBIENCES = Object.freeze({
   ice: Object.freeze({ bed: "coldWind", events: Object.freeze(["iceCrack"]) }),
   nature: Object.freeze({ bed: "leaves", events: Object.freeze(["bird"]) }),
   void: Object.freeze({ bed: "cosmicDrone", events: Object.freeze(["voidSweep"]) }),
-  storm: Object.freeze({ bed: "stormWind", events: Object.freeze(["thunder", "rain"]) }),
-  abyss: Object.freeze({ bed: "deepWater", events: Object.freeze(["pressurePulse", "echoPing"]) })
+  reef: Object.freeze({ bed: "deepWater", events: Object.freeze(["pressurePulse", "echoPing"]) }),
+  temple: Object.freeze({ bed: "leaves", events: Object.freeze(["bird"]) }),
+  eclipse: Object.freeze({ bed: "cosmicDrone", events: Object.freeze(["voidSweep", "rumble"]) })
 });
 
 // Signature vocalization recipes per companion. Played rarely (see

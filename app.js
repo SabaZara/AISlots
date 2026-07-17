@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.6.9";
+} from "./asset-catalog.js?v=4.7.0";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -779,6 +779,8 @@ function updateLobbyStep() {
   if (next) {
     next.hidden = false;
     next.disabled = !state.lobbyChoices[step.key];
+    const allChosen = FACTORY_STEPS.every((factoryStep) => state.lobbyChoices[factoryStep.key]);
+    next.textContent = stepIndex === FACTORY_STEPS.length - 1 && allChosen ? "Start →" : "Next →";
   }
   window.requestAnimationFrame(() => {
     const focusTarget = ui.lobbyGames.querySelector(`[data-factory-step="${stepIndex}"] [data-config-group]`);
@@ -884,6 +886,8 @@ function restoreVisualConfig() {
     if (stored && typeof stored === "object") {
       // The Mystic and Dark atmospheres became Arcane and Shadow.
       stored.mood = { mystic: "arcane", dark: "shadow" }[stored.mood] ?? stored.mood;
+      stored.theme = { storm: "reef", abyss: "reef" }[stored.theme] ?? stored.theme;
+      stored.symbols = { abyssal: "coral" }[stored.symbols] ?? stored.symbols;
       const resolved = resolveVisualConfig(stored);
       state.visualConfig = {
         theme: resolved.theme.id,

@@ -57,7 +57,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /--topbar-art/);
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
-  assert.match(html, /1,152 combinations/);
+  assert.match(html, /1,344 combinations/);
   assert.match(html, new RegExp(`app\\.js\\?v=${versionPattern}`));
   assert.match(html, new RegExp(`styles\\.css\\?v=${versionPattern}`));
   assert.match(app, new RegExp(`asset-catalog\\.js\\?v=${versionPattern}`));
@@ -270,11 +270,8 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(JSON.parse(packageJson).version, /^\d+\.\d+\.\d+$/);
 });
 
-test("four atmosphere profiles provide distinct adaptive music identities and licensed files stay local", async () => {
-  const [engine, licenses] = await Promise.all([
-    readFile(new URL("experience-engine.js", root), "utf8"),
-    readFile(new URL("assets/audio/LICENSES.md", root), "utf8")
-  ]);
+test("four atmosphere profiles provide distinct adaptive procedural music identities", async () => {
+  const engine = await readFile(new URL("experience-engine.js", root), "utf8");
   assert.match(engine, /scheduleMusic\(\)/);
   assert.match(engine, /startMusic\(\)/);
   assert.match(engine, /restartMusic\(\)/);
@@ -283,15 +280,4 @@ test("four atmosphere profiles provide distinct adaptive music identities and li
   for (const percussion of ["warDrum", "bellTick", "toyPop", "darkMetal"]) {
     assert.match(engine, new RegExp(`perc: ["']${percussion}["']`));
   }
-  for (const path of [
-    "assets/audio/wow-astral-background-modern-edgy.ogg",
-    "assets/audio/wow-astral-spin-start.ogg",
-    "assets/audio/wow-astral-reel-tick.ogg",
-    "assets/audio/wow-astral-victory-sting.ogg",
-    "assets/audio/wow-astral-big-win-cinematic.ogg"
-  ]) {
-    const file = await readFile(new URL(path, root));
-    assert.ok(file.length > 5_000);
-  }
-  assert.match(licenses, /WOW Sound Starter Pack/);
 });
