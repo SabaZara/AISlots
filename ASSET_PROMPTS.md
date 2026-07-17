@@ -26,16 +26,18 @@ Shared constraints: reserve the central 55% as a low-detail, darker negative-spa
 - **Storm:** A ruined sky citadel under churning thunderheads, distant fork lightning, wind-driven rain and mist, broken pillars on the outer thirds, dramatic gray and electric-blue illumination, dark calm central play area.
 - **Abyss:** A lost shrine in a deep-ocean trench, crushing dark water, faint bioluminescent glow rising from below, drifting marine particles, rock walls and coral silhouettes around the edges, deep teal and black, dark calm central play area.
 
-## Companions — square portrait
+## Companions — supplied 2:3 full-body cutouts
 
-Shared constraints: exactly one full creature or warrior, centered, front three-quarter pose, entire silhouette visible with breathing space, plain near-black studio field for clean screen-blended isolation, no scenery, no pedestal, no circular frame, no duplicate figure.
+Shared constraints for new masters: exactly one full creature or warrior, centered, front three-quarter or iconic hero pose, entire silhouette visible with breathing space, one perfectly flat chroma-green field, no scenery, no pedestal, no frame, no duplicate figure. The eight supplied masters were converted locally with automatic border-key detection, soft alpha matte, green despill, and one-pixel edge contraction; the source artwork itself was not regenerated.
 
-- **Dragon:** A majestic armored dragon coiled and ready to strike, molten light between layered scales, long sharp horns, intelligent glowing eyes, wings folded into a powerful compact silhouette.
-- **Valkyrie:** An original armored valkyrie warrior with luminous feathered wings, ornate winged helm, engraved plate armor, heroic grounded stance, face unobstructed, no resemblance to a real person.
-- **Kraken:** A colossal ancient kraken facing forward, wet iridescent skin, several tentacles curling toward the viewer, luminous intelligent eyes, suction cups and surface detail sharply separated.
-- **Phoenix:** A blazing phoenix with wings spread in a broad upward arc, feathers made of fire and light, bright crown plumage, elegant readable silhouette, controlled flame wisps.
-- **Direwolf:** A massive armored direwolf braced to leap, bristling layered fur, luminous eyes, engraved shoulder armor, powerful paws and clean ear silhouette.
-- **Titan:** A towering stone-and-crystal titan, faceted mineral armor, glowing cracks across its body, broad ancient face, monumental shoulders and hands, original nonhuman design.
+- **Valkyrie:** A winged gold-and-steel valkyrie holding an ornate spear and round shield, luminous feathers, heroic grounded stance, face unobstructed.
+- **Dragon:** A standing black obsidian dragon with broad wings, molten orange fissures, long horns, glowing eyes, powerful clawed silhouette.
+- **Direwolf:** An upright black-furred direwolf warrior in layered dark armor, blue eyes, broad shoulders, large paws, and a readable tail silhouette.
+- **Kraken:** An upright abyssal kraken warrior with dark iridescent skin, multiple curling tentacles, subtle blue-violet highlights, and sharply readable suction cups.
+- **Titan:** A towering black-rock titan with amber crystal growths, glowing gold cracks, monumental shoulders, fists, and feet.
+- **Tiger Warrior:** An upright tiger warrior with striped fur, dark bronze armor, draped cloth, bead ornaments, and a strong grounded stance.
+- **Gorilla Warrior:** A massive upright gorilla warrior with black fur, dark bronze armor, draped cloth, and a broad asymmetrical hero stance.
+- **Arcane Sorceress:** An original purple-clad sorceress with long dark hair, a glowing violet spell in one hand, gold filigree, and flowing layered fabric.
 
 ## Mood overlays — transparent-look 16:9 plates
 
@@ -60,7 +62,7 @@ Shared constraints: exact 4-column × 2-row atlas; seven isolated icons in the f
 ## Export map
 
 - backgrounds: 1672 × 941 JPG;
-- companions: 1254 × 1254 transparent RGBA PNG cutouts;
+- companions: 1024 × 1536 transparent RGBA PNG cutouts;
 - mood overlays: 1672 × 941 JPG;
 - symbol atlases: 1774 × 887 transparent RGBA PNG;
 - runtime location: `assets/factory/`;
@@ -81,7 +83,7 @@ All six use the shared premium slot-art direction above plus: one centered iconi
 
 CSS displays these PNGs with `object-fit: contain`. Normal wins animate within the cell. Scatter collection animates only the transparent artwork beyond its stationary tile, so no rectangular atlas background can jump into neighboring cells.
 
-The mood modifier can be appended to any future background or companion prompt immediately before the shared art direction. Companion masters are generated against a single flat chroma field, then converted to edge-cleaned RGBA PNG cutouts so no black or square canvas appears in the builder, cabinet, or cinematic layer. Runtime mood overlays avoid duplicating the six backgrounds and six companions, which keeps all 144 theme × companion × mood combinations available from only 16 conceptual layer assets.
+The mood modifier can be appended to any future background or companion prompt immediately before the shared art direction. Companion masters use a single flat chroma field, then become edge-cleaned RGBA PNG cutouts so no green, black, or square canvas appears in the builder, cabinet, or cinematic layer. Runtime mood overlays avoid duplicating the six backgrounds and eight companions, which keeps all 192 theme × companion × mood combinations available from only 18 conceptual layer assets.
 
 ## Theme-specific Sky Runner bonus assets
 

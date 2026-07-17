@@ -6934,7 +6934,7 @@ body {
   }
 }
 
-/* 3.0 World Forge: one audited slot model, 4,320 independent visual combinations. */
+/* 3.0 World Forge: one audited slot model with independent visual layers. */
 .mood-overlay {
   position: absolute;
   z-index: 0;
@@ -9428,6 +9428,7 @@ body {
 
 .factory-group-companion .factory-options button > .factory-option-art {
   background-color: color-mix(in srgb, var(--choice-color) 5%, #030611);
+  background-position: center bottom;
 }
 
 .factory-options button > span {
@@ -9663,6 +9664,39 @@ body {
   .factory-preview { width: min(88vw, 330px); }
   .game-stage[data-game="astral"] .control-deck { grid-template-columns: minmax(0, 1fr) 74px minmax(0, 1fr); gap: 6px; padding-inline: 6px; }
   .game-stage[data-game="astral"] .spin-button { width: 74px; height: 74px; }
+}
+
+/* 4.3 — eight supplied companion cutouts remain fully visible on phones. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .factory-group-companion .factory-options {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .factory-group-companion .factory-options button {
+    padding: 4px;
+    gap: 3px;
+    border-radius: 12px 4px;
+  }
+
+  .factory-group-companion .factory-options button > .factory-option-art {
+    background-size: contain;
+    background-position: center bottom;
+  }
+
+  .factory-group-companion .factory-options button > span {
+    min-height: 20px;
+    padding: 4px 1px 3px;
+    font-size: 6.5px;
+    letter-spacing: 0;
+  }
+}
+
+@media (max-width: 360px) and (orientation: portrait) {
+  .factory-group-companion .factory-options { gap: 3px; }
+  .factory-group-companion .factory-options button { padding: 3px; }
+  .factory-group-companion .factory-options button > span { min-height: 17px; padding-block: 2px; font-size: 5.5px; }
 }
 
 /* 4.2 — transparent symbol system, quieter cabinet hierarchy, and fused wins. */

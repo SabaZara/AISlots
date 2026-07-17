@@ -2,7 +2,7 @@
 
 AISlots is a dependency-free, free-play slot prototype built around one configurable game. Before entering the cabinet, the player chooses a background world, one companion, a mood, and a symbol family in a guided four-step creator.
 
-`6 themes × 6 companions × 4 moods × 6 symbol sets = 864 configurations`
+`6 themes × 8 companions × 4 moods × 6 symbol sets = 1,152 configurations`
 
 Every configuration uses the same deterministic outcome model, exact **99.00% theoretical RTP**, and SHA-256 commit/reveal receipt. Visual choices, sound choices, balance, and play history never change outcome probabilities.
 
@@ -11,11 +11,11 @@ Every configuration uses the same deterministic outcome model, exact **99.00% th
 | Layer | Choices |
 |---|---|
 | Themes | Fire, Ice, Nature, Void, Storm, Abyss |
-| Companions | Dragon, Valkyrie, Kraken, Phoenix, Direwolf, Titan |
+| Companions | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, Arcane Sorceress |
 | Moods | Epic, Mystic, Playful, Dark |
 | Symbol sets | Inferno, Frostbound, Verdant, Cosmic, Tempest, Abyssal |
 
-Only one companion is displayed in a game. Each companion is a transparent RGBA foreground cutout with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every symbol family is also a true-alpha 4×2 atlas: seven isolated world-specific silhouettes and one empty cell, with no square artwork background. The opening creator fills the viewport, presents one graphical choice group at a time, automatically advances to the next layer, keeps a cinematic preview below, and completely hides the cabinet until the player creates the world. Phones show every choice in a fixed two-row grid with no internal scrolling. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
+Only one companion is displayed in a game. The eight supplied green-screen masters are converted into edge-cleaned transparent RGBA foreground cutouts with no rectangular image canvas, while the background, mood treatment, and seven-symbol family remain independent layers. Every symbol family is also a true-alpha 4×2 atlas: seven isolated world-specific silhouettes and one empty cell, with no square artwork background. The opening creator fills the viewport, presents one graphical choice group at a time, automatically advances to the next layer, keeps a cinematic preview below, and completely hides the cabinet until the player creates the world. Phones show every choice without internal scrolling; the Character step uses a fixed 4×2 grid. The enhanced generation prompts and asset specifications are recorded in [`ASSET_PROMPTS.md`](./ASSET_PROMPTS.md).
 
 ## Play features
 

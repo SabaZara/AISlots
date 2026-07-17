@@ -15,26 +15,36 @@ import {
 
 const root = new URL("../", import.meta.url);
 
-test("World Forge publishes all 864 player-selectable combinations", () => {
+test("World Forge publishes all 1,152 player-selectable combinations", () => {
   assert.equal(THEMES.length, 6);
-  assert.equal(COMPANIONS.length, 6);
+  assert.equal(COMPANIONS.length, 8);
   assert.equal(MOODS.length, 4);
   assert.equal(SYMBOL_SETS.length, 6);
   assert.equal(ANIMATION_STYLES.length, 5);
-  assert.equal(VISUAL_COMBINATION_COUNT, 6 * 6 * 4 * 6);
-  assert.equal(VISUAL_COMBINATION_COUNT, 864);
+  assert.equal(VISUAL_COMBINATION_COUNT, 6 * 8 * 4 * 6);
+  assert.equal(VISUAL_COMBINATION_COUNT, 1152);
+  assert.deepEqual(COMPANIONS.map(({ id }) => id), [
+    "valkyrie",
+    "dragon",
+    "direwolf",
+    "kraken",
+    "titan",
+    "tiger",
+    "gorilla",
+    "sorceress"
+  ]);
 });
 
 test("each generated raster asset is local and production-sized", async () => {
   const items = [...THEMES, ...COMPANIONS, ...MOODS, ...SYMBOL_SETS];
-  assert.equal(new Set(items.map((item) => item.asset)).size, 22);
+  assert.equal(new Set(items.map((item) => item.asset)).size, 24);
   for (const item of items) {
     assert.match(item.asset, /^\.\/assets\/factory\/.+\.(?:jpg|png)$/);
     const image = await readFile(new URL(item.asset.slice(2), root));
     if (item.asset.endsWith(".png")) {
       assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
       assert.equal(image[25], 6, `${item.asset} should use RGBA transparency`);
-      if (COMPANIONS.includes(item)) assert.match(item.asset, /companion-.+-cutout-v2\.png$/);
+      if (COMPANIONS.includes(item)) assert.match(item.asset, /companion-.+-cutout-v3\.png$/);
       if (SYMBOL_SETS.includes(item)) assert.match(item.asset, /symbols-.+-transparent-v2\.png$/);
     } else {
       assert.deepEqual(Array.from(image.subarray(0, 3)), [255, 216, 255]);
