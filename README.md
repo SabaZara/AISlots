@@ -22,7 +22,7 @@ Only one companion is displayed in a game. The eight supplied green-screen maste
 - six uninterrupted reels, five rows, one continuous reel bed, and 25 fixed left-to-right paylines;
 - continuous downward reel travel followed by strictly ordered reel-one-to-reel-six stops; landed reel tracks remain reserved so later animation never crosses them;
 - every positive return is shown, including returns smaller than the wager;
-- a single Auto–Spin–Speed control row, with finite 10, 25, or 50-spin autoplay on the left and the standalone Normal 1× / Fast 3× toggle on the right;
+- a single Auto–Spin–Speed control row, with direct infinite Auto/Stop on the left and the standalone Normal 1× / Fast 3× toggle on the right;
 - persistent 18-Scatter feature progress shown by a compact themed Scatter-art tracker with no circular counter or dot field;
 - theme-art Special Bet modes that guarantee +1 or +2 meter progress while preserving 99.00% theoretical RTP;
 - theme-art 25×, 50×, and 100× free-play Buy Bonus choices calibrated to the same 99.00% return;
@@ -59,7 +59,7 @@ The built-in verifier recomputes the commitment and outcome. Changing presentati
 
 ## Responsive layout
 
-Gameplay and the World Forge creator are viewport-locked with no document scrolling on desktop, phone, or iPad. The creator opens in a neutral state with no environment selected or preloaded; world art is staged only after the player explicitly picks a theme. Phones use a dedicated touch-first composition with a fixed choice grid, portrait preview, safe-area padding, and roomier separation around controls. Rotated phones and tablets retain their own viewport-specific sizing. The cabinet uses a quieter frame and one unified control language; Autoplay is attached to Spin, and the enlarged 99.00% RTP badge remains visible on narrow screens. On laptops the companion retains a dedicated but balanced right-side stage. The 6×5 board, Scatter tracker, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, and Buy Bonus remain inside the viewport. Autoplay is a viewport-level dialog and remains clickable above the cabinet. During a win, transparent symbol art can fuse toward a shared energy core while every underlying reel tile stays still.
+Gameplay and the World Forge creator are viewport-locked with no document scrolling on desktop, phone, or iPad. The creator opens in a neutral state with no environment selected or preloaded; world art is staged only after the player explicitly picks a theme. Phones use a dedicated touch-first composition with a fixed choice grid, portrait preview, safe-area padding, and roomier separation around controls. Rotated phones and tablets retain their own viewport-specific sizing. The cabinet uses a quieter frame and one unified control language; direct infinite Auto/Stop is attached to Spin, and the enlarged 99.00% RTP badge remains visible on narrow screens. On laptops the companion retains a dedicated but balanced right-side stage. The 6×5 board, Scatter tracker, companion, Spin, bet controls, Normal/Fast, Autoplay, Special Bet, and Buy Bonus remain inside the viewport. During a win, transparent symbol art can fuse toward a shared energy core while every underlying reel tile stays still.
 
 ## Run locally
 

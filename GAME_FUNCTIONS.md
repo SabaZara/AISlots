@@ -27,7 +27,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 | Bet controls | Implemented | Minus, plus, and Max with balance-aware limits. |
 | Spin | Implemented | Wager is sealed before the presentation begins; symbols travel downward continuously and the result lands strictly from reel one through reel six. |
 | Normal/Fast | Implemented | One standalone Speed button toggles between 1× and 3× presentation timing immediately to the right of Spin; it never changes the result. |
-| Autoplay | Implemented | Finite 10, 25, or 50 spins. Its standalone button sits immediately left of Spin, becomes Stop while active, and stops on insufficient free-play balance. |
+| Autoplay | Implemented | One click starts continuous infinite autoplay. The same standalone button immediately becomes Stop; clicking it ends the sequence after the active spin. Insufficient free-play balance also stops it safely. |
 | Positive-return display | Implemented | Every positive payout receives an animated numeric result, even when it is smaller than the wager. |
 | Win celebrations | Implemented | Win, Nice, Big, Mega, and Epic tiers scale the banner, particles, cabinet reaction, audio, and cinematic treatment. |
 | Winner animation | Implemented | Winning symbol art pulls toward a shared energy core, connects with themed light threads, bursts, and settles into a readable pulse. Reel tiles never move or stretch; only transparent art animates. |
@@ -82,7 +82,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 - `100dvh` sizing and safe-area insets account for mobile browser chrome and notches.
 - Mobile controls are rearranged rather than reduced into overlapping desktop positions.
 - Spin, bet, Normal/Fast, Autoplay, Special Bet, and Buy Bonus remain clickable.
-- Autoplay opens as a viewport-level dialog that cannot be clipped by the cabinet.
+- Infinite Autoplay starts directly from its cabinet button with no menu or clipped overlay; the same button becomes Stop.
 - The 6×5 board and transparent companion are resized/repositioned on narrow screens without covering interactive controls.
 - Winning transparent art can pull inward and pulse beyond its tile during the fusion effect. Tiles remain stationary; controls stay inside their safe regions.
 - Reduced-motion preferences shorten or remove nonessential movement without changing game timing integrity.

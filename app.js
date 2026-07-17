@@ -23,7 +23,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.5.3";
+} from "./asset-catalog.js?v=4.5.4";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -108,8 +108,6 @@ const ui = {
   showcaseRow: $("showcaseRow"),
   speedToggleButton: $("speedToggleButton"),
   speedToggleValue: $("speedToggleValue"),
-  autoplayOverlay: $("autoplayOverlay"),
-  autoplayMenu: $("autoplayMenu"),
   maxBetButton: $("maxBetButton"),
   lobbyOverlay: $("lobbyOverlay"),
   lobbyGames: $("lobbyGames"),
@@ -164,7 +162,6 @@ const state = {
   clientSeed: `garden-${randomSeed(6)}`,
   isSpinning: false,
   autoActive: false,
-  autoRemaining: 0,
   autoStopRequested: false,
   ageConfirmed: false,
   soundEnabled: false,
@@ -620,10 +617,10 @@ function updateUi() {
   ui.clientSeedInput.disabled = controlsLocked;
   ui.autoButton.disabled = state.isSpinning && !state.autoActive;
   ui.autoButton.classList.toggle("is-running", state.autoActive);
-  ui.autoButton.setAttribute("aria-label", state.autoActive ? `Stop autoplay after the current spin · ${state.autoRemaining} remaining` : "Open autoplay options");
+  ui.autoButton.setAttribute("aria-label", state.autoActive ? "Stop infinite autoplay after the current spin" : "Start infinite autoplay");
   ui.autoButton.innerHTML = state.autoActive
-    ? `<span aria-hidden="true">STOP</span><strong>${state.autoRemaining}</strong>`
-    : `<span aria-hidden="true">AUTO</span><strong>10 · 25 · 50</strong>`;
+    ? `<span aria-hidden="true">STOP</span><strong>∞</strong>`
+    : `<span aria-hidden="true">AUTO</span><strong>∞</strong>`;
   ui.speedToggleButton.disabled = controlsLocked;
   ui.speedToggleButton.classList.toggle("is-fast", speed.id === "fast");
   ui.speedToggleButton.setAttribute("aria-label", speed.id === "fast" ? "Switch to Normal 1× spin" : "Switch to Fast 3× spin");
@@ -989,7 +986,6 @@ function applyGameTheme({ resetGrid = false } = {}) {
   gameStage.dataset.animation = visuals.animation.id;
   const spinCenterRow = ui.spinCenter.querySelector(".spin-center-row");
   if (spinCenterRow && ui.autoButton.parentElement !== spinCenterRow) spinCenterRow.prepend(ui.autoButton);
-  setAutoplayMenuOpen(false);
   ui.featureCard.dataset.game = game.id;
   ui.featureVisual.dataset.meter = game.meterMode;
   ui.scatterMeterArt.src = game.scatterAsset;
@@ -1364,7 +1360,7 @@ async function settleOutcome(outcome) {
   // while the six decelerations still overlap like a physical slot cabinet.
   const orderedLandingGap = speed.id === "fast" ? 130 : 225;
   const reelGap = Math.max(orderedLandingGap, Math.round(game.reelStopGap * speed.settleScale));
-  const settleTail = Math.max(140, Math.round(620 * speed.settleScale));
+  const settleTail = speed.id === "fast" ? 40 : 90;
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-spinning");
   ui.reelViewport.classList.add("is-stopping");
@@ -2177,55 +2173,33 @@ async function spin({ fromAuto = false } = {}) {
 function stopAutoplay(message = "Autoplay stopped") {
   state.autoStopRequested = true;
   state.autoActive = false;
-  setAutoplayMenuOpen(false);
   updateUi();
   if (!state.isSpinning) setStatus(message);
 }
 
-async function startAutoplay(count) {
+async function startAutoplay() {
   if (state.isSpinning || state.autoActive) return;
   state.autoActive = true;
   state.autoStopRequested = false;
-  state.autoRemaining = count;
-  setAutoplayMenuOpen(false);
   updateUi();
-  setStatus(`Autoplay started · ${count} finite spins`);
+  setStatus("Infinite autoplay started · press Stop at any time");
 
-  while (state.autoActive && !state.autoStopRequested && state.autoRemaining > 0) {
+  while (state.autoActive && !state.autoStopRequested) {
     const completed = await spin({ fromAuto: true });
     if (!completed) break;
-    state.autoRemaining -= 1;
-    updateUi();
-    if (state.autoRemaining > 0 && state.autoActive && !state.autoStopRequested) await delay(currentSpinSpeed().autoplayGapMs);
+    if (state.autoActive && !state.autoStopRequested) await delay(currentSpinSpeed().autoplayGapMs);
   }
 
-  const completedAll = state.autoRemaining === 0;
   state.autoActive = false;
   state.autoStopRequested = false;
-  state.autoRemaining = 0;
   updateUi();
-  setStatus(completedAll ? "Autoplay session complete · choose another limit or spin manually" : "Autoplay stopped");
+  setStatus("Autoplay stopped");
   ui.autoButton.focus();
 }
 
 function openDialog(id) {
   const dialog = $(id);
   if (dialog && !dialog.open) dialog.showModal();
-}
-
-function setAutoplayMenuOpen(open, { returnFocus = false } = {}) {
-  const shouldOpen = Boolean(open) && !state.autoActive && !state.isSpinning;
-  ui.autoplayOverlay.hidden = !shouldOpen;
-  ui.autoplayOverlay.setAttribute("aria-hidden", String(!shouldOpen));
-  ui.autoplayMenu.hidden = !shouldOpen;
-  ui.autoButton.setAttribute("aria-expanded", String(shouldOpen));
-  document.body.classList.toggle("is-autoplay-open", shouldOpen);
-  $("appShell").inert = shouldOpen;
-  if (shouldOpen) {
-    window.requestAnimationFrame(() => ui.autoplayMenu.querySelector("[data-auto-count]")?.focus());
-  } else if (returnFocus) {
-    ui.autoButton.focus();
-  }
 }
 
 function updateSoundControl() {
@@ -2337,16 +2311,7 @@ function bindEvents() {
       stopAutoplay("Autoplay will stop after the current spin");
       return;
     }
-    setAutoplayMenuOpen(ui.autoplayMenu.hidden);
-  });
-  $("closeAutoplay").addEventListener("click", () => {
-    setAutoplayMenuOpen(false, { returnFocus: true });
-  });
-  ui.autoplayOverlay.addEventListener("click", (event) => {
-    if (event.target === ui.autoplayOverlay) setAutoplayMenuOpen(false, { returnFocus: true });
-  });
-  document.querySelectorAll("[data-auto-count]").forEach((button) => {
-    button.addEventListener("click", () => startAutoplay(Number(button.dataset.autoCount)));
+    startAutoplay();
   });
   ui.soundButton.addEventListener("click", () => {
     setSoundEnabled(!state.soundEnabled, { remember: true, cue: true });
@@ -2401,11 +2366,6 @@ function bindEvents() {
   });
 
   window.addEventListener("keydown", (event) => {
-    if (event.code === "Escape" && !ui.autoplayOverlay.hidden) {
-      event.preventDefault();
-      setAutoplayMenuOpen(false, { returnFocus: true });
-      return;
-    }
     if (event.code !== "Space" || event.repeat) return;
     const activeTag = document.activeElement?.tagName;
     const dialogOpen = Boolean(document.querySelector("dialog[open]"));

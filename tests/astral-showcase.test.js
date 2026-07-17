@@ -18,7 +18,7 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
     "cinematicOverlay", "astralBonusStage", "astralFlightWorld",
     "astralFlightPlane", "astralDistanceValue", "astralDistanceBar", "astralAltitudeValue",
     "astralAltitudeBar", "astralMultiplierLadder", "bonusExit",
-    "specialBetButton", "buyFeatureButton", "featureMarketOverlay", "autoplayOverlay",
+    "specialBetButton", "buyFeatureButton", "featureMarketOverlay",
     "reels", "spinButton", "spinCenter", "speedToggleButton", "speedToggleValue", "fairnessButton", "companionStage", "companionPortrait",
     "scatterMeterArt", "featureVisual"
   ]) {
@@ -177,12 +177,17 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("styles.css", root), "utf8")
   ]);
-  assert.match(html, /id="autoplayOverlay"[\s\S]*?id="autoplayMenu"[\s\S]*?aria-modal="true"/);
   assert.match(html, /id="spinCenter"[\s\S]*?id="autoButton"[\s\S]*?id="spinButton"[\s\S]*?id="speedToggleButton"/);
-  assert.doesNotMatch(html, /spin-speed-selector|data-spin-speed/);
-  assert.match(app, /function setAutoplayMenuOpen/);
+  assert.match(html, /id="autoButton"[\s\S]*?Start infinite autoplay[\s\S]*?∞/);
+  assert.doesNotMatch(html, /spin-speed-selector|data-spin-speed|autoplayOverlay|data-auto-count/);
+  assert.match(app, /async function startAutoplay\(\)/);
+  assert.match(app, /while \(state\.autoActive && !state\.autoStopRequested\)/);
+  assert.match(app, /Stop infinite autoplay after the current spin/);
+  assert.doesNotMatch(app, /autoRemaining|setAutoplayMenuOpen/);
   assert.match(app, /speedToggleButton\.addEventListener/);
-  assert.match(css, /\.autoplay-overlay \{[\s\S]*?position: fixed;[\s\S]*?inset: 0/);
+  assert.match(app, /const settleTail = speed\.id === ["']fast["'] \? 40 : 90/);
+  assert.match(css, /\.reel-spin-item \.generated-symbol,[\s\S]*?filter: none;/);
+  assert.match(css, /\.reel-spin-column \{ contain: layout paint; \}/);
   for (const speed of ["normal", "fast"]) assert.match(app, new RegExp(`id: ["']${speed}["']`));
   assert.match(app, /SPIN_SPEED_STORAGE_KEY/);
   assert.match(app, /selectSpinSpeed/);

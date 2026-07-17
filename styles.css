@@ -10477,6 +10477,15 @@ input,
   .game-stage[data-game="astral"] .spin-center .spin-button { margin: 0; }
 }
 
+/* 4.5.4 — moving copies stay GPU-cheap; settled symbols retain the full glow stack. */
+.game-stage[data-game="astral"] .reel-spin-item .generated-symbol,
+.game-stage[data-game="astral"] .reel-spin-item .scatter-symbol,
+.game-stage[data-game="astral"] .reel-spin-item svg {
+  filter: none;
+}
+
+.reel-spin-column { contain: layout paint; }
+
 @media (max-width: 600px) and (orientation: portrait) {
   .game-stage[data-game="astral"] .control-deck { grid-template-columns: minmax(0, 1fr) 132px minmax(0, 1fr); }
   .game-stage[data-game="astral"] .spin-center { width: 132px; }

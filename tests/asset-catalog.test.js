@@ -44,13 +44,14 @@ test("each generated raster asset is local and production-sized", async () => {
     if (item.asset.endsWith(".png")) {
       assert.deepEqual(Array.from(image.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
       assert.equal(image[25], 6, `${item.asset} should use RGBA transparency`);
-      if (COMPANIONS.includes(item)) assert.match(item.asset, /companion-.+-cutout-v3\.png$/);
+      if (COMPANIONS.includes(item)) assert.match(item.asset, /companion-.+-cutout-v(?:3|4)\.png$/);
       if (SYMBOL_SETS.includes(item)) assert.match(item.asset, /symbols-.+-transparent-v3\.png$/);
     } else {
       assert.deepEqual(Array.from(image.subarray(0, 3)), [255, 216, 255]);
     }
     assert.ok(image.length > 75_000, `${item.asset} should retain production detail`);
   }
+  assert.equal(COMPANIONS.find((item) => item.id === "dragon")?.asset, "./assets/factory/companion-dragon-cutout-v4.png");
 });
 
 test("each symbol family has a dedicated transparent Scatter cutout", async () => {
