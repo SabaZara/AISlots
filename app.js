@@ -22,7 +22,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.4.3";
+} from "./asset-catalog.js?v=4.4.4";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -392,6 +392,47 @@ function renderGrid(grid, {
   }
   ui.reels.classList.toggle("has-winners", winnerCells.size > 0);
   ui.reels.replaceChildren(fragment);
+}
+
+function clearSpinReelLayer() {
+  ui.reelViewport.querySelector(".reel-spin-layer")?.remove();
+  ui.reelViewport.classList.remove("has-spin-reels");
+}
+
+function startSpinReelLayer(seed = 0) {
+  clearSpinReelLayer();
+  const ids = currentSymbols().map((symbol) => symbol.id);
+  const layer = document.createElement("div");
+  layer.className = "reel-spin-layer";
+  layer.setAttribute("aria-hidden", "true");
+
+  for (let col = 0; col < COLS; col += 1) {
+    const column = document.createElement("div");
+    column.className = "reel-spin-column";
+    column.dataset.col = String(col);
+    column.style.setProperty("--reel-phase", `${-(col * 43)}ms`);
+    const strip = document.createElement("div");
+    strip.className = "reel-spin-strip";
+    const sequence = Array.from({ length: ROWS }, (_, row) => ids[(seed + col * 2 + row * 3) % ids.length]);
+
+    [...sequence, ...sequence].forEach((id) => {
+      const item = document.createElement("div");
+      item.className = "reel-spin-item";
+      item.dataset.symbol = id;
+      item.style.setProperty("--symbol-glow", symbolGlow(id));
+      item.innerHTML = symbolGraphic(id);
+      strip.append(item);
+    });
+    column.append(strip);
+    layer.append(column);
+  }
+
+  ui.reelViewport.append(layer);
+  ui.reelViewport.classList.add("has-spin-reels");
+}
+
+function stopSpinReelColumn(col) {
+  ui.reelViewport.querySelector(`.reel-spin-column[data-col="${col}"]`)?.remove();
 }
 
 function renderReelStopFrame(outcomeGrid, reel, shuffleTick) {
@@ -934,6 +975,7 @@ function switchGame(gameId) {
   audio.stopSpinLoop({ immediate: true });
   setAnticipationUi(false);
   ui.reelViewport.classList.remove("is-spinning", "is-stopping");
+  clearSpinReelLayer();
   ui.reelImpactLayer.replaceChildren();
   applyGameTheme({ resetGrid: true });
   updateUi();
@@ -1222,10 +1264,12 @@ async function settleOutcome(outcome) {
   for (let reel = 0; reel < COLS; reel += 1) {
     if (reel > 0) await waitForSpinDelay(reelGap);
     renderReelStopFrame(outcome.grid, reel, reel * 7 + 3);
+    stopSpinReelColumn(reel);
     const collector = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).includes("petal");
     playReelStopSound(reel);
     flashReelStop(reel, { collector, final: reel === COLS - 1 });
   }
+  clearSpinReelLayer();
   audio.stopSpinLoop();
   await waitForSpinDelay(settleTail);
   revealWinningCells(winningCells(outcome));
@@ -1928,9 +1972,9 @@ async function spin({ fromAuto = false } = {}) {
 
   let shuffleTick = 0;
   renderGrid(cosmeticGrid(shuffleTick), { shuffling: true });
+  startSpinReelLayer(shuffleTick);
   const shuffleTimer = window.setInterval(() => {
     shuffleTick += 1;
-    renderGrid(cosmeticGrid(shuffleTick), { shuffling: true });
     playSpinTick(shuffleTick);
   }, Math.max(58, Math.round(currentAnimation().spinInterval * currentSpinSpeed().shuffleScale * .72)));
 

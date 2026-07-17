@@ -51,8 +51,8 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.match(css, /\.is-lobby-open #appShell \{ visibility: hidden/);
   assert.match(css, /\.lobby-shell \{[\s\S]*?width: 100vw;[\s\S]*?height: 100dvh/);
   assert.match(html, /1,152 combinations/);
-  assert.match(html, /app\.js\?v=4\.4\.3/);
-  assert.match(app, /asset-catalog\.js\?v=4\.4\.3/);
+  assert.match(html, /app\.js\?v=4\.4\.4/);
+  assert.match(app, /asset-catalog\.js\?v=4\.4\.4/);
   assert.doesNotMatch(app, /group\("Motion", "animation"/);
 });
 
@@ -82,7 +82,10 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(css, /grid-template-rows: repeat\(5/);
   assert.match(css, /continuous reel bed/);
   assert.match(css, /\.symbol-cell\[data-col="5"\] \{ border-right: 0/);
-  assert.match(css, /naturalReelRoll/);
+  assert.match(app, /function startSpinReelLayer/);
+  assert.match(app, /stopSpinReelColumn\(reel\)/);
+  assert.match(css, /@keyframes continuousReelStrip/);
+  assert.match(css, /real reel strips replace independent tile\/block shuffling/);
 });
 
 test("Sky Runner Land continuously follows the sealed flight result", async () => {
@@ -181,7 +184,7 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(css, /min-width: 561px[\s\S]*?max-width: 820px/);
   assert.match(readme, /desktop, phone, or iPad/i);
   assert.match(inventory, /no document scrolling/i);
-  assert.equal(JSON.parse(packageJson).version, "4.4.3");
+  assert.equal(JSON.parse(packageJson).version, "4.4.4");
 });
 
 test("four mood profiles provide distinct music identities and licensed files stay local", async () => {
