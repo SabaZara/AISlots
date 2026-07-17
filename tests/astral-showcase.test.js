@@ -96,10 +96,13 @@ test("the complete 6×5 reel board stays visible through six real stop phases", 
   assert.match(app, /strip\.style\.transform = `translateY\(\$\{startY\}px\)`/);
   assert.match(app, /velocityMatch = 0\.30 \/ 0\.18/);
   assert.match(app, /orderedLandingGap = speed\.id === "fast" \? 130 : 225/);
+  assert.match(app, /column\?\.classList\.add\("is-landed"\)/);
+  assert.doesNotMatch(app, /column\?\.remove\(\)/);
   assert.match(app, /easing: "cubic-bezier\(\.18,\.30,\.42,1\)"/);
   assert.doesNotMatch(app, /endY \+ overshoot|reelStripLand/);
   assert.match(css, /@keyframes continuousReelStrip/);
   assert.match(css, /reel-spin-column\.is-decelerating/);
+  assert.match(css, /reel-spin-column\.is-landed[\s\S]*?visibility: hidden/);
   assert.match(css, /real reel strips replace independent tile\/block shuffling/);
   assert.match(css, /the stopped result is stationary/);
   assert.match(css, /reel-viewport\.is-stopping[\s\S]*?animation: none !important/);
@@ -175,7 +178,7 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
     readFile(new URL("styles.css", root), "utf8")
   ]);
   assert.match(html, /id="autoplayOverlay"[\s\S]*?id="autoplayMenu"[\s\S]*?aria-modal="true"/);
-  assert.match(html, /id="spinCenter"[\s\S]*?id="spinButton"[\s\S]*?id="autoButton"[\s\S]*?id="speedToggleButton"/);
+  assert.match(html, /id="spinCenter"[\s\S]*?id="autoButton"[\s\S]*?id="spinButton"[\s\S]*?id="speedToggleButton"/);
   assert.doesNotMatch(html, /spin-speed-selector|data-spin-speed/);
   assert.match(app, /function setAutoplayMenuOpen/);
   assert.match(app, /speedToggleButton\.addEventListener/);

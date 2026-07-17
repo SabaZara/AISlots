@@ -23,7 +23,7 @@ import {
   VISUAL_COMBINATION_COUNT,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.5.2";
+} from "./asset-catalog.js?v=4.5.3";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -471,7 +471,9 @@ async function stopSpinReelColumn(reel) {
   const column = ui.reelViewport.querySelector(`.reel-spin-column[data-col="${reel}"]`);
   const finalize = () => {
     renderReelStopFrame(outcomeGrid, reel);
-    column?.remove();
+    // Keep the transparent column in its original grid track until every reel has
+    // landed. Removing it here would reflow later animated reels over settled ones.
+    column?.classList.add("is-landed");
   };
   const strip = column?.querySelector(".reel-spin-strip");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
