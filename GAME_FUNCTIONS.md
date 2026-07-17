@@ -11,9 +11,9 @@ This file is the team-review checklist for the current simulated-credit build. R
 | First-screen game creator | Implemented | The site opens on a true edge-to-edge guided creator. One graphical choice group appears at a time and a cinematic preview stays centered below. The cabinet remains hidden until play starts. |
 | Explicit layer choices | Implemented | World, Character, Mood, and Relics are four ordered steps. A selection stays on its current step until the player clicks Next; Back revisits the previous step. The fourth button starts the game directly, with no review page. |
 | Theme selection | Implemented | Graphical choices select Fire, Ice, Nature, Void, Storm, or Abyss. The selected world immediately updates the preview and creator accent. |
-| One companion | Implemented | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, or Arcane Sorceress; exactly one static transparent cutout is displayed to the left of the board. |
+| One companion | Implemented | Valkyrie, Dragon, Direwolf, Kraken, Titan, Tiger Warrior, Gorilla Warrior, or Arcane Sorceress; exactly one static transparent cutout uses the original right-side cabinet layout. |
 | Atmosphere selection | Implemented | Epic, Arcane, Playful, or Shadow swaps the entire layered soundscape (music, ambience, spin, rewards, UI) and complements it with a matching lighting treatment. The live preview shows a dedicated color-coded Mood badge and matching light treatment. |
-| Symbol selection | Implemented | Six generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, weapons, and scatter crests. Creator cards show all six paying relics plus the dedicated Scatter cutout. |
+| Symbol selection | Implemented | Six generated seven-symbol RGBA families use distinct silhouettes, color palettes, value tiers, and world-specific coins, weapons, and scatter crests. Creator cards show all six paying relics plus the dedicated Scatter cutout without dark artwork backing tiles. |
 | Surprise me | Implemented | Randomly chooses all four player-facing visual layers, updates the preview, and moves to the final Relics step ready to start. |
 | Saved configuration | Implemented | The browser restores the player’s previous World Forge choices. |
 | Combination count | Implemented | 6 × 8 × 4 × 6 = 1,152 configurations. |
@@ -55,7 +55,8 @@ This file is the team-review checklist for the current simulated-credit build. R
 - Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed. The catalog module is versioned with the release so deployed browsers cannot reuse obsolete atlas mappings.
 - The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
 - Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
-- One larger static companion is layered independently from the selected background, anchored to the left, and given dedicated cabinet space so the reel board does not hide it.
+- One larger static companion is layered independently from the selected background in the original right-side cabinet position.
+- The Bet, Auto, Spin, and Speed controls float directly on the world art without a dark control-deck block.
 - The top navigation, control deck, feature buttons, feature market, and bonus telemetry inherit the selected theme's artwork, accent, and secondary colors.
 - Four mood-linked procedural music identities use different tempo, waveform, melody, ambience, and percussion behavior.
 - Reel roll, reel stop, button, meter collection, flight launch, flight landing, victory, and big-win events have separate sound roles.

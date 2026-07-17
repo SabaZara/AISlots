@@ -216,9 +216,12 @@ test("separate autoplay and speed buttons plus every positive payout remain visi
   assert.match(css, /spin-button\.is-autoplay-stop \.spin-icon[\s\S]*?color: #ff3347/);
   assert.doesNotMatch(css, /spin-button\.is-autoplay-stop \{[\s\S]*?background:/);
   assert.doesNotMatch(css, /companionCinematicIdle/);
-  assert.match(css, /machine > \.companion-stage[\s\S]*?left: -2%[\s\S]*?right: auto[\s\S]*?width: min\(34%, 480px\)/);
+  assert.match(css, /machine > \.companion-stage[\s\S]*?left: auto[\s\S]*?right: -5%[\s\S]*?width: min\(62%, 760px\)/);
   assert.match(css, /\.companion-stage img[\s\S]*?animation: none !important/);
   assert.match(css, /\.factory-symbol-showcase \{[\s\S]*?grid-template-columns: repeat\(4[\s\S]*?grid-template-rows: repeat\(2/);
+  assert.match(css, /\.factory-symbol-showcase b \{[\s\S]*?background-color: transparent/);
+  assert.match(css, /factory-options button > \.factory-symbol-showcase \{ border: 0; \}/);
+  assert.match(css, /game-stage\[data-game="astral"\] \.control-deck \{[\s\S]*?border: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none/);
   assert.match(css, /factory-group-symbols \.factory-options[\s\S]*?repeat\(3[\s\S]*?repeat\(2/);
   assert.match(css, /max-width: 820px[\s\S]*?control-deck[\s\S]*?grid-template-columns: minmax\(0, 1fr\) clamp\(128px, 32vw, 184px\)/);
   assert.match(app, /--win-world-art/);
