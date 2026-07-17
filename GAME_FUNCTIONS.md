@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **4.4.2**
+Version reviewed: **4.4.3**
 
 This file is the team-review checklist for the current free-play build. Runtime publication contains one configurable slot, not several reskinned games.
 
@@ -54,7 +54,7 @@ This file is the team-review checklist for the current free-play build. Runtime 
 ## Visual and sound systems
 
 - 42 active project-local generated raster assets: six backgrounds, eight transparent companion cutouts, four mood overlays, six transparent symbol atlases, six transparent Scatter tracker cutouts, six bonus launch scenes, and six transparent themed planes.
-- Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed.
+- Backgrounds keep the central reel area low-detail; companion and symbol PNGs use true alpha transparency. Version-three symbol atlases normalize occupied area, glow strength, and centering; long weapons use a diagonal presentation without stretching, the final atlas cell stays empty, and cross-cell fragments are removed. The catalog module is versioned with the release so deployed browsers cannot reuse obsolete atlas mappings.
 - The cabinet uses one display typeface and one interface typeface. Frames, tiles, and control panels use a restrained single-border system so symbols, Spin, RTP, and wins dominate the hierarchy.
 - Dollar formatting replaces the legacy unit suffix throughout balance, bet, returns, bonus awards, receipts, and win details; the 99.00% RTP badge is enlarged and remains visible on phones.
 - One larger companion is layered independently from the selected background and receives dedicated cabinet space instead of a black portrait rectangle, including an expanded laptop stage.
