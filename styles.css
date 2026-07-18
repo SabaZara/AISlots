@@ -11969,3 +11969,261 @@ input,
   animation: none !important;
   transform: none !important;
 }
+
+/* 4.7.7 — complete phone companion cutouts and a consistent touch-control grid. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .topbar .icon-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .game-stage[data-game="astral"] .machine {
+    top: clamp(87px, calc(18vw + 23px), 95px);
+    grid-template-rows: minmax(0, 1fr) 190px !important;
+  }
+
+  .game-stage[data-game="astral"] .machine > .companion-stage {
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .game-stage[data-game="astral"] .companion-stage img {
+    position: absolute;
+    inset: 0 0 auto auto;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: right top;
+  }
+
+  .game-stage[data-game="astral"] .control-deck {
+    --phone-action-gap: 5px;
+    --phone-action-width: calc(25% - 6.25px);
+    width: calc(100vw - 10px);
+    height: 190px;
+    min-height: 190px;
+    padding: 5px;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    grid-template-rows: 64px 60px 48px;
+    gap: var(--phone-action-gap);
+    overflow: hidden;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control,
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper,
+  .game-stage[data-game="astral"] .control-deck > .spin-center,
+  .game-stage[data-game="astral"] .control-deck .spin-center-row,
+  .game-stage[data-game="astral"] .control-deck > .astral-feature-dock {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: contents !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .control-label {
+    display: none;
+  }
+
+  .game-stage[data-game="astral"] #betDown,
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper > strong,
+  .game-stage[data-game="astral"] #betUp {
+    position: absolute !important;
+    top: 10px;
+    bottom: auto;
+  }
+
+  .game-stage[data-game="astral"] #betDown { left: 7px; }
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper > strong { left: 55px; }
+  .game-stage[data-game="astral"] #betUp { left: 103px; }
+
+  .game-stage[data-game="astral"] .control-deck > .feature-card {
+    position: absolute !important;
+    top: 72px !important;
+    right: 5px !important;
+    bottom: auto !important;
+    left: 5px !important;
+    width: auto !important;
+    height: 60px;
+    grid-area: auto !important;
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .feature-card .scatter-tracker {
+    width: min(250px, 72%);
+    height: 54px;
+    margin-inline: auto;
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .game-stage[data-game="astral"] .control-deck .scatter-meter-art {
+    height: 48px;
+  }
+
+  .game-stage[data-game="astral"] #spinButton {
+    position: absolute !important;
+    z-index: 10;
+    top: 4px;
+    left: 50%;
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    transform: translateX(-50%) !important;
+  }
+
+  .game-stage[data-game="astral"] #speedToggleButton {
+    top: 8px;
+    right: 5px;
+    left: auto;
+    width: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    height: 48px;
+  }
+
+  .game-stage[data-game="astral"] #maxBetButton,
+  .game-stage[data-game="astral"] #autoButton,
+  .game-stage[data-game="astral"] #specialBetButton,
+  .game-stage[data-game="astral"] #buyFeatureButton {
+    position: absolute !important;
+    top: auto !important;
+    bottom: 5px !important;
+    width: var(--phone-action-width) !important;
+    min-width: 0 !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 6px 4px !important;
+    border-radius: 9px;
+    transform: none !important;
+  }
+
+  .game-stage[data-game="astral"] #maxBetButton {
+    right: auto !important;
+    left: 5px !important;
+  }
+
+  .game-stage[data-game="astral"] #autoButton {
+    right: auto !important;
+    left: calc(5px + var(--phone-action-width) + var(--phone-action-gap)) !important;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .astral-feature-dock {
+    grid-area: auto !important;
+  }
+
+  .game-stage[data-game="astral"] #specialBetButton,
+  .game-stage[data-game="astral"] #buyFeatureButton {
+    position: absolute !important;
+  }
+
+  .game-stage[data-game="astral"] #specialBetButton {
+    right: auto !important;
+    left: calc(5px + var(--phone-action-width) + var(--phone-action-gap) + var(--phone-action-width) + var(--phone-action-gap)) !important;
+  }
+
+  .game-stage[data-game="astral"] #buyFeatureButton {
+    right: 5px !important;
+    left: auto !important;
+  }
+
+  .game-stage[data-game="astral"] #specialBetButton strong,
+  .game-stage[data-game="astral"] #buyFeatureButton strong,
+  .game-stage[data-game="astral"] #autoButton > span,
+  .game-stage[data-game="astral"] #maxBetButton {
+    font-size: 7px;
+    line-height: 1;
+    letter-spacing: .04em;
+  }
+
+  .game-stage[data-game="astral"] #specialBetButton small,
+  .game-stage[data-game="astral"] #buyFeatureButton small {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 5.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) and (orientation: portrait) {
+  .game-stage[data-game="astral"] .machine {
+    top: 85px;
+  }
+
+  .game-stage[data-game="astral"] #spinButton {
+    top: 5px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .game-stage[data-game="astral"] #speedToggleButton {
+    right: 0;
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    min-height: 46px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .game-stage[data-game="astral"] .machine > .companion-stage {
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .game-stage[data-game="astral"] .companion-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper {
+    gap: 0;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper button,
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper strong {
+    width: 30px;
+    min-width: 30px;
+    height: 36px;
+    min-height: 36px;
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .game-stage[data-game="astral"] #maxBetButton {
+    width: 30px;
+    min-width: 30px;
+    height: 36px;
+    min-height: 36px;
+    font-size: 5.5px;
+    letter-spacing: .02em;
+  }
+
+  .game-stage[data-game="astral"] .spin-center .auto-button,
+  .game-stage[data-game="astral"] .spin-center .speed-toggle-button {
+    width: 58px;
+    min-width: 58px;
+    height: 40px;
+    min-height: 40px;
+  }
+}
