@@ -12447,3 +12447,72 @@ input,
     top: -94px;
   }
 }
+
+/* 4.7.10 — dedicated rotated-phone character bay and compact desktop-style feature art. */
+.game-stage[data-game="astral"] #buyFeatureButton {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--game-accent) 16%, rgba(3, 8, 22, .34)), rgba(2, 5, 15, .7)),
+    var(--feature-bonus-art) center / cover no-repeat;
+}
+
+.game-stage[data-game="astral"] #buyFeatureButton .feature-button-orb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: 30px;
+  height: auto;
+  display: block !important;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 42%, white 18%);
+  border-radius: 7px;
+  background: var(--feature-bonus-art) center / cover no-repeat;
+  color: transparent;
+  box-shadow: inset 0 0 10px rgba(0,0,0,.18), 0 0 8px color-mix(in srgb, var(--game-accent) 24%, transparent);
+}
+
+.game-stage[data-game="astral"] #buyFeatureButton strong,
+.game-stage[data-game="astral"] #buyFeatureButton small {
+  margin-left: 28px;
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+  #featureCard #featureVisual.scatter-tracker {
+    width: 120px;
+    margin-inline: auto;
+  }
+
+  .game-stage[data-game="astral"] #buyFeatureButton {
+    padding-left: 35px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .game-stage[data-game="astral"] .reel-frame {
+    width: calc(100% - clamp(104px, 14vw, 122px));
+    justify-self: start;
+  }
+
+  .game-stage[data-game="astral"] .machine > .companion-stage {
+    z-index: 4;
+    top: 30px;
+    right: clamp(180px, 28vw, 228px);
+    bottom: auto;
+    width: clamp(96px, 13vw, 112px);
+    height: calc(100% - 60px);
+    overflow: visible;
+    opacity: 1;
+  }
+
+  .game-stage[data-game="astral"] .companion-stage img {
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .game-stage[data-game="astral"] #buyFeatureButton {
+    padding-left: 36px;
+  }
+}

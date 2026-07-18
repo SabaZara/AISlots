@@ -290,6 +290,9 @@ test("phone spin, bet sizing, and feature controls stay visible without RTP or M
   assert.match(css, /4\.7\.9 — clear short-phone HUD[\s\S]*?topbar \.session-strip \.rtp-pill[\s\S]*?display: none !important[\s\S]*?visibility: hidden !important/);
   assert.match(css, /#maxBetButton \{[\s\S]*?display: none !important/);
   assert.match(css, /\.result-status,[\s\S]*?#lastWinButton,[\s\S]*?#winDetailsDialog[\s\S]*?display: none !important/);
+  assert.match(css, /4\.7\.10 — dedicated rotated-phone character bay[\s\S]*?#featureCard #featureVisual\.scatter-tracker[\s\S]*?width: 120px/);
+  assert.match(css, /#buyFeatureButton \.feature-button-orb[\s\S]*?var\(--feature-bonus-art\) center \/ cover no-repeat/);
+  assert.match(css, /orientation: landscape[\s\S]*?max-height: 520px[\s\S]*?\.reel-frame[\s\S]*?width: calc\(100% - clamp\(104px, 14vw, 122px\)\)/);
   assert.match(css, /stepper button:not\(\.mini-action\),[\s\S]*?stepper strong[\s\S]*?width: 44px[\s\S]*?height: 44px/);
   assert.match(css, /control-deck \.spin-center \{[\s\S]*?grid-column: 1 \/ -1 !important/);
   assert.match(css, /#spinButton \{[\s\S]*?left: 50%[\s\S]*?transform: translateX\(-50%\) !important/);
