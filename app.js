@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.5";
+} from "./asset-catalog.js?v=4.8.6";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -424,6 +424,7 @@ function startSpinReelLayer(seed = 0) {
     column.className = "reel-spin-column";
     column.dataset.col = String(col);
     column.style.setProperty("--reel-phase", `${-(col * 43)}ms`);
+    column.style.setProperty("--reel-start-delay", `${col * 70}ms`);
     const strip = document.createElement("div");
     strip.className = "reel-spin-strip";
     const sequence = Array.from({ length: ROWS }, (_, row) => ids[(seed + col * 2 + row * 3) % ids.length]);

@@ -8332,7 +8332,7 @@ body {
   width: 68px;
   padding: 7px 5px;
   display: grid;
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   border-right: 2px solid color-mix(in srgb, var(--game-accent) 52%, white 12%);
   border-radius: 10px 2px 2px 10px;
   background: linear-gradient(90deg, rgba(2,7,22,.68), rgba(2,7,22,.24));
@@ -12576,7 +12576,7 @@ input,
     padding: 2px;
   }
 }
-/* 4.8.5 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
+/* 4.8.6 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
 @media (max-width: 820px), (orientation: landscape) and (max-height: 520px) {
   .topbar .session-strip .rtp-pill {
     display: none !important;
@@ -12628,6 +12628,15 @@ input,
     box-shadow: inset 0 0 10px rgba(102,219,255,.13), 0 0 12px rgba(102,219,255,.12) !important;
     filter: none !important;
     transform: none !important;
+  }
+
+  .game-stage[data-game="astral"] .reel-spin-column {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    background: transparent !important;
+    box-shadow: none !important;
+    animation: phoneReelStartLeftToRight 170ms cubic-bezier(.2,.78,.24,1) both;
+    animation-delay: var(--reel-start-delay, 0ms);
   }
 
   .feature-market-close {
@@ -12884,6 +12893,15 @@ input,
   }
 }
 
+@media (max-width: 600px) and (orientation: portrait) {
+  .bonus-overlay[data-mode="astral-aviator"] .astral-locked-multipliers {
+    right: 2% !important;
+    left: auto !important;
+    width: auto !important;
+    transform: none !important;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 520px) {
   .topbar {
     min-height: 56px;
@@ -13015,4 +13033,17 @@ input,
   .game-stage[data-game="astral"] .control-deck .astral-feature-button small { font-size: 8px !important; }
   .game-stage[data-game="astral"] #buyFeatureButton strong,
   .game-stage[data-game="astral"] #buyFeatureButton small { margin-left: 28px; }
+}
+
+@keyframes phoneReelStartLeftToRight {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to { opacity: 1; clip-path: inset(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-stage[data-game="astral"] .reel-spin-column {
+    opacity: 1;
+    clip-path: none;
+    animation: none !important;
+  }
 }

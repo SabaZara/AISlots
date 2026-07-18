@@ -78,12 +78,13 @@ const GAME_TEMPLATES = {
       { multiplier: 2, weight: 1200 },
       { multiplier: 3, weight: 800 },
       { multiplier: 5, weight: 400 },
-      { multiplier: 10, weight: 100 }
+      { multiplier: 10, weight: 90 },
+      { multiplier: 100, weight: 10 }
     ],
     symbols: symbolsFor({
       luma: "Sunsteel Coin", orbit: "Horned Ring", nova: "Flame Crystal", comet: "Ember Blade",
       dew: "Magma Drop", leaf: "Dragon Scale", petal: "Flame Crown"
-    }, 14.889152028213422)
+    }, 12.967838362016055)
   },
   neon: {
     id: "neon",

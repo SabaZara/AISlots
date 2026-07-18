@@ -20,6 +20,7 @@ test("the published configurable game model returns exactly 99.00%", () => {
     const result = model.theoreticalRtp(gameId);
     assert.ok(Math.abs(result.totalRtp - 0.99) < 1e-12, `${gameId} RTP drifted`);
     assert.ok(result.baseRtp > 0 && result.bonusRtp > 0);
+    assert.equal(Math.max(...model.GAMES[gameId].bonusPrizes.map((prize) => prize.multiplier)), 100);
   }
 });
 
