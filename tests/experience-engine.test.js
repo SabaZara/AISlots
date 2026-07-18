@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   AUDIO_PROFILES,
   CHARACTER_VOICES,
+  SAMPLE_SLOTS,
   WORLD_AMBIENCES,
   audioProfileFor
 } from "../experience-engine.js";
@@ -45,4 +46,11 @@ test("every companion has a signature vocalization", () => {
     Object.keys(CHARACTER_VOICES),
     ["valkyrie", "dragon", "direwolf", "kraken", "titan", "tiger", "gorilla", "sorceress"]
   );
+});
+
+test("licensed music slots retain synthesized fallbacks", () => {
+  assert.equal(SAMPLE_SLOTS.music_base.loop, true);
+  assert.equal(SAMPLE_SLOTS.music_bonus.loop, true);
+  assert.equal(SAMPLE_SLOTS.music_base.bus, "music");
+  assert.equal(SAMPLE_SLOTS.reel_stop.bus, "sfx");
 });

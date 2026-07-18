@@ -1,7 +1,8 @@
 // AISlots premium audio engine.
 //
-// Every sound is synthesized live — there are no sample files. Each gameplay
-// moment (spin, reel stop, win, bonus, jackpot) mixes several layered voices —
+// Every sound has a live synthesized version, while owned/licensed sample files
+// can replace the essential slots through assets/audio/manifest.json. Each
+// gameplay moment (spin, reel stop, win, bonus, jackpot) mixes layered voices —
 // mechanical movement, magical energy, wind, sub bass, particles and momentum
 // — with weighted random variation in pitch, timing, stereo position and
 // layer choice so no action repeats exactly.
@@ -13,8 +14,9 @@
 // can be mixed, ducked and EQ'd without masking the others.
 
 export const AUDIO_PROFILES = Object.freeze({
-  // "I am embarking on an epic legendary adventure." — orchestral warmth,
-  // brass-like saw stacks, cinematic drum thumps, deep impacts, heroic rises.
+  // "I am marching to war with a Viking horde." — galloping war drums, shield
+  // stomps, low chant drones in open fifths, and horn-call melodies. Martial
+  // and driving, never euro-pop.
   epic: Object.freeze({
     label: "Epic",
     wave: "triangle",
@@ -24,29 +26,40 @@ export const AUDIO_PROFILES = Object.freeze({
     wet: 0.24,
     echo: 0.06,
     spin: Object.freeze({
-      motorFreq: 98, motorWave: "triangle", motorLevel: 0.03,
+      motorFreq: 82, motorWave: "triangle", motorLevel: 0.03,
       windFreq: 1350, windType: "bandpass",
-      subFreq: 55, subLevel: 0.02, tickRate: 13
+      subFreq: 50, subLevel: 0.023, tickRate: 13
     }),
     stop: Object.freeze({ thumpFreq: 170, toneFreq: 392, sparkle: 0.8, ringRatio: 1.5 }),
     ui: Object.freeze({ base: 523.25, wave: "triangle" }),
     music: Object.freeze({
-      bpm: 120,
-      padWave: "sawtooth", bassWave: "triangle", leadWave: "triangle",
-      // Dm — Bb — F — C: a classic heroic minor progression.
+      bpm: 96,
+      padWave: "sawtooth", bassWave: "sawtooth", leadWave: "sawtooth",
+      // Open-fifth chant drones instead of pop chords: D5 — D5 — C5 — Bb5.
       chords: Object.freeze([
-        Object.freeze([0, 3, 7, 12]),
-        Object.freeze([-4, 0, 3, 8]),
-        Object.freeze([3, 7, 10, 15]),
-        Object.freeze([-2, 2, 5, 10])
+        Object.freeze([0, 7, 12]),
+        Object.freeze([0, 7, 12]),
+        Object.freeze([-2, 5, 10]),
+        Object.freeze([-4, 3, 10])
       ]),
-      bass: Object.freeze([0, null, 0, 0, 7, null, 0, null, 0, null, 0, 0, 5, null, 7, 7]),
-      lead: Object.freeze([0, null, 2, null, 4, null, 5, 4, null, 2, null, 0, null, 1, null, null]),
-      leadChance: 0.85,
+      // B section: the drone rises — F5 — G5 — C5 — D5, a war band cresting.
+      chordsB: Object.freeze([
+        Object.freeze([3, 10, 15]),
+        Object.freeze([5, 12, 17]),
+        Object.freeze([-2, 5, 10]),
+        Object.freeze([0, 7, 12])
+      ]),
+      // Galloping 3-3-2 longboat-oar bassline.
+      bass: Object.freeze([0, null, null, 0, null, null, 0, null, 0, null, null, 0, null, null, 0, 0]),
+      // Horn-call phrases: long, narrow-range signals — not a synth hook.
+      lead: Object.freeze([0, null, null, null, 2, null, 3, null, null, null, 2, null, 0, null, null, null]),
+      leadB: Object.freeze([4, null, null, 3, null, 2, null, null, 3, null, 2, null, 0, null, null, null]),
+      leadChance: 0.8,
+      swing: 0.02,
       perc: "warDrum",
-      level: 0.021,
-      filter: 2400,
-      wet: 0.3
+      level: 0.026,
+      filter: 1600,
+      wet: 0.34
     })
   }),
   // "I entered an ancient magical realm." — crystal chimes, mystical bells,
@@ -76,11 +89,20 @@ export const AUDIO_PROFILES = Object.freeze({
         Object.freeze([-3, 4, 9, 16]),
         Object.freeze([-5, 2, 7, 14])
       ]),
+      // B section: the suspensions climb a step, opening the ceiling.
+      chordsB: Object.freeze([
+        Object.freeze([4, 11, 16, 21]),
+        Object.freeze([2, 9, 14, 18]),
+        Object.freeze([7, 14, 19, 23]),
+        Object.freeze([0, 7, 12, 19])
+      ]),
       bass: Object.freeze([0, null, 7, null, 0, null, 7, 12, 0, null, 7, null, 0, 12, 7, null]),
       lead: Object.freeze([4, null, 2, 6, null, 5, null, 7, 3, null, 5, 1, null, 4, 6, null]),
+      leadB: Object.freeze([6, null, 4, null, 7, null, 5, 4, null, 6, null, 8, null, 7, null, 5]),
       leadChance: 0.75,
+      swing: 0.1,
       perc: "bellTick",
-      level: 0.019,
+      level: 0.022,
       filter: 3400,
       wet: 0.46
     })
@@ -112,11 +134,20 @@ export const AUDIO_PROFILES = Object.freeze({
         Object.freeze([-7, -3, 0, 5]),
         Object.freeze([-5, -1, 2, 7])
       ]),
+      // B section: IV — V — iii — ii lifted voicings, pure singalong chorus.
+      chordsB: Object.freeze([
+        Object.freeze([5, 9, 12, 16]),
+        Object.freeze([7, 11, 14, 17]),
+        Object.freeze([4, 7, 12, 16]),
+        Object.freeze([2, 5, 9, 14])
+      ]),
       bass: Object.freeze([0, 12, null, 0, 7, 12, null, 7, 0, 12, null, 0, 5, 12, 7, null]),
       lead: Object.freeze([0, null, 2, 4, null, 4, null, 3, null, 2, null, 1, 2, null, 0, null]),
+      leadB: Object.freeze([4, null, 3, 2, 4, null, 2, null, 1, 2, null, 4, null, 3, 2, 0]),
       leadChance: 0.9,
+      swing: 0.16,
       perc: "toyPop",
-      level: 0.018,
+      level: 0.021,
       filter: 2800,
       wet: 0.14
     })
@@ -148,11 +179,20 @@ export const AUDIO_PROFILES = Object.freeze({
         Object.freeze([-4, 3, 8, 15]),
         Object.freeze([0, 7, 10, 14])
       ]),
+      // B section: the pedal tone tilts to the flat second — deeper menace.
+      chordsB: Object.freeze([
+        Object.freeze([0, 7, 13, 15]),
+        Object.freeze([1, 8, 13, 20]),
+        Object.freeze([-4, 3, 10, 15]),
+        Object.freeze([3, 8, 12, 19])
+      ]),
       bass: Object.freeze([0, null, 0, null, 0, 0, null, 12, 0, null, 0, null, 0, 0, 12, null]),
       lead: Object.freeze([null, null, 3, null, null, null, 1, null, null, null, 0, null, null, 5, null, 2]),
+      leadB: Object.freeze([5, null, null, 3, null, null, 2, null, null, 1, null, null, 0, null, 3, null]),
       leadChance: 0.6,
+      swing: 0.04,
       perc: "darkMetal",
-      level: 0.02,
+      level: 0.023,
       filter: 1100,
       wet: 0.24
     })
@@ -187,6 +227,34 @@ export const CHARACTER_VOICES = Object.freeze({
   sorceress: "spell-cast"
 });
 
+// Licensed sample slots — the essential sounds worth replacing with produced
+// audio files. Drop licensed files into assets/audio/ and list them in
+// assets/audio/manifest.json; any filled slot automatically replaces the
+// synthesized version of that event, and the synth remains the fallback for
+// every empty slot. A slot can also be atmosphere-specific by suffixing the
+// manifest key with the atmosphere id (e.g. "music_base_epic").
+export const SAMPLE_SLOTS = Object.freeze({
+  music_base: Object.freeze({ bus: "music", loop: true, volume: 0.5, replaces: "adaptive base music" }),
+  music_bonus: Object.freeze({ bus: "music", loop: true, volume: 0.55, replaces: "bonus-mode music" }),
+  ambience: Object.freeze({ bus: "ambience", loop: true, volume: 0.5, replaces: "world ambience bed (ambience_<world> overrides per world)" }),
+  spin_loop: Object.freeze({ bus: "spin", loop: true, volume: 0.5, replaces: "motor + tick-train spin loop" }),
+  spin_start: Object.freeze({ bus: "spin", volume: 0.6, replaces: "spin launch" }),
+  reel_stop: Object.freeze({ bus: "sfx", volume: 0.5, replaces: "mechanism reel stops (variants recommended)" }),
+  scatter_land: Object.freeze({ bus: "sfx", volume: 0.7, replaces: "escalating scatter landings (_1.._n = escalation steps)" }),
+  anticipation: Object.freeze({ bus: "sfx", volume: 0.6, replaces: "final-reel anticipation" }),
+  line_win: Object.freeze({ bus: "sfx", volume: 0.55, replaces: "line win reveals (variants recommended)" }),
+  win_count_end: Object.freeze({ bus: "sfx", volume: 0.6, replaces: "count-up closing sting" }),
+  wintier_big: Object.freeze({ bus: "sfx", volume: 0.7, replaces: "big win fanfare" }),
+  wintier_mega: Object.freeze({ bus: "sfx", volume: 0.75, replaces: "mega win fanfare" }),
+  wintier_epic: Object.freeze({ bus: "sfx", volume: 0.8, replaces: "epic win / jackpot sequence" }),
+  bonus_trigger: Object.freeze({ bus: "sfx", volume: 0.75, replaces: "bonus entry sequence" }),
+  bonus_reveal: Object.freeze({ bus: "sfx", volume: 0.65, replaces: "multiplier ladder reveals (_1.._n = ladder steps)" }),
+  coin_rain: Object.freeze({ bus: "sfx", volume: 0.5, replaces: "celebration coin rain" }),
+  ui_click: Object.freeze({ bus: "ui", volume: 0.4, replaces: "select/confirm clicks" })
+});
+
+const SAMPLE_BASE_PATH = "./assets/audio/";
+
 const rand = (min, max) => min + Math.random() * (max - min);
 const chance = (probability) => Math.random() < probability;
 const pickFrom = (list) => list[Math.floor(Math.random() * list.length)];
@@ -214,6 +282,11 @@ export class SlotAudioEngine {
     this.bonusMode = false;
     // Ambience state.
     this.ambience = null;
+    // Licensed sample library (assets/audio/manifest.json); null until loaded.
+    this.samples = null;
+    this.samplePromise = null;
+    this.musicSampleVoice = null;
+    this.sampleRevision = Date.now().toString(36);
   }
 
   config() {
@@ -239,6 +312,98 @@ export class SlotAudioEngine {
     const context = this.ensure();
     if (context?.state === "suspended") void context.resume();
     this.startMusic();
+    void this.loadSampleLibrary().then((loaded) => {
+      // If a music or ambience sample just became available, restart the
+      // scene so the produced loops take over from the synth.
+      if (loaded && this.enabled) this.restartMusic();
+    });
+  }
+
+  // ─── Licensed sample library ──────────────────────────────────────────────
+  // assets/audio/manifest.json maps slot names to files inside assets/audio/:
+  //   { "reel_stop": ["reel-stop-1.webm", "reel-stop-2.webm"],
+  //     "music_base": "main-theme.webm", "music_base_shadow": "dark-theme.webm" }
+  // Any filled slot replaces the synthesized event; missing slots fall back to
+  // the synth automatically. Numbered arrays double as escalation ladders.
+
+  sampleAssetUrl(file) {
+    const url = new URL(file, new URL(SAMPLE_BASE_PATH, import.meta.url));
+    url.searchParams.set("music", this.sampleRevision);
+    return url.href;
+  }
+
+  loadSampleLibrary() {
+    if (this.samplePromise) return this.samplePromise;
+    this.samplePromise = (async () => {
+      const context = this.ensure();
+      if (!context) return false;
+      let manifest;
+      try {
+        const response = await fetch(this.sampleAssetUrl("manifest.json"), { cache: "no-store" });
+        if (!response.ok) return false;
+        manifest = await response.json();
+      } catch {
+        return false; // no manifest — fully synthesized soundscape
+      }
+      const library = new Map();
+      await Promise.all(Object.entries(manifest).map(async ([slot, files]) => {
+        const list = Array.isArray(files) ? files : [files];
+        const buffers = [];
+        for (const file of list) {
+          try {
+            const response = await fetch(this.sampleAssetUrl(file), { cache: "no-store" });
+            if (!response.ok) continue;
+            buffers.push(await context.decodeAudioData(await response.arrayBuffer()));
+          } catch (error) {
+            console.warn(`Audio sample "${file}" for slot "${slot}" could not be loaded.`, error);
+          }
+        }
+        if (buffers.length) library.set(slot, buffers);
+      }));
+      this.samples = library;
+      return library.size > 0;
+    })();
+    return this.samplePromise;
+  }
+
+  // Buffers for a slot, preferring an atmosphere-specific override
+  // ("<slot>_<mood>") over the generic entry.
+  slotBuffers(slot) {
+    if (!this.samples) return null;
+    return this.samples.get(`${slot}_${this.config().mood}`) ?? this.samples.get(slot) ?? null;
+  }
+
+  // Play a filled slot. Returns the playing voice, or null when the slot is
+  // empty (callers then fall back to the synthesized version). `variant`
+  // indexes escalation ladders; otherwise a random variant is chosen. `key`
+  // names a preferred manifest entry tried before the slot's own lookup.
+  playSlot(slot, { volume = 1, pan = 0, rate = null, variant = null, delay = 0, key = null } = {}) {
+    if (!this.enabled) return null;
+    const buffers = (key ? this.samples?.get(key) : null) ?? this.slotBuffers(slot);
+    if (!buffers) return null;
+    const context = this.ensure();
+    if (!context) return null;
+    const spec = SAMPLE_SLOTS[slot] ?? { bus: "sfx", volume: 0.6, loop: false };
+    const buffer = variant === null
+      ? pickFrom(buffers)
+      : buffers[clamp(variant, 0, buffers.length - 1)];
+    const source = context.createBufferSource();
+    const gain = context.createGain();
+    source.buffer = buffer;
+    source.loop = Boolean(spec.loop);
+    source.playbackRate.value = rate ?? (spec.loop ? 1 : rand(0.97, 1.04));
+    gain.gain.value = spec.volume * volume;
+    source.connect(gain);
+    this.connectVoice(gain, { pan, bus: spec.bus });
+    source.start(context.currentTime + delay);
+    return { source, gain };
+  }
+
+  stopSampleVoice(voice, { immediate = false } = {}) {
+    if (!voice || !this.context) return;
+    const now = this.context.currentTime;
+    voice.gain.gain.setTargetAtTime(0.0001, now, immediate ? 0.004 : 0.12);
+    try { voice.source.stop(now + (immediate ? 0.02 : 0.4)); } catch { /* already stopped */ }
   }
 
   ensure() {
@@ -515,13 +680,21 @@ export class SlotAudioEngine {
     this.stopMusic();
     if (!this.enabled || !this.ensure()) return;
     const context = this.context;
-    this.musicStep = 0;
-    this.nextStepAt = context.currentTime + 0.08;
     const bus = this.graph.buses.music;
     bus.gain.cancelScheduledValues(context.currentTime);
     bus.gain.setValueAtTime(0.0001, context.currentTime);
     bus.gain.setTargetAtTime(0.72, context.currentTime, 0.5);
-    this.musicTimer = window.setInterval(() => this.scheduleMusic(), 90);
+    // A licensed music loop takes over from the generative arrangement when
+    // the matching slot is filled (music_bonus during bonus scenes).
+    const musicSlot = this.bonusMode && this.slotBuffers("music_bonus") ? "music_bonus" : "music_base";
+    const sampleVoice = this.playSlot(musicSlot);
+    if (sampleVoice) {
+      this.musicSampleVoice = sampleVoice;
+    } else {
+      this.musicStep = 0;
+      this.nextStepAt = context.currentTime + 0.08;
+      this.musicTimer = window.setInterval(() => this.scheduleMusic(), 90);
+    }
     this.startAmbience();
   }
 
@@ -529,6 +702,10 @@ export class SlotAudioEngine {
     if (this.musicTimer !== null) window.clearInterval(this.musicTimer);
     this.musicTimer = null;
     this.musicStep = 0;
+    if (this.musicSampleVoice) {
+      this.stopSampleVoice(this.musicSampleVoice);
+      this.musicSampleVoice = null;
+    }
     this.stopAmbience();
   }
 
@@ -556,19 +733,36 @@ export class SlotAudioEngine {
     }
   }
 
+  // The arrangement is a real song, not a looping bar: 8-bar phrases split
+  // into an A section and a lifted B section (its own chords, answering
+  // melody, octave lift), with drum fills into every section change, a crash
+  // on each section downbeat, swing on the off-16ths, and call-and-response
+  // melodies — so the track keeps moving instead of treading water.
   playMusicStep(step, delay) {
     const profile = this.profile();
     const music = profile.music;
     const stepInBar = step % 16;
     const bar = Math.floor(step / 16);
-    const chord = music.chords[bar % music.chords.length];
+    const barInPhrase = bar % 8;
+    const inB = barInPhrase >= 4;
+    const fillBar = barInPhrase === 3 || barInPhrase === 7;
     const beat = this.stepSeconds();
+    const chords = inB && music.chordsB ? music.chordsB : music.chords;
+    const chord = chords[barInPhrase % 4 % chords.length];
     const root = profile.root;
     const freq = (semitones, octave = 0) => root * 2 ** ((semitones + octave * 12) / 12);
+    // Swing: every off-16th lands late, giving the groove a human push.
+    const when = delay + (stepInBar % 2 === 1 ? beat * (music.swing ?? 0.1) : 0);
 
-    // Pad layer — always on, swelling chords once per bar (twice when excited).
-    if (stepInBar === 0 || (stepInBar === 8 && this.energy > 0.55)) {
-      const tones = this.bonusMode ? [...chord, chord[1] + 12] : chord;
+    // Section downbeat: a bright splash and low boom announce each new section.
+    if (stepInBar === 0 && (barInPhrase === 0 || barInPhrase === 4)) {
+      this.noise(0.45, { volume: music.level * 0.9, delay, music: true, filterType: "highpass", frequency: 5200, frequencyEnd: 9800, wet: 0.3, attack: 0.004 });
+      this.tone(freq(chord[0], -2), 0.4, { type: "sine", volume: music.level * 1.3, delay, frequencyEnd: Math.max(30, freq(chord[0], -2) * 0.7), music: true, attack: 0.005 });
+    }
+
+    // Pad layer — chord swell at bar start; the B section voices it brighter.
+    if (stepInBar === 0 || (stepInBar === 8 && this.energy > 0.5)) {
+      const tones = inB || this.bonusMode ? [...chord, chord[1] + 12] : chord;
       tones.forEach((semitone, index) => {
         this.tone(varyFreq(freq(semitone), 5), beat * 14, {
           type: music.padWave,
@@ -577,21 +771,22 @@ export class SlotAudioEngine {
           delay,
           pan: (index / (tones.length - 1) - 0.5) * 0.7,
           wet: music.wet,
-          filter: music.filter * (0.8 + this.energy * 0.5),
+          filter: music.filter * (inB ? 1.15 : 0.85) * (0.8 + this.energy * 0.4),
           filterEnd: music.filter * 0.6,
           music: true
         });
       });
     }
 
-    // Rhythmic chord stabs — punchy off-beat hits that drive the groove.
-    if ((stepInBar === 4 || stepInBar === 12) && this.energy > 0.4) {
+    // Rhythmic chord stabs — off-beat hits in A, syncopated 16ths-feel in B.
+    const stabSteps = inB ? [2, 6, 10, 14] : [4, 12];
+    if (stabSteps.includes(stepInBar) && this.energy > 0.3) {
       chord.slice(0, 3).forEach((semitone, index) => {
         this.tone(varyFreq(freq(semitone), 6), beat * 1.6, {
           type: music.padWave,
-          volume: music.level * 0.55,
+          volume: music.level * (inB ? 0.48 : 0.58),
           attack: 0.006,
-          delay,
+          delay: when,
           pan: (index - 1) * 0.4,
           wet: music.wet * 0.6,
           filter: music.filter * 1.1,
@@ -601,52 +796,74 @@ export class SlotAudioEngine {
       });
     }
 
-    // Bass layer — always on, driving eighths that follow the chord root.
-    const bassOffset = music.bass[stepInBar];
+    // Bass layer — driving pattern with a sub-octave double; the B section
+    // fills the gaps into relentless eighths.
+    let bassOffset = music.bass[stepInBar];
+    if (!Number.isFinite(bassOffset) && inB && stepInBar % 2 === 0) bassOffset = 0;
     if (Number.isFinite(bassOffset)) {
-      this.tone(freq(chord[0] + bassOffset, -1), beat * 1.4, {
+      const bassFreq = freq(chord[0] + bassOffset, -1);
+      this.tone(bassFreq, beat * 1.4, {
         type: music.bassWave,
-        volume: music.level * 1.9,
+        volume: music.level * 2.1,
         attack: 0.008,
-        delay,
+        delay: when,
         wet: music.wet * 0.2,
         filter: Math.max(260, music.filter * 0.45),
         filterEnd: Math.max(170, music.filter * 0.26),
         music: true
       });
+      this.tone(bassFreq / 2, beat * 1.2, { type: "sine", volume: music.level * 1.2, attack: 0.008, delay: when, music: true });
     }
 
-    // Lead layer — joins with activity; melody notes are skipped or lifted an
-    // octave with weighted randomness so the line never loops identically.
-    const leadDegree = music.lead[stepInBar];
+    // Lead layer — call (bars 0-1) and response (bars 2-3), then both again an
+    // octave up in the B section. Two detuned voices thicken the line, and
+    // weighted randomness keeps repeats from ever being identical.
+    const leadPattern = Math.floor(bar / 2) % 2 === 1 && music.leadB ? music.leadB : music.lead;
+    const leadDegree = leadPattern[stepInBar];
     if (Number.isFinite(leadDegree) && this.energy > 0.12 && chance(music.leadChance)) {
-      const octave = (this.bonusMode ? 2 : 1) + (chance(0.14) ? 1 : 0);
-      this.tone(varyFreq(this.scaleFreq(leadDegree, octave), 7), beat * rand(1.4, 2.4), {
-        type: music.leadWave,
-        volume: music.level * (0.62 + this.energy * 0.36),
-        attack: 0.02,
-        delay,
-        pan: Math.sin(step * 0.9) * 0.36,
-        wet: music.wet,
-        echo: profile.echo * 0.6,
-        filter: music.filter,
-        filterEnd: music.filter * 0.7,
-        music: true
+      const octave = 1 + (inB || this.bonusMode ? 1 : 0) + (chance(0.1) ? 1 : 0);
+      const leadFreq = varyFreq(this.scaleFreq(leadDegree, octave), 6);
+      [-6, 6].forEach((cents) => {
+        this.tone(leadFreq, beat * rand(1.4, 2.2), {
+          type: music.leadWave,
+          detune: cents,
+          volume: music.level * (0.38 + this.energy * 0.22),
+          attack: 0.02,
+          delay: when,
+          pan: Math.sin(step * 0.9) * 0.36 + cents * 0.02,
+          wet: music.wet,
+          echo: profile.echo * 0.6,
+          filter: music.filter,
+          filterEnd: music.filter * 0.7,
+          music: true
+        });
       });
     }
 
-    // Arp topper — excitement layer of high chord tones.
-    if (this.energy > 0.4 && stepInBar % 2 === 0) {
+    // Arp topper — always on in the B section, excitement-gated in A.
+    if ((inB || this.energy > 0.5) && stepInBar % 2 === 0) {
       const semitone = chord[(stepInBar / 2) % chord.length];
       this.tone(varyFreq(freq(semitone, 2), 9), beat * 1.1, {
         type: "sine",
-        volume: music.level * 0.4 * this.energy,
+        volume: music.level * 0.42 * Math.max(0.6, this.energy),
         attack: 0.008,
-        delay,
+        delay: when,
         pan: Math.sin(step * 1.7) * 0.6,
         wet: music.wet + 0.1,
         music: true
       });
+    }
+
+    // Fill bar: the last beat becomes a rising drum fill, with a sweep that
+    // launches the next section.
+    if (fillBar && stepInBar === 8) {
+      this.noise(beat * 8, { volume: music.level * 0.7, delay, music: true, filterType: "bandpass", frequency: 700, frequencyEnd: 3600, wet: 0.24, attack: beat * 5 });
+    }
+    if (fillBar && stepInBar >= 12) {
+      const fillStep = stepInBar - 12;
+      this.tone(varyFreq(190 - fillStep * 28, 16), 0.1, { type: "sine", volume: music.level * (0.8 + fillStep * 0.25), delay: when, frequencyEnd: 70, music: true, attack: 0.003 });
+      this.noise(0.05, { volume: music.level * (0.5 + fillStep * 0.2), delay: when, music: true, filterType: "bandpass", frequency: 1700 + fillStep * 350, frequencyEnd: 900, wetShort: 0.2 });
+      return;
     }
 
     // Percussion layer — atmosphere-specific character, always driving.
@@ -658,18 +875,28 @@ export class SlotAudioEngine {
     const onBeat = stepInBar % 4 === 0;
     const offBeat = stepInBar % 4 === 2;
     if (kind === "warDrum") {
-      // Cinematic war drums: four-to-the-bar hits, big accents on 1 and 3,
-      // a snare-crack backbeat and galloping hats when excited.
-      if (onBeat) {
-        const accent = stepInBar === 0 || stepInBar === 8 ? 1 : 0.7;
-        this.tone(varyFreq(74, 20), 0.22, { type: "sine", volume: 0.024 * accent, delay, frequencyEnd: 46, music: true, attack: 0.004 });
-        this.noise(0.12, { volume: 0.014 * accent, delay, music: true, filterType: "lowpass", frequency: 300, frequencyEnd: 80, wetShort: 0.2 });
+      // Viking war drums: a galloping 3-3-2 tom pattern (row-stroke rhythm),
+      // deep hall-heavy hits, shield-stomp cracks on the backbeats and a low
+      // chant bark on the phrase accents. No bright hats — nothing euro.
+      const gallop = [0, 3, 6, 8, 11, 14];
+      if (gallop.includes(stepInBar)) {
+        const accent = stepInBar === 0 || stepInBar === 8 ? 1 : 0.68;
+        this.tone(varyFreq(62, 18), 0.3, { type: "sine", volume: 0.028 * accent, delay, frequencyEnd: 40, music: true, attack: 0.005 });
+        this.noise(0.16, { volume: 0.016 * accent, delay, music: true, filterType: "lowpass", frequency: 260, frequencyEnd: 70, wetShort: 0.3, wet: 0.12 });
       }
       if (stepInBar === 4 || stepInBar === 12) {
-        this.noise(0.09, { volume: 0.011, delay, music: true, filterType: "bandpass", frequency: 1900, frequencyEnd: 900, wetShort: 0.24 });
+        // Shield stomp: a woody crack with body.
+        this.noise(0.07, { volume: 0.013, delay, music: true, filterType: "bandpass", frequency: 1200, frequencyEnd: 550, wetShort: 0.28 });
+        this.thump(varyFreq(120, 16), { volume: 0.016, delay, duration: 0.09, bus: "music" });
       }
-      if (stepInBar % 2 === 1 && (excited || stepInBar % 4 === 3)) {
-        this.noise(0.025, { volume: 0.005, delay, music: true, filterType: "highpass", frequency: 8200, frequencyEnd: 9800 });
+      if (stepInBar === 8 && (excited || chance(0.4))) {
+        // Chant bark ("HUH!"): a short vocal-shaped saw grunt.
+        this.tone(varyFreq(105, 30), 0.14, { type: "sawtooth", volume: 0.014, delay, frequencyEnd: 82, filter: 620, filterEnd: 300, music: true, attack: 0.01, wetShort: 0.24 });
+        this.noise(0.08, { volume: 0.007, delay, music: true, filterType: "bandpass", frequency: 700, frequencyEnd: 400 });
+      }
+      if (excited && (stepInBar === 2 || stepInBar === 10)) {
+        // Extra oar-stroke double when the horde is excited.
+        this.tone(varyFreq(70, 18), 0.16, { type: "sine", volume: 0.014, delay, frequencyEnd: 46, music: true, attack: 0.004 });
       }
     } else if (kind === "bellTick") {
       // Pulsing magical percussion: soft heartbeat kick under sparkling bells.
@@ -718,10 +945,22 @@ export class SlotAudioEngine {
     if (this.ambience?.themeId === themeId && this.ambience?.running) return;
     this.stopAmbience();
     if (!this.enabled || !this.ensure()) return;
+    const context = this.context;
+    const busGain = this.graph.buses.ambience;
+    busGain.gain.cancelScheduledValues(context.currentTime);
+    busGain.gain.setValueAtTime(0.0001, context.currentTime);
+    busGain.gain.setTargetAtTime(0.5, context.currentTime, 1.2);
+
+    // A licensed ambience loop replaces the synthesized bed and events; the
+    // per-world manifest key ("ambience_<world>") wins over the generic one.
+    const ambientSample = this.playSlot("ambience", { key: `ambience_${themeId}` });
+    if (ambientSample) {
+      this.ambience = { themeId, nodes: [], eventTimer: 0, sampleVoice: ambientSample, running: true };
+      return;
+    }
+
     const spec = WORLD_AMBIENCES[themeId] ?? WORLD_AMBIENCES.fire;
     const nodes = [];
-    const context = this.context;
-
     const bed = this.buildAmbienceBed(spec.bed);
     if (bed) nodes.push(...bed);
 
@@ -729,18 +968,14 @@ export class SlotAudioEngine {
       if (!this.enabled) return;
       spec.events.forEach((event) => this.playAmbienceEvent(event));
     }, 900);
-
-    const busGain = this.graph.buses.ambience;
-    busGain.gain.cancelScheduledValues(context.currentTime);
-    busGain.gain.setValueAtTime(0.0001, context.currentTime);
-    busGain.gain.setTargetAtTime(0.5, context.currentTime, 1.2);
     this.ambience = { themeId, nodes, eventTimer, running: true };
   }
 
   stopAmbience() {
     if (!this.ambience) return;
-    const { nodes, eventTimer } = this.ambience;
+    const { nodes, eventTimer, sampleVoice } = this.ambience;
     window.clearInterval(eventTimer);
+    if (sampleVoice) this.stopSampleVoice(sampleVoice);
     nodes.forEach((node) => {
       try { node.stop?.(); } catch { /* already stopped */ }
       try { node.disconnect?.(); } catch { /* already disconnected */ }
@@ -902,6 +1137,16 @@ export class SlotAudioEngine {
     this.stopSpinLoop({ immediate: true });
     const context = this.ensure();
     if (!context) return;
+    // A licensed spin loop replaces the whole synthesized loop; fast mode
+    // prefers a dedicated "spin_loop_fast" entry, else speeds the loop up.
+    const sampleVoice = this.playSlot("spin_loop", {
+      key: this.fastSpin ? "spin_loop_fast" : null,
+      rate: this.fastSpin && !this.samples?.get("spin_loop_fast") ? 1.15 : 1
+    });
+    if (sampleVoice) {
+      this.spinVoice = { sampleVoice, stops: 0 };
+      return;
+    }
     const spin = this.profile().spin;
     const now = context.currentTime;
     const lift = this.bonusMode ? 1.18 : 1;
@@ -978,6 +1223,10 @@ export class SlotAudioEngine {
 
   updateSpin(tick, anticipation = false) {
     if (!this.spinVoice || !this.context) return;
+    if (this.spinVoice.sampleVoice) {
+      if (anticipation) this.spinVoice.sampleVoice.source.playbackRate.setTargetAtTime(1.18, this.context.currentTime, 0.1);
+      return;
+    }
     const spin = this.profile().spin;
     const now = this.context.currentTime;
     const target = spin.motorFreq * (anticipation ? 1.35 : 1 + tick % 4 * 0.02);
@@ -994,13 +1243,17 @@ export class SlotAudioEngine {
     const end = now + (immediate ? 0.025 : 0.16);
     if (this.spinVoice) {
       const voice = this.spinVoice;
-      [voice.motorGain, voice.tickerGain, voice.subGain].forEach((gain) => {
-        gain.gain.cancelScheduledValues(now);
-        gain.gain.setTargetAtTime(0.0001, now, immediate ? 0.004 : 0.035);
-      });
-      [voice.motor, voice.motorB, voice.harm, voice.motorLfo, voice.ticker, voice.sub].forEach((node) => {
-        try { node.stop(end + 0.03); } catch { /* already stopped */ }
-      });
+      if (voice.sampleVoice) {
+        this.stopSampleVoice(voice.sampleVoice, { immediate });
+      } else {
+        [voice.motorGain, voice.tickerGain, voice.subGain].forEach((gain) => {
+          gain.gain.cancelScheduledValues(now);
+          gain.gain.setTargetAtTime(0.0001, now, immediate ? 0.004 : 0.035);
+        });
+        [voice.motor, voice.motorB, voice.harm, voice.motorLfo, voice.ticker, voice.sub].forEach((node) => {
+          try { node.stop(end + 0.03); } catch { /* already stopped */ }
+        });
+      }
     }
     this.spinVoice = null;
   }
@@ -1012,6 +1265,10 @@ export class SlotAudioEngine {
     this.fastSpin = fast;
     const pace = fast ? 0.6 : 1;
     this.bumpEnergy(0.65);
+    if (this.playSlot("spin_start", { key: fast ? "spin_start_fast" : null })) {
+      this.startSpinLoop();
+      return;
+    }
     // Launch: mechanical clunk-engage + punchy thump + rising energy zip.
     this.thump(varyFreq(spin.motorFreq * 1.6, 20), { volume: 0.05, duration: 0.13 * pace, bus: "spin" });
     this.noise(0.03, { volume: 0.03, spin: true, filterType: "highpass", frequency: 2600, frequencyEnd: 5200 });
@@ -1062,9 +1319,21 @@ export class SlotAudioEngine {
       this.spinVoice.stops += 1;
       const remaining = clamp(1 - this.spinVoice.stops * 0.16, 0.2, 1);
       const now = this.context.currentTime;
-      this.spinVoice.motorGain.gain.setTargetAtTime(profile.spin.motorLevel * remaining, now, 0.09);
-      this.spinVoice.tickerGain.gain.setTargetAtTime(0.016 * remaining, now, 0.09);
-      this.spinVoice.ticker.frequency.setTargetAtTime(profile.spin.tickRate * (0.5 + remaining * 0.6), now, 0.12);
+      if (this.spinVoice.sampleVoice) {
+        this.spinVoice.sampleVoice.gain.gain.setTargetAtTime((SAMPLE_SLOTS.spin_loop.volume ?? 0.5) * remaining, now, 0.09);
+      } else {
+        this.spinVoice.motorGain.gain.setTargetAtTime(profile.spin.motorLevel * remaining, now, 0.09);
+        this.spinVoice.tickerGain.gain.setTargetAtTime(0.016 * remaining, now, 0.09);
+        this.spinVoice.ticker.frequency.setTargetAtTime(profile.spin.tickRate * (0.5 + remaining * 0.6), now, 0.12);
+      }
+    }
+    // A licensed reel-stop replaces the mechanism recipes; the loop wind-down
+    // above and the penultimate tension riser below still apply.
+    if (this.playSlot("reel_stop", { pan, volume: isFinal ? 1.25 : 1 })) {
+      if (reelIndex === 4 && !isFinal) {
+        this.riser(0.5, { volume: 0.024, from: profile.spin.windFreq * 0.8, to: profile.spin.windFreq * 2.4, bus: "spin", wet: profile.wet });
+      }
+      return;
     }
     // One of four mechanism characters, weighted-random per landing.
     const mechanism = pickFrom(["wood", "metal", "clunk", "latch"]);
@@ -1106,6 +1375,7 @@ export class SlotAudioEngine {
     const profile = this.profile();
     this.bumpEnergy(0.72);
     this.updateSpin(0, true);
+    if (this.playSlot("anticipation")) return;
     // Heartbeat sub pulses under a long shimmer riser.
     [0, 0.38, 0.72].forEach((delay) => {
       this.tone(50, 0.2, { type: "sine", delay, volume: 0.032, attack: 0.01, frequencyEnd: 40 });
@@ -1126,6 +1396,7 @@ export class SlotAudioEngine {
   lineWin(lineIndex, amountRatio = 1) {
     const profile = this.profile();
     this.bumpEnergy(clamp(0.4 + amountRatio * 0.04, 0, 0.85));
+    if (this.playSlot("line_win", { pan: lineIndex % 2 ? 0.3 : -0.3 })) return;
     const lift = Math.floor(clamp(Math.log2(Math.max(1, amountRatio)), 0, 3));
     const degrees = pickFrom([[0, 2], [0, 3], [2, 4], [1, 3]]);
     degrees.forEach((degree, index) => {
@@ -1162,6 +1433,8 @@ export class SlotAudioEngine {
   // softly; profits resolve brightly; 10×+ gets a triumphant close.
   winCountEnd(ratio = 1) {
     const profile = this.profile();
+    // With variants, the ladder maps below-bet / profit / 10×+ to files 1/2/3.
+    if (this.playSlot("win_count_end", { variant: ratio < 1 ? 0 : ratio < 10 ? 1 : 2 })) return;
     if (ratio < 1) {
       this.tone(varyFreq(this.scaleFreq(2, 1), 8), 0.2, { volume: 0.028, wet: profile.wet * 0.7 });
       this.tone(varyFreq(this.scaleFreq(0, 1), 8), 0.28, { delay: 0.09, volume: 0.024, wet: profile.wet * 0.7 });
@@ -1190,6 +1463,18 @@ export class SlotAudioEngine {
     const strength = { big: 1, mega: 2, epic: 3 }[tierId] ?? 0;
     if (!strength) return;
     this.bumpEnergy(0.6 + strength * 0.13);
+    // A licensed win-tier sting replaces the whole fanfare (and the jackpot
+    // sequence for the epic tier), ducking the music underneath it.
+    const tierVoice = this.playSlot(`wintier_${tierId}`);
+    if (tierVoice) {
+      if (this.context && this.graph) {
+        const duration = tierVoice.source.buffer?.duration ?? 3;
+        const music = this.graph.buses.music;
+        music.gain.setTargetAtTime(0.16, this.context.currentTime, 0.08);
+        music.gain.setTargetAtTime(0.72, this.context.currentTime + Math.min(duration, 8), 0.4);
+      }
+      return;
+    }
     if (strength >= 3) {
       this.jackpotSequence();
       return;
@@ -1342,6 +1627,14 @@ export class SlotAudioEngine {
     const profile = this.profile();
     const step = clamp(countSoFar, 1, 4);
     this.bumpEnergy(0.5 + step * 0.15);
+    if (this.playSlot("scatter_land", { variant: step - 1 })) {
+      if (step >= 3 && this.context && this.graph) {
+        const music = this.graph.buses.music;
+        music.gain.setTargetAtTime(0.2, this.context.currentTime, 0.05);
+        music.gain.setTargetAtTime(0.72, this.context.currentTime + 0.7, 0.3);
+      }
+      return;
+    }
     const baseFreq = this.scaleFreq(step * 2, 1);
     // Dramatic hit that grows with each landed scatter.
     this.thump(varyFreq(110 - step * 10, 18), { volume: 0.045 + step * 0.012, duration: 0.16 + step * 0.05 });
@@ -1371,6 +1664,7 @@ export class SlotAudioEngine {
   // Coin-rain celebration texture (reference: coin_spam_1..4): a cluster of
   // small metallic pings scattered across the stereo field.
   coinRain(strength = 1, duration = 0.8) {
+    if (this.playSlot("coin_rain", { volume: clamp(strength, 0.4, 1.3) })) return;
     const pings = Math.floor(6 + strength * 10);
     for (let index = 0; index < pings; index += 1) {
       const when = rand(0, duration);
@@ -1424,6 +1718,10 @@ export class SlotAudioEngine {
       music.gain.setTargetAtTime(0.06, this.context.currentTime, 0.06);
       music.gain.setTargetAtTime(0.72, this.context.currentTime + 1.5, 0.4);
     }
+    if (this.playSlot("bonus_trigger")) {
+      this.characterMoment("bonus");
+      return;
+    }
     // Energy gathering.
     this.riser(0.85, { volume: 0.05, delay: 0.16, from: 240, to: 3400, wet: profile.wet + 0.1 });
     [0, 1, 2, 3, 4].forEach((degree, index) => {
@@ -1443,11 +1741,14 @@ export class SlotAudioEngine {
   bonusSceneStart() {
     this.bonusMode = true;
     this.bumpEnergy(1);
+    // With licensed music loops, entering the bonus swaps to the bonus track.
+    if (this.musicSampleVoice && this.slotBuffers("music_bonus")) this.restartMusic();
   }
 
   bonusSceneEnd() {
     this.bonusMode = false;
     this.energy = Math.min(this.energy, 0.5);
+    if (this.musicSampleVoice) this.restartMusic();
   }
 
   // Multiplier ladder: each reveal escalates like the reference multi_1..10
@@ -1459,6 +1760,7 @@ export class SlotAudioEngine {
     const step = clamp(index + lift, 0, 9);
     const grow = step / 9; // 0 → 1 across the ladder
     this.bumpEnergy(0.7 + grow * 0.3);
+    if (this.playSlot("bonus_reveal", { variant: step, pan: index % 2 ? 0.3 : -0.3 })) return;
     this.noise(0.16, { volume: 0.04, filterType: "bandpass", frequency: 760, frequencyEnd: 2200, pan: index % 2 ? 0.45 : -0.45, wet: profile.wet });
     // Stacked chord tones — the stack deepens as the ladder climbs.
     const stack = [0, 4, 7, 12].slice(0, 2 + Math.floor(grow * 2.2));
@@ -1575,6 +1877,7 @@ export class SlotAudioEngine {
   }
 
   uiSelect(variant = 0) {
+    if (this.playSlot("ui_click")) return;
     const ui = this.profile().ui;
     const frequency = varyFreq(ui.base * 2 ** (this.profile().scale[variant % this.profile().scale.length] / 12), 10);
     this.tone(frequency, 0.09, { type: ui.wave, volume: 0.028, wet: 0.14, bus: "ui" });
@@ -1582,6 +1885,7 @@ export class SlotAudioEngine {
   }
 
   uiConfirm() {
+    if (this.playSlot("ui_click", { rate: rand(1.02, 1.08) })) return;
     const ui = this.profile().ui;
     this.tone(varyFreq(ui.base, 8), 0.1, { type: ui.wave, volume: 0.026, wet: 0.14, bus: "ui" });
     this.tone(varyFreq(ui.base * 1.5, 8), 0.16, { type: ui.wave, delay: 0.06, volume: 0.03, wet: 0.2, bus: "ui" });

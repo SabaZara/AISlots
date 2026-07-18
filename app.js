@@ -1,5 +1,10 @@
 import { randomSeed, sha256Hex } from "./fairness.js";
-import { SlotAudioEngine } from "./experience-engine.js?v=4.8.11";
+// Music is intentionally imported with a per-visit revision. Render may keep
+// static assets cached, but a newly opened game must always request the latest
+// audio engine after its music has been updated.
+const audioEngineUrl = new URL("./experience-engine.js", import.meta.url);
+audioEngineUrl.searchParams.set("music", String(Date.now()));
+const { SlotAudioEngine } = await import(audioEngineUrl.href);
 import {
   COLS,
   DEFAULT_GAME_ID,
@@ -22,7 +27,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.11";
+} from "./asset-catalog.js?v=4.8.12";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;

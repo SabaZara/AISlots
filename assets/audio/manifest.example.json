@@ -1,0 +1,12 @@
+{
+  "music_base": "main-theme.webm",
+  "music_bonus": "bonus-theme.webm",
+  "spin_loop": "reel-roll.webm",
+  "spin_start": ["spin-launch-1.webm", "spin-launch-2.webm"],
+  "reel_stop": ["stop-1.webm", "stop-2.webm", "stop-3.webm"],
+  "scatter_land": ["scatter-1.webm", "scatter-2.webm", "scatter-3.webm"],
+  "wintier_big": "big-win.webm",
+  "wintier_mega": "mega-win.webm",
+  "wintier_epic": "jackpot.webm",
+  "ambience_fire": "embers-loop.webm"
+}
