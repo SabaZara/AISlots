@@ -1,5 +1,5 @@
 import { randomSeed, sha256Hex } from "./fairness.js";
-import { SlotAudioEngine } from "./experience-engine.js?v=4.8.9";
+import { SlotAudioEngine } from "./experience-engine.js?v=4.8.10";
 import {
   COLS,
   DEFAULT_GAME_ID,
@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.9";
+} from "./asset-catalog.js?v=4.8.10";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
