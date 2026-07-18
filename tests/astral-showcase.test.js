@@ -271,6 +271,16 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(JSON.parse(packageJson).version, /^\d+\.\d+\.\d+$/);
 });
 
+test("phone spin, RTP, bet sizing, and feature controls stay visible", async () => {
+  const css = await readFile(new URL("styles.css", root), "utf8");
+  assert.match(css, /4\.7\.5 — centered phone spin, equal bet controls, and persistent feature access/);
+  assert.match(css, /topbar \.session-strip \.rtp-pill[\s\S]*?display: inline-flex !important[\s\S]*?visibility: visible !important/);
+  assert.match(css, /stepper button:not\(\.mini-action\),[\s\S]*?stepper strong[\s\S]*?width: 44px[\s\S]*?height: 44px/);
+  assert.match(css, /control-deck \.spin-center \{[\s\S]*?grid-column: 1 \/ -1 !important/);
+  assert.match(css, /#spinButton \{[\s\S]*?left: 50%[\s\S]*?transform: translateX\(-50%\) !important/);
+  assert.match(css, /#specialBetButton,[\s\S]*?#buyFeatureButton,[\s\S]*?display: grid !important[\s\S]*?opacity: 1 !important/);
+});
+
 test("four atmosphere profiles provide distinct adaptive procedural music identities", async () => {
   const engine = await readFile(new URL("experience-engine.js", root), "utf8");
   assert.match(engine, /scheduleMusic\(\)/);
