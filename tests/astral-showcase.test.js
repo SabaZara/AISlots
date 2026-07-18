@@ -69,6 +69,9 @@ test("World Forge markup, controls, and one-companion presentation stay connecte
   assert.doesNotMatch(app, /astralShowcaseButton|runAstralShowcasePreview/);
   assert.doesNotMatch(html, /Free play|Free-play|no cash value|No deposits/i);
   assert.doesNotMatch(html, /id="gameTitle"|class="machine-title"/);
+  assert.doesNotMatch(html, /id="reelCommitment"|FIRE · RTP 99\.00%/i);
+  assert.match(css, /moltenWinnerPulse/);
+  assert.match(css, /reels\.has-winners \.symbol-cell:not\(\.is-winner\)/);
   assert.match(css, /factory-step-track \{ grid-template-columns: repeat\(4/);
   assert.match(css, /\.factory-symbol-showcase b[\s\S]*?background-size: 400% 200%/);
   assert.match(app, /Array\.from\(\{ length: 6 \}[\s\S]*?symbol-sheet-\$\{index\}[\s\S]*?factory-scatter-choice/);

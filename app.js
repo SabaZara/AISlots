@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.7.0";
+} from "./asset-catalog.js?v=4.7.1";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -70,7 +70,6 @@ const ui = {
   meterMessage: $("meterMessage"),
   meterThreshold: $("meterThreshold"),
   fullCommitment: $("fullCommitment"),
-  reelCommitment: $("reelCommitment"),
   clientSeedInput: $("clientSeedInput"),
   saveClientSeed: $("saveClientSeed"),
   receiptStatus: $("receiptStatus"),
@@ -642,7 +641,6 @@ function updateUi() {
 
 function updateCommitmentUi() {
   ui.fullCommitment.textContent = state.serverHash || "Preparing cryptographic seed…";
-  ui.reelCommitment.textContent = `${currentGame().shortName} · RTP 99.00%`;
 }
 
 async function rotateServerSeed() {
