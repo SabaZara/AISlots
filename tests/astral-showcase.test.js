@@ -294,13 +294,13 @@ test("phone spin, bet sizing, and feature controls stay visible without RTP or M
   assert.match(css, /#buyFeatureButton \.feature-button-orb[\s\S]*?var\(--feature-bonus-art\) center \/ cover no-repeat/);
   assert.match(css, /orientation: landscape[\s\S]*?max-height: 520px[\s\S]*?\.reel-frame[\s\S]*?width: calc\(100% - clamp\(104px, 14vw, 122px\)\)/);
   assert.match(css, /4\.7\.11 — rotated-phone action cluster[\s\S]*?left: -108px !important[\s\S]*?grid-template-columns: 42px 62px 42px/);
-  assert.match(css, /4\.8\.6 final phone override[\s\S]*?brand > \.brand-mark[\s\S]*?display: grid !important/);
-  assert.match(css, /4\.8\.6 final phone override[\s\S]*?#maxBetButton[\s\S]*?display: none !important/);
-  assert.match(css, /4\.8\.6 final phone override[\s\S]*?#autoButton[\s\S]*?pointer-events: auto !important/);
-  assert.match(css, /4\.8\.6 final phone override[\s\S]*?#betDown:hover:not\(:disabled\)[\s\S]*?transform: none !important/);
-  assert.match(css, /4\.8\.6 final phone override[\s\S]*?phoneReelStartLeftToRight[\s\S]*?animation-delay: var\(--reel-start-delay/);
-  assert.match(css, /4\.8\.6 final phone override[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?left: -112px !important/);
-  assert.match(css, /4\.8\.6 final phone override[\s\S]*?#autoButton[\s\S]*?left: calc\(50% \+ 32px\) !important/);
+  assert.match(css, /4\.8\.7 final phone override[\s\S]*?brand > \.brand-mark[\s\S]*?display: grid !important/);
+  assert.match(css, /4\.8\.7 final phone override[\s\S]*?#maxBetButton[\s\S]*?display: none !important/);
+  assert.match(css, /4\.8\.7 final phone override[\s\S]*?#autoButton[\s\S]*?pointer-events: auto !important/);
+  assert.match(css, /4\.8\.7 final phone override[\s\S]*?#betDown:hover:not\(:disabled\)[\s\S]*?transform: none !important/);
+  assert.match(css, /4\.8\.7 final phone override[\s\S]*?phoneReelStartLeftToRight[\s\S]*?animation-delay: var\(--reel-start-delay/);
+  assert.match(css, /4\.8\.7 final phone override[\s\S]*?grid-template-columns: minmax\(0, 1fr\)[\s\S]*?left: -112px !important/);
+  assert.match(css, /4\.8\.7 final phone override[\s\S]*?#autoButton[\s\S]*?left: calc\(50% \+ 32px\) !important/);
   assert.match(css, /astral-locked-multipliers[\s\S]*?left: auto !important[\s\S]*?width: auto !important/);
   assert.match(css, /orientation: landscape[\s\S]*?max-height: 520px[\s\S]*?\.reel-frame[\s\S]*?height: 100%[\s\S]*?\.reel-footer[\s\S]*?display: none !important/);
   assert.match(css, /min-width: 361px[\s\S]*?max-width: 600px[\s\S]*?orientation: portrait[\s\S]*?#specialBetButton[\s\S]*?bottom: -8px !important/);
@@ -317,6 +317,10 @@ test("four atmosphere profiles provide distinct adaptive procedural music identi
   assert.match(engine, /restartMusic\(\)/);
   assert.match(engine, /startAmbience\(\)/);
   assert.match(engine, /characterMoment\(/);
+  assert.match(engine, /gameIntro\(\)/);
+  assert.match(engine, /winCountEnd\(/);
+  assert.match(engine, /scatterLand\(/);
+  assert.match(engine, /spinStart\(\{ fast = false \} = \{\}\)/);
   for (const percussion of ["warDrum", "bellTick", "toyPop", "darkMetal"]) {
     assert.match(engine, new RegExp(`perc: ["']${percussion}["']`));
   }

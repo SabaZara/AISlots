@@ -20,6 +20,7 @@ test("all four atmospheres have distinct layered audio identities", () => {
     assert.ok(profile.scale.length >= 5, `${id} needs a musical scale`);
     assert.ok(profile.wet >= 0 && profile.wet <= 0.5);
     assert.ok(profile.spin.motorFreq > 20 && profile.spin.subLevel > 0, `${id} needs layered spin voices`);
+    assert.ok(profile.spin.tickRate >= 10, `${id} needs a mechanical reel cadence`);
     assert.equal(profile.music.bass.length, 16);
     assert.equal(profile.music.lead.length, 16);
     assert.ok(profile.music.chords.length >= 4, `${id} needs a chord progression`);

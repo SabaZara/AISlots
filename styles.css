@@ -12576,7 +12576,7 @@ input,
     padding: 2px;
   }
 }
-/* 4.8.6 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
+/* 4.8.7 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
 @media (max-width: 820px), (orientation: landscape) and (max-height: 520px) {
   .topbar .session-strip .rtp-pill {
     display: none !important;

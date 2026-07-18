@@ -1,5 +1,5 @@
 import { randomSeed, sha256Hex } from "./fairness.js";
-import { SlotAudioEngine } from "./experience-engine.js";
+import { SlotAudioEngine } from "./experience-engine.js?v=4.8.7";
 import {
   COLS,
   DEFAULT_GAME_ID,
@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.6";
+} from "./asset-catalog.js?v=4.8.7";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -924,7 +924,10 @@ function chooseLobbyGame() {
   saveVisualConfig();
   applyGameTheme({ resetGrid: true });
   updateUi();
-  if (state.soundEnabled) audio.startMusic();
+  if (state.soundEnabled) {
+    audio.startMusic();
+    audio.gameIntro();
+  }
   ui.lobbyOverlay.hidden = true;
   ui.lobbyOverlay.setAttribute("aria-hidden", "true");
   $("appShell").inert = false;
@@ -1089,7 +1092,7 @@ function playNoise(duration = 0.22, volume = 0.05) {
 }
 
 function playSpinSound() {
-  audio.spinStart();
+  audio.spinStart({ fast: currentSpinSpeed().id === "fast" });
 }
 
 function playSpinTick(tick) {
@@ -1097,7 +1100,8 @@ function playSpinTick(tick) {
 }
 
 function playCollectSound(count = 1) {
-  audio.collect(count);
+  const game = currentGame();
+  audio.collect(count, game.threshold > 0 ? state.progress[state.gameId] / game.threshold : 0);
 }
 
 function playGameChangeSound() {
@@ -1253,7 +1257,10 @@ function showWinBanner(amount, bet, { outcomeClass = outcomeClassFor(amount, bet
   if (outcomeClass === "net-win") audio.winVoice();
   else audio.payoutTick(1, "win");
   const amountAnimation = animateCreditValue(ui.winBannerAmount, amount, tier.id === "nice" ? 1050 : 720, { sound: true, tierId: tier.id })
-    .then(() => jumpText(ui.winBannerAmount));
+    .then(() => {
+      jumpText(ui.winBannerAmount);
+      audio.winCountEnd(amount / bet);
+    });
   window.setTimeout(() => ui.winBanner.classList.remove("is-visible"), tier.id === "nice" ? 2100 : 1650);
   return amountAnimation;
 }
@@ -1320,6 +1327,7 @@ async function settleOutcome(outcome) {
   if (state.gameId === "astral") ui.reels.classList.add("is-cinematic-drop");
   settlingOutcomeGrid = outcome.grid;
   const landings = [];
+  let landedScatters = 0;
   for (let reel = 0; reel < COLS; reel += 1) {
     if (reel > 0) await waitForSpinDelay(reelGap);
     // stopSpinReelColumn() awaits the strip's landing animation, then calls
@@ -1327,9 +1335,14 @@ async function settleOutcome(outcome) {
     // before removing the spin-layer column on the same frame. Initiations are
     // staggered by reelGap while the decelerations overlap, so reels land
     // left-to-right at a real-slot cadence instead of one full landing at a time.
-    const collector = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).includes("petal");
+    const columnScatters = Array.from({ length: ROWS }, (_, row) => outcome.grid[cellIndex(reel, row)]).filter((id) => id === "petal").length;
+    const collector = columnScatters > 0;
     landings.push(stopSpinReelColumn(reel).then(() => {
       playReelStopSound(reel);
+      if (collector) {
+        landedScatters += columnScatters;
+        audio.scatterLand(landedScatters);
+      }
       flashReelStop(reel, { collector, final: reel === COLS - 1 });
     }));
   }
