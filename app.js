@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.4";
+} from "./asset-catalog.js?v=4.8.5";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;

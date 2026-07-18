@@ -12576,7 +12576,7 @@ input,
     padding: 2px;
   }
 }
-/* 4.8.4 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
+/* 4.8.5 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
 @media (max-width: 820px), (orientation: landscape) and (max-height: 520px) {
   .topbar .session-strip .rtp-pill {
     display: none !important;
@@ -12599,6 +12599,35 @@ input,
 
   .game-stage[data-game="astral"] #maxBetButton {
     display: none !important;
+  }
+
+  .game-stage[data-game="astral"] #autoButton,
+  .game-stage[data-game="astral"] #speedToggleButton {
+    z-index: 12;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+  }
+
+  .game-stage[data-game="astral"] #betDown,
+  .game-stage[data-game="astral"] #betUp {
+    transition: none !important;
+    transform: none !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .game-stage[data-game="astral"] #betDown:hover:not(:disabled),
+  .game-stage[data-game="astral"] #betDown:active:not(:disabled),
+  .game-stage[data-game="astral"] #betUp:hover:not(:disabled),
+  .game-stage[data-game="astral"] #betUp:active:not(:disabled) {
+    border-color: rgba(154,232,255,.62) !important;
+    color: #f7fbff !important;
+    background:
+      radial-gradient(circle at 34% 28%, rgba(255,255,255,.32), transparent 22%),
+      rgba(66,64,146,.28) !important;
+    box-shadow: inset 0 0 10px rgba(102,219,255,.13), 0 0 12px rgba(102,219,255,.12) !important;
+    filter: none !important;
+    transform: none !important;
   }
 
   .feature-market-close {
@@ -12883,9 +12912,18 @@ input,
   }
 
   .game-stage[data-game="astral"] .reel-frame {
-    height: calc(100% - 56px);
+    height: 100%;
     margin: 0 !important;
-    align-self: start;
+    align-self: stretch;
+  }
+
+  .game-stage[data-game="astral"] .reel-footer {
+    display: none !important;
+  }
+
+  .game-stage[data-game="astral"] .reel-viewport,
+  .game-stage[data-game="astral"] .reels {
+    height: 100% !important;
   }
 
   .game-stage[data-game="astral"] .machine > .companion-stage {
