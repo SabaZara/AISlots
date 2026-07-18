@@ -12576,7 +12576,7 @@ input,
     padding: 2px;
   }
 }
-/* 4.8.1 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
+/* 4.8.2 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
 @media (max-width: 820px), (orientation: landscape) and (max-height: 520px) {
   .topbar .session-strip .rtp-pill {
     display: none !important;
@@ -12644,8 +12644,8 @@ input,
   }
 
   .game-stage[data-game="astral"] .machine {
-    top: clamp(72px, calc(12.5dvh - 8px), 98px);
-    grid-template-rows: minmax(0, 1fr) 112px !important;
+    top: clamp(64px, calc(12.5dvh - 16px), 90px);
+    grid-template-rows: minmax(0, 1fr) 120px !important;
   }
 
   .game-stage[data-game="astral"] .machine > .companion-stage {
@@ -12670,8 +12670,8 @@ input,
     --phone-action-gap: 4px;
     --phone-action-width: calc((100% - 18px) / 3);
     z-index: 4;
-    height: 112px;
-    min-height: 112px;
+    height: 120px;
+    min-height: 120px;
     padding: 4px 5px;
     overflow: visible;
   }
@@ -12818,7 +12818,7 @@ input,
 
 @media (max-width: 360px) and (orientation: portrait) {
   .topbar .brand > span:last-child { display: none; }
-  .game-stage[data-game="astral"] .machine { top: 44px; }
+  .game-stage[data-game="astral"] .machine { top: 36px; }
 
   .game-stage[data-game="astral"] #spinButton {
     left: calc(50% + 18px);
@@ -12834,7 +12834,7 @@ input,
 }
 
 @media (max-width: 600px) and (orientation: portrait) and (min-height: 780px) {
-  .game-stage[data-game="astral"] .machine { top: 118px; }
+  .game-stage[data-game="astral"] .machine { top: 110px; }
 }
 
 @media (orientation: landscape) and (max-height: 520px) {
