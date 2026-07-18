@@ -12576,7 +12576,7 @@ input,
     padding: 2px;
   }
 }
-/* 4.8.10 creator selection fix — no check badges on any World Forge choice. */
+/* 4.8.11 creator selection fix — no check badges on any World Forge choice. */
 .factory-builder .factory-options button.is-selected::after {
   display: none !important;
   content: none !important;
