@@ -284,10 +284,12 @@ test("viewport lock and safe-area layouts cover desktop, phone, rotation, and iP
   assert.match(JSON.parse(packageJson).version, /^\d+\.\d+\.\d+$/);
 });
 
-test("phone spin, RTP, bet sizing, and feature controls stay visible", async () => {
+test("phone spin, bet sizing, and feature controls stay visible without RTP or MAX clutter", async () => {
   const css = await readFile(new URL("styles.css", root), "utf8");
   assert.match(css, /4\.7\.5 — centered phone spin, equal bet controls, and persistent feature access/);
-  assert.match(css, /topbar \.session-strip \.rtp-pill[\s\S]*?display: inline-flex !important[\s\S]*?visibility: visible !important/);
+  assert.match(css, /4\.7\.9 — clear short-phone HUD[\s\S]*?topbar \.session-strip \.rtp-pill[\s\S]*?display: none !important[\s\S]*?visibility: hidden !important/);
+  assert.match(css, /#maxBetButton \{[\s\S]*?display: none !important/);
+  assert.match(css, /\.result-status,[\s\S]*?#lastWinButton,[\s\S]*?#winDetailsDialog[\s\S]*?display: none !important/);
   assert.match(css, /stepper button:not\(\.mini-action\),[\s\S]*?stepper strong[\s\S]*?width: 44px[\s\S]*?height: 44px/);
   assert.match(css, /control-deck \.spin-center \{[\s\S]*?grid-column: 1 \/ -1 !important/);
   assert.match(css, /#spinButton \{[\s\S]*?left: 50%[\s\S]*?transform: translateX\(-50%\) !important/);
