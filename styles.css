@@ -11458,3 +11458,232 @@ input,
     animation: none !important;
   }
 }
+
+/* 4.7.2 — balanced phone choices, touch-sized controls, and a cropped grid companion. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .factory-builder {
+    grid-template-rows: minmax(438px, 54%) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .factory-controls {
+    padding: 9px;
+    grid-template-rows: 46px 32px minmax(0, 1fr) 48px;
+    gap: 7px;
+  }
+
+  .factory-choice-intro {
+    min-height: 46px;
+    grid-template-columns: 78px minmax(0, 1fr) 92px;
+    gap: 7px;
+  }
+
+  .factory-choice-intro button {
+    min-height: 42px;
+    padding: 8px 6px;
+    font-size: 7px;
+    letter-spacing: .06em;
+  }
+
+  .factory-step-track,
+  .factory-step-track i { min-height: 32px; }
+  .factory-step-track span { font-size: 8px; }
+  .factory-group-head { margin-bottom: 5px; font-size: 7.5px; }
+  .factory-actions button { min-height: 48px; font-size: 8.5px; }
+
+  .factory-group-theme .factory-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .factory-group-theme .factory-options button {
+    min-height: 0;
+    padding: 5px;
+    gap: 6px;
+    grid-template-columns: clamp(54px, 17vw, 68px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    border-radius: 14px 5px;
+  }
+
+  .factory-group-theme .factory-options button:last-child {
+    width: calc(50% - 3px);
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  .factory-group-theme .factory-options button > .factory-option-art {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border-radius: 10px 3px;
+  }
+
+  .factory-group-theme .factory-options button > span {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 4px 3px;
+    font-size: 8px;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .game-stage[data-game="astral"] .machine {
+    padding-top: 0 !important;
+    grid-template-rows: minmax(0, 1fr) 144px !important;
+  }
+
+  .game-stage[data-game="astral"] .machine > .companion-stage {
+    z-index: 5;
+    top: 0;
+    right: -4px;
+    bottom: auto;
+    width: clamp(150px, 43vw, 188px);
+    height: clamp(156px, 47vw, 204px);
+    align-items: flex-start;
+    justify-content: flex-end;
+    overflow: hidden;
+    opacity: .98;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
+  }
+
+  .game-stage[data-game="astral"] .companion-stage img {
+    position: absolute;
+    top: -2%;
+    right: -17%;
+    width: auto;
+    max-width: none;
+    height: 205%;
+    object-fit: contain;
+    object-position: center top;
+    filter: saturate(1.1) drop-shadow(0 10px 14px rgba(0,0,0,.76)) drop-shadow(0 0 10px color-mix(in srgb, var(--game-accent) 34%, transparent));
+  }
+
+  .game-stage[data-game="astral"] .control-deck {
+    width: calc(100vw - 10px);
+    height: 144px;
+    min-height: 144px;
+    padding: 5px;
+    grid-template-columns: 106px minmax(0, 1fr) clamp(140px, 37vw, 150px) !important;
+    grid-template-rows: 68px 60px;
+    gap: 5px 6px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control {
+    padding-inline: 2px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper { gap: 4px; }
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper button:not(.mini-action) {
+    width: 40px;
+    min-width: 40px;
+    height: 44px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper strong {
+    min-width: 42px;
+    font-size: 13px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper .mini-action {
+    min-width: 54px;
+    min-height: 38px;
+    height: 38px;
+    font-size: 7px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center-row {
+    grid-template-columns: minmax(40px, 1fr) 58px minmax(40px, 1fr);
+    gap: 4px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center .spin-button {
+    width: 58px;
+    height: 58px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center .auto-button,
+  .game-stage[data-game="astral"] .control-deck .spin-center .speed-toggle-button {
+    min-width: 40px;
+    min-height: 40px;
+    height: 40px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center .auto-button > span,
+  .game-stage[data-game="astral"] .control-deck .spin-center .speed-toggle-button > span {
+    font-size: 6.5px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .feature-card,
+  .game-stage[data-game="astral"] .control-deck > .astral-feature-dock,
+  .game-stage[data-game="astral"] .control-deck .astral-feature-button {
+    height: 60px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .astral-feature-button { min-height: 60px; }
+  .game-stage[data-game="astral"] .control-deck .astral-feature-button strong { font-size: 8px; }
+}
+
+@media (max-width: 360px) and (orientation: portrait) {
+  .factory-builder { grid-template-rows: minmax(424px, 55%) minmax(0, 1fr); }
+  .factory-controls { padding: 7px; gap: 6px; }
+  .factory-choice-intro { grid-template-columns: 72px minmax(0, 1fr) 84px; gap: 5px; }
+  .factory-group-theme .factory-options { gap: 5px; }
+  .factory-group-theme .factory-options button {
+    grid-template-columns: 52px minmax(0, 1fr);
+    padding: 4px;
+    gap: 4px;
+  }
+  .factory-group-theme .factory-options button:last-child { width: calc(50% - 2.5px); }
+  .factory-group-theme .factory-options button > span { font-size: 7px; }
+
+  .game-stage[data-game="astral"] .control-deck {
+    grid-template-columns: 98px minmax(0, 1fr) 138px !important;
+    gap: 4px;
+  }
+  .game-stage[data-game="astral"] .control-deck > .feature-card { width: 98px; }
+  .game-stage[data-game="astral"] .control-deck .spin-center-row {
+    grid-template-columns: 38px 56px 38px;
+    gap: 3px;
+  }
+  .game-stage[data-game="astral"] .control-deck .spin-center .spin-button { width: 56px; height: 56px; }
+  .game-stage[data-game="astral"] .control-deck .spin-center .auto-button,
+  .game-stage[data-game="astral"] .control-deck .spin-center .speed-toggle-button {
+    min-width: 38px;
+    min-height: 38px;
+    height: 38px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .factory-choice-intro button { min-height: 32px; font-size: 6.5px; }
+  .factory-options button > span { font-size: 6px; }
+  .factory-actions button { min-height: 34px; font-size: 7px; }
+
+  .game-stage[data-game="astral"] .machine > .companion-stage {
+    z-index: 5;
+    top: 40px;
+    right: clamp(204px, 27vw, 230px);
+    bottom: auto;
+    width: clamp(120px, 18vw, 156px);
+    height: clamp(104px, 34vh, 138px);
+    overflow: hidden;
+    opacity: .96;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0 82%, transparent 100%);
+  }
+
+  .game-stage[data-game="astral"] .companion-stage img {
+    position: absolute;
+    top: -2%;
+    right: -16%;
+    width: auto;
+    max-width: none;
+    height: 205%;
+    object-fit: contain;
+    object-position: center top;
+  }
+
+}
