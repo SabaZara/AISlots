@@ -11687,3 +11687,131 @@ input,
   }
 
 }
+
+/* 4.7.3 — reserve a phone character bay and separate higher-risk actions. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .game-stage[data-game="astral"] .machine {
+    --phone-companion-height: clamp(170px, 47vw, 184px);
+    top: clamp(64px, 18vw, 72px);
+  }
+
+  .game-stage[data-game="astral"] .machine > .companion-stage {
+    top: calc(-1 * var(--phone-companion-height));
+    right: 0;
+    width: clamp(150px, 43vw, 188px);
+    height: var(--phone-companion-height);
+    opacity: 1;
+  }
+
+  .game-stage[data-game="astral"] .control-deck { overflow: visible; }
+  .game-stage[data-game="astral"] .showcase-row {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .bet-control,
+  .game-stage[data-game="astral"] .control-deck > .bet-control .stepper,
+  .game-stage[data-game="astral"] .control-deck > .spin-center,
+  .game-stage[data-game="astral"] .control-deck .spin-center-row,
+  .game-stage[data-game="astral"] .control-deck > .astral-feature-dock {
+    position: static !important;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center-row {
+    grid-template-columns: 62px 48px;
+    justify-content: end;
+    gap: 10px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center .spin-button { width: 62px; height: 62px; }
+  .game-stage[data-game="astral"] .control-deck .spin-center .speed-toggle-button {
+    width: 48px;
+    min-width: 48px;
+    min-height: 44px;
+    height: 44px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .astral-feature-dock {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .game-stage[data-game="astral"] #maxBetButton,
+  .game-stage[data-game="astral"] #autoButton,
+  .game-stage[data-game="astral"] #buyFeatureButton {
+    position: absolute !important;
+    z-index: 8;
+    bottom: -54px;
+    min-height: 48px;
+    height: 48px;
+    margin: 0;
+    padding: 6px 8px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 2px;
+    border-radius: 9px;
+    color: #dce7f7;
+    background: rgba(3, 7, 18, .86);
+    box-shadow: inset 0 1px rgba(255,255,255,.05);
+    text-align: center;
+    line-height: 1;
+  }
+
+  .game-stage[data-game="astral"] #maxBetButton {
+    top: auto !important;
+    left: 0;
+    right: auto !important;
+    min-width: 0 !important;
+    width: calc(25vw - 10px);
+    transform: translateY(83px) !important;
+    border-color: rgba(175, 202, 255, .22);
+    font-size: 7px;
+    letter-spacing: .06em;
+  }
+
+  .game-stage[data-game="astral"] #autoButton {
+    left: 25%;
+    width: calc(25% - 8px);
+    min-width: 0;
+    border-color: rgba(175, 202, 255, .22);
+  }
+
+  .game-stage[data-game="astral"] #buyFeatureButton {
+    left: 50%;
+    right: 5px;
+    width: auto;
+    border-color: color-mix(in srgb, var(--game-accent) 24%, rgba(255,255,255,.14));
+  }
+
+  .game-stage[data-game="astral"] #autoButton > span,
+  .game-stage[data-game="astral"] #buyFeatureButton strong {
+    font-size: 7px;
+    line-height: 1;
+    letter-spacing: .04em;
+  }
+
+  .game-stage[data-game="astral"] #autoButton > strong { font-size: 8px; }
+  .game-stage[data-game="astral"] #buyFeatureButton .feature-button-orb { display: none; }
+  .game-stage[data-game="astral"] #buyFeatureButton small { display: block; font-size: 5.5px; }
+
+  .game-stage[data-game="astral"] .control-deck button,
+  .game-stage[data-game="astral"] .control-deck strong,
+  .game-stage[data-game="astral"] .control-deck span {
+    text-align: center;
+  }
+}
+
+@media (max-width: 360px) and (orientation: portrait) {
+  .game-stage[data-game="astral"] .machine {
+    --phone-companion-height: clamp(160px, 47vw, 170px);
+    top: 62px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center-row {
+    grid-template-columns: 58px 44px;
+    gap: 7px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center .spin-button { width: 58px; height: 58px; }
+  .game-stage[data-game="astral"] .control-deck .spin-center .speed-toggle-button { width: 44px; min-width: 44px; }
+}
