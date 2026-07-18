@@ -12516,3 +12516,63 @@ input,
     padding-left: 36px;
   }
 }
+
+/* 4.7.11 — rotated-phone action cluster with scatter beside the bonus controls. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .game-stage[data-game="astral"] .machine > .companion-stage {
+    height: calc(100% - 100px);
+  }
+
+  .game-stage[data-game="astral"] .control-deck {
+    overflow: visible;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .feature-card {
+    position: absolute !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: 4px !important;
+    left: -108px !important;
+    width: 100px;
+    height: 48px;
+    display: block !important;
+    grid-area: auto !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  #featureCard #featureVisual.scatter-tracker {
+    width: 94px;
+    height: 42px;
+    min-height: 0;
+    padding: 0;
+    margin-inline: auto;
+    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 3px;
+    gap: 0 3px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .scatter-meter-art {
+    height: 39px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck > .spin-center {
+    width: 154px;
+  }
+
+  .game-stage[data-game="astral"] .control-deck .spin-center-row {
+    grid-template-columns: 42px 62px 42px !important;
+    gap: 4px;
+  }
+
+  .game-stage[data-game="astral"] .spin-center .auto-button,
+  .game-stage[data-game="astral"] .spin-center .speed-toggle-button {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 2px;
+  }
+}
