@@ -11955,3 +11955,17 @@ input,
   .game-stage[data-game="astral"] #spinButton { width: 58px; height: 58px; }
   .game-stage[data-game="astral"] #speedToggleButton { width: 44px; min-width: 44px; right: 4px; }
 }
+
+/* 4.7.6 — remove the reel-stop ring, orbiting dots, flash, and machine shake. */
+.game-stage[data-game="astral"] .reel-impact,
+.game-stage[data-game="astral"] .reel-impact i,
+.game-stage[data-game="astral"] .reel-impact b,
+.game-stage[data-game="astral"] .reel-impact em {
+  display: none !important;
+  animation: none !important;
+}
+
+.game-stage[data-game="astral"] .machine.is-reel-impact {
+  animation: none !important;
+  transform: none !important;
+}

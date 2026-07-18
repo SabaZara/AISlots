@@ -195,6 +195,19 @@ test("scored symbols remain static while reel tiles stay stationary", async () =
   assert.match(css, /mix-blend-mode: normal/);
 });
 
+test("reel stops do not create the laggy ring, orbiting dots, or machine shake", async () => {
+  const [app, css] = await Promise.all([
+    readFile(new URL("app.js", root), "utf8"),
+    readFile(new URL("styles.css", root), "utf8")
+  ]);
+  assert.match(app, /function flashReelStop\(\) \{[\s\S]*?Intentionally static/);
+  assert.doesNotMatch(app, /impact\.innerHTML = "<i><\/i><b><\/b><em><\/em>"/);
+  assert.doesNotMatch(app, /void machine\?\.offsetWidth/);
+  assert.match(css, /4\.7\.6 — remove the reel-stop ring, orbiting dots, flash, and machine shake/);
+  assert.match(css, /\.reel-impact b,[\s\S]*?display: none !important[\s\S]*?animation: none !important/);
+  assert.match(css, /\.machine\.is-reel-impact[\s\S]*?animation: none !important[\s\S]*?transform: none !important/);
+});
+
 test("separate autoplay and speed buttons plus every positive payout remain visible", async () => {
   const [html, app, css] = await Promise.all([
     readFile(new URL("index.html", root), "utf8"),

@@ -1,6 +1,6 @@
 # AISlots World Forge — Function Inventory
 
-Version reviewed: **4.7.5**
+Version reviewed: **4.7.6**
 
 This file is the team-review checklist for the current simulated-credit build. Runtime publication contains one configurable slot, not several reskinned games.
 

@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.7.5";
+} from "./asset-catalog.js?v=4.7.6";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -1127,19 +1127,9 @@ function setAnticipationUi(active, copy = currentGame().anticipationCopy) {
   ui.anticipationCopy.textContent = copy;
 }
 
-function flashReelStop(reelIndex, { collector = false, final = false } = {}) {
-  const impact = document.createElement("span");
-  impact.className = `reel-impact${collector ? " is-collector" : ""}${final ? " is-final" : ""}`;
-  impact.style.setProperty("--impact-left", `${(reelIndex + .5) / COLS * 100}%`);
-  impact.innerHTML = "<i></i><b></b><em></em>";
-  ui.reelImpactLayer.append(impact);
-  const machine = document.querySelector(".machine");
-  machine?.style.setProperty("--impact-direction", reelIndex % 2 ? "-1" : "1");
-  machine?.classList.remove("is-reel-impact");
-  void machine?.offsetWidth;
-  machine?.classList.add("is-reel-impact");
-  window.setTimeout(() => impact.remove(), 920);
-  window.setTimeout(() => machine?.classList.remove("is-reel-impact"), 260);
+function flashReelStop() {
+  // Intentionally static: reel-impact rings, particles, and forced-layout shake
+  // caused the scored-grid hitch shown in the phone/desktop result state.
 }
 
 function sequenceLineWinSounds(outcome, bet) {
