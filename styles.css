@@ -12576,7 +12576,7 @@ input,
     padding: 2px;
   }
 }
-/* 4.8.8 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
+/* 4.8.9 final phone override — keep this block last so earlier legacy breakpoints cannot regress it. */
 @media (max-width: 820px), (orientation: landscape) and (max-height: 520px) {
   .topbar .session-strip .rtp-pill {
     display: none !important;
@@ -12663,6 +12663,11 @@ input,
 
   .factory-builder[data-factory-step="theme"] .factory-group-theme .factory-options button.is-selected > span {
     background: color-mix(in srgb, var(--choice-color) 11%, rgba(3,7,18,.78));
+  }
+
+  .factory-builder[data-factory-step="theme"] .factory-group-theme .factory-options button.is-selected::after {
+    display: none;
+    content: none;
   }
 
   .factory-builder[data-factory-step="theme"]:not(.is-awaiting-theme) .factory-preview {
