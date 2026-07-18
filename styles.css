@@ -11815,3 +11815,30 @@ input,
   .game-stage[data-game="astral"] .control-deck .spin-center .spin-button { width: 58px; height: 58px; }
   .game-stage[data-game="astral"] .control-deck .spin-center .speed-toggle-button { width: 44px; min-width: 44px; }
 }
+
+/* 4.7.4 — scored reel symbols stay completely static. */
+.game-stage[data-game="astral"] .reels.has-winners .symbol-cell.is-winner,
+.game-stage[data-game="astral"] #reels.has-winners .symbol-cell.is-winner .generated-symbol,
+.game-stage[data-game="astral"] #reels.has-winners .symbol-cell.is-winner .scatter-symbol,
+.game-stage[data-game="astral"] #reels.has-winners .symbol-cell.is-winner svg,
+.game-stage[data-game="astral"] .reels.has-winners .symbol-cell.is-winner .generated-symbol,
+.game-stage[data-game="astral"] .reels.has-winners .symbol-cell.is-winner .scatter-symbol,
+.game-stage[data-game="astral"] .reels.has-winners .symbol-cell.is-winner svg,
+.game-stage[data-game="astral"] .symbol-cell.is-winner::before,
+.game-stage[data-game="astral"] .symbol-cell.is-winner::after,
+.game-stage[data-game="astral"] .symbol-cell.is-fusing,
+.game-stage[data-game="astral"] .symbol-cell.is-fusing .generated-symbol,
+.game-stage[data-game="astral"] .symbol-cell.is-fusing .scatter-symbol,
+.game-stage[data-game="astral"] .symbol-cell.is-fusing svg {
+  animation: none !important;
+  animation-name: none !important;
+  animation-duration: 0s !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+.game-stage[data-game="astral"] .symbol-fusion-thread,
+.game-stage[data-game="astral"] .symbol-fusion-burst {
+  display: none !important;
+  animation: none !important;
+}

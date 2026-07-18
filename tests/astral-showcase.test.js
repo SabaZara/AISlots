@@ -179,19 +179,17 @@ test("Sky Runner Land continuously follows the sealed flight result", async () =
   assert.doesNotMatch(app, /jumpText\(ui\.astralRoundAward\)/);
 });
 
-test("transparent symbols fuse while reel tiles remain stationary", async () => {
+test("scored symbols remain static while reel tiles stay stationary", async () => {
   const [app, css] = await Promise.all([
     readFile(new URL("app.js", root), "utf8"),
     readFile(new URL("styles.css", root), "utf8")
   ]);
   assert.match(app, /function revealSpecialCollectors\(collectorCount\)/);
   assert.match(app, /revealSpecialCollectors\(outcome\.collectorCount\)/);
-  assert.match(app, /async function playSymbolFusion\(outcome\)/);
-  assert.match(app, /await playSymbolFusion\(outcome\)/);
-  assert.match(app, /symbol-fusion-thread/);
-  assert.match(css, /@keyframes symbolFusionPull/);
-  assert.match(css, /@keyframes fusionCoreBurst/);
-  assert.match(css, /\.symbol-cell\.is-fusing \.generated-symbol/);
+  assert.doesNotMatch(app, /await playSymbolFusion\(outcome\)/);
+  assert.match(css, /4\.7\.4 — scored reel symbols stay completely static/);
+  assert.match(css, /\.reels\.has-winners \.symbol-cell\.is-winner[\s\S]*?animation: none !important/);
+  assert.match(css, /\.symbol-fusion-thread[\s\S]*?display: none !important/);
   assert.match(css, /\.symbol-cell\.is-winner[\s\S]*?transform: none/);
   assert.match(app, /return `<img class="scatter-symbol" src="\$\{game\.scatterAsset\}"/);
   assert.match(css, /mix-blend-mode: normal/);

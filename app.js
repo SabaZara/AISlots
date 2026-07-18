@@ -22,7 +22,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.7.3";
+} from "./asset-catalog.js?v=4.7.4";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -1348,7 +1348,7 @@ async function settleOutcome(outcome) {
   audio.stopSpinLoop();
   await waitForSpinDelay(settleTail);
   revealWinningCells(winningCells(outcome));
-  await playSymbolFusion(outcome);
+  if (winningCells(outcome).size > 1) playWinChord();
   revealSpecialCollectors(outcome.collectorCount);
   ui.reels.classList.remove("is-cinematic-drop");
   ui.reelViewport.classList.remove("is-stopping");
