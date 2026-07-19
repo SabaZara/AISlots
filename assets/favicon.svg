@@ -1,6 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs><radialGradient id="g"><stop stop-color="#d8fbff"/><stop offset=".45" stop-color="#74dfff"/><stop offset="1" stop-color="#8a5cff"/></radialGradient></defs>
-  <rect width="64" height="64" rx="16" fill="#081128"/>
-  <path d="M32 8 38 26 56 32 38 38 32 56 26 38 8 32 26 26Z" fill="url(#g)"/>
-  <circle cx="32" cy="32" r="7" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">AISlots</title>
+  <defs>
+    <linearGradient id="mark" x1="10" y1="12" x2="56" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d8fbff"/>
+      <stop offset=".48" stop-color="#74dfff"/>
+      <stop offset="1" stop-color="#a778ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="62%">
+      <stop stop-color="#213d79"/>
+      <stop offset="1" stop-color="#071024"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#glow)"/>
+  <rect x="2" y="2" width="60" height="60" rx="13" fill="none" stroke="#74dfff" stroke-opacity=".28" stroke-width="2"/>
+  <path fill="url(#mark)" d="M7 49 21 15h10l13 34H34l-2.5-7H19.4L17 49H7Zm15.1-15h6.7l-3.4-10.2L22.1 34ZM46 15h10v34H46z"/>
+  <circle cx="51" cy="10" r="3" fill="#f9d779"/>
 </svg>
