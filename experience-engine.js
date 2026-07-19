@@ -26,9 +26,9 @@ export const AUDIO_PROFILES = Object.freeze({
     wet: 0.24,
     echo: 0.06,
     spin: Object.freeze({
-      motorFreq: 82, motorWave: "triangle", motorLevel: 0.03,
+      motorFreq: 82, motorWave: "triangle", motorLevel: 0.015,
       windFreq: 1350, windType: "bandpass",
-      subFreq: 50, subLevel: 0.023, tickRate: 13
+      subFreq: 50, subLevel: 0.015, tickRate: 16
     }),
     stop: Object.freeze({ thumpFreq: 170, toneFreq: 392, sparkle: 0.8, ringRatio: 1.5 }),
     ui: Object.freeze({ base: 523.25, wave: "triangle" }),
@@ -73,9 +73,9 @@ export const AUDIO_PROFILES = Object.freeze({
     wet: 0.4,
     echo: 0.16,
     spin: Object.freeze({
-      motorFreq: 110, motorWave: "triangle", motorLevel: 0.022,
+      motorFreq: 110, motorWave: "triangle", motorLevel: 0.011,
       windFreq: 900, windType: "lowpass",
-      subFreq: 55, subLevel: 0.014, tickRate: 12
+      subFreq: 55, subLevel: 0.01, tickRate: 15
     }),
     stop: Object.freeze({ thumpFreq: 210, toneFreq: 660, sparkle: 1, ringRatio: 2 }),
     ui: Object.freeze({ base: 880, wave: "sine" }),
@@ -118,9 +118,9 @@ export const AUDIO_PROFILES = Object.freeze({
     wet: 0.14,
     echo: 0.04,
     spin: Object.freeze({
-      motorFreq: 130, motorWave: "triangle", motorLevel: 0.026,
+      motorFreq: 130, motorWave: "triangle", motorLevel: 0.013,
       windFreq: 1650, windType: "highpass",
-      subFreq: 65, subLevel: 0.013, tickRate: 15
+      subFreq: 65, subLevel: 0.009, tickRate: 18
     }),
     stop: Object.freeze({ thumpFreq: 240, toneFreq: 523.25, sparkle: 0.9, ringRatio: 1.25 }),
     ui: Object.freeze({ base: 659.25, wave: "triangle" }),
@@ -163,9 +163,9 @@ export const AUDIO_PROFILES = Object.freeze({
     wet: 0.2,
     echo: 0.24,
     spin: Object.freeze({
-      motorFreq: 62, motorWave: "sawtooth", motorLevel: 0.024,
+      motorFreq: 62, motorWave: "sawtooth", motorLevel: 0.013,
       windFreq: 480, windType: "bandpass",
-      subFreq: 41, subLevel: 0.026, tickRate: 11
+      subFreq: 41, subLevel: 0.017, tickRate: 13
     }),
     stop: Object.freeze({ thumpFreq: 120, toneFreq: 220, sparkle: 0.45, ringRatio: 1.5 }),
     ui: Object.freeze({ base: 329.63, wave: "triangle" }),
@@ -754,10 +754,11 @@ export class SlotAudioEngine {
     // Swing: every off-16th lands late, giving the groove a human push.
     const when = delay + (stepInBar % 2 === 1 ? beat * (music.swing ?? 0.1) : 0);
 
-    // Section downbeat: a bright splash and low boom announce each new section.
+    // Section downbeat: a warm mid splash and low boom announce each section
+    // (reference music carries almost nothing above 2 kHz, so no bright crash).
     if (stepInBar === 0 && (barInPhrase === 0 || barInPhrase === 4)) {
-      this.noise(0.45, { volume: music.level * 0.9, delay, music: true, filterType: "highpass", frequency: 5200, frequencyEnd: 9800, wet: 0.3, attack: 0.004 });
-      this.tone(freq(chord[0], -2), 0.4, { type: "sine", volume: music.level * 1.3, delay, frequencyEnd: Math.max(30, freq(chord[0], -2) * 0.7), music: true, attack: 0.005 });
+      this.noise(0.45, { volume: music.level * 0.5, delay, music: true, filterType: "bandpass", frequency: 2600, frequencyEnd: 1200, wet: 0.3, attack: 0.004 });
+      this.tone(freq(chord[0], -2), 0.4, { type: "sine", volume: music.level * 1.4, delay, frequencyEnd: Math.max(30, freq(chord[0], -2) * 0.7), music: true, attack: 0.005 });
     }
 
     // Pad layer — chord swell at bar start; the B section voices it brighter.
@@ -771,8 +772,10 @@ export class SlotAudioEngine {
           delay,
           pan: (index / (tones.length - 1) - 0.5) * 0.7,
           wet: music.wet,
-          filter: music.filter * (inB ? 1.15 : 0.85) * (0.8 + this.energy * 0.4),
-          filterEnd: music.filter * 0.6,
+          // Reference pads live in the 120–400 Hz warmth band — keep the
+          // filter low so the bed stays dark and full, never fizzy.
+          filter: music.filter * (inB ? 0.55 : 0.45) * (0.8 + this.energy * 0.4),
+          filterEnd: music.filter * 0.3,
           music: true
         });
       });
@@ -789,8 +792,8 @@ export class SlotAudioEngine {
           delay: when,
           pan: (index - 1) * 0.4,
           wet: music.wet * 0.6,
-          filter: music.filter * 1.1,
-          filterEnd: music.filter * 0.5,
+          filter: music.filter * 0.7,
+          filterEnd: music.filter * 0.4,
           music: true
         });
       });
@@ -812,7 +815,9 @@ export class SlotAudioEngine {
         filterEnd: Math.max(170, music.filter * 0.26),
         music: true
       });
-      this.tone(bassFreq / 2, beat * 1.2, { type: "sine", volume: music.level * 1.2, attack: 0.008, delay: when, music: true });
+      // Sub-octave double — the reference's top intensity level is over half
+      // sub-bass, so this layer swells hard with excitement.
+      this.tone(bassFreq / 2, beat * 1.2, { type: "sine", volume: music.level * (1.1 + this.energy * 1.6), attack: 0.008, delay: when, music: true });
     }
 
     // Lead layer — call (bars 0-1) and response (bars 2-3), then both again an
@@ -840,18 +845,21 @@ export class SlotAudioEngine {
       });
     }
 
-    // Arp topper — always on in the B section, excitement-gated in A.
-    if ((inB || this.energy > 0.5) && stepInBar % 2 === 0) {
-      const semitone = chord[(stepInBar / 2) % chord.length];
-      this.tone(varyFreq(freq(semitone, 2), 9), beat * 1.1, {
-        type: "sine",
-        volume: music.level * 0.42 * Math.max(0.6, this.energy),
-        attack: 0.008,
-        delay: when,
-        pan: Math.sin(step * 1.7) * 0.6,
-        wet: music.wet + 0.1,
-        music: true
-      });
+    // Arp topper — reserved for real excitement, and kept an octave lower
+    // than before so the bed never turns fizzy (reference music is dark).
+    if ((inB && this.energy > 0.55) || this.energy > 0.7) {
+      if (stepInBar % 2 === 0) {
+        const semitone = chord[(stepInBar / 2) % chord.length];
+        this.tone(varyFreq(freq(semitone, 1), 9), beat * 1.1, {
+          type: "sine",
+          volume: music.level * 0.3 * Math.max(0.6, this.energy),
+          attack: 0.008,
+          delay: when,
+          pan: Math.sin(step * 1.7) * 0.6,
+          wet: music.wet + 0.1,
+          music: true
+        });
+      }
     }
 
     // Fill bar: the last beat becomes a rising drum fill, with a sweep that
@@ -1188,18 +1196,20 @@ export class SlotAudioEngine {
     // Layer 2: mechanical tick-train — a low-frequency pulse wave highpassed
     // down to its edge transients, leaving a fast reel clacker: tk-tk-tk.
     // (Reference wheels center around ~6 kHz, so the filter sits high.)
-    const tickRate = spin.tickRate * (this.fastSpin ? 1.35 : 1);
+    // Reference wheels ratchet at ~16 ticks/s (~18 turbo, a ×1.15 lift) with
+    // most energy at 2–6 kHz — so the clacker leads the mix, not the hum.
+    const tickRate = spin.tickRate * (this.fastSpin ? 1.15 : 1);
     const ticker = context.createOscillator();
     ticker.type = "square";
     ticker.frequency.setValueAtTime(tickRate, now);
     ticker.frequency.exponentialRampToValueAtTime(tickRate * 1.12, now + (this.fastSpin ? 1.2 : 2.6));
     const tickerFilter = context.createBiquadFilter();
     tickerFilter.type = "highpass";
-    tickerFilter.Q.value = 1.1;
-    tickerFilter.frequency.value = 2400;
+    tickerFilter.Q.value = 1.4;
+    tickerFilter.frequency.value = 2800;
     const tickerGain = context.createGain();
     tickerGain.gain.setValueAtTime(0.0001, now);
-    tickerGain.gain.exponentialRampToValueAtTime(0.016 * lift, now + 0.2);
+    tickerGain.gain.exponentialRampToValueAtTime(0.026 * lift, now + 0.2);
 
     // Layer 3: subtle sub bass bed for physical weight.
     const sub = context.createOscillator();
@@ -1232,7 +1242,7 @@ export class SlotAudioEngine {
     const target = spin.motorFreq * (anticipation ? 1.35 : 1 + tick % 4 * 0.02);
     this.spinVoice.motor.frequency.setTargetAtTime(target, now, 0.03);
     this.spinVoice.motorB.frequency.setTargetAtTime(target, now, 0.03);
-    this.spinVoice.ticker.frequency.setTargetAtTime(spin.tickRate * (anticipation ? 1.6 : 1.08), now, 0.05);
+    this.spinVoice.ticker.frequency.setTargetAtTime(spin.tickRate * (anticipation ? 1.3 : 1.08), now, 0.05);
     if (anticipation) this.spinVoice.motorFilter.frequency.setTargetAtTime(spin.motorFreq * 8, now, 0.06);
     if (this.spinVoice.panner.pan) this.spinVoice.panner.pan.setTargetAtTime(Math.sin(tick * 0.47) * 0.42, now, 0.06);
   }
@@ -1323,7 +1333,7 @@ export class SlotAudioEngine {
         this.spinVoice.sampleVoice.gain.gain.setTargetAtTime((SAMPLE_SLOTS.spin_loop.volume ?? 0.5) * remaining, now, 0.09);
       } else {
         this.spinVoice.motorGain.gain.setTargetAtTime(profile.spin.motorLevel * remaining, now, 0.09);
-        this.spinVoice.tickerGain.gain.setTargetAtTime(0.016 * remaining, now, 0.09);
+        this.spinVoice.tickerGain.gain.setTargetAtTime(0.026 * remaining, now, 0.09);
         this.spinVoice.ticker.frequency.setTargetAtTime(profile.spin.tickRate * (0.5 + remaining * 0.6), now, 0.12);
       }
     }
