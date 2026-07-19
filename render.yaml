@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: aislots
+    name: slotsAI
     runtime: static
     staticPublishPath: .
     buildCommand: echo "AISlots World Forge ready"
