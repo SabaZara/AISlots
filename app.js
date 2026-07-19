@@ -27,7 +27,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.13";
+} from "./asset-catalog.js?v=4.8.14";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -1946,9 +1946,44 @@ function openFeatureMarket(panel = "special") {
   window.requestAnimationFrame(() => focusTarget?.focus());
 }
 
+let pendingFeatureConfirm = null;
+
+function showFeatureConfirm(request) {
+  pendingFeatureConfirm = request;
+  const game = currentGame();
+  const bet = currentBaseBet();
+  if (request.type === "buy") {
+    const cost = bet * request.value;
+    $("featureConfirmTitle").textContent = `Buy the ${request.name} bonus (${request.value}×)`;
+    $("featureConfirmPrice").textContent = formatMoney(cost);
+    $("featureConfirmPriceNote").textContent = `${request.value}× your ${formatMoney(bet)} bet · charged once, right now`;
+    $("featureConfirmCopy").textContent = `Paying ${formatMoney(cost)} launches three sealed multiplier flights of the ${game.featureName} bonus immediately. The prizes are already sealed before the animation plays, and RTP stays 99%.`;
+  } else {
+    const multiplier = specialBetCostMultiplier("astral", request.value);
+    const costPerSpin = bet * multiplier;
+    $("featureConfirmTitle").textContent = `Activate ${request.name} (${multiplier.toFixed(2)}×)`;
+    $("featureConfirmPrice").textContent = `${formatMoney(costPerSpin)} per spin`;
+    $("featureConfirmPriceNote").textContent = `${multiplier.toFixed(2)}× your ${formatMoney(bet)} bet · on every spin until you switch back`;
+    $("featureConfirmCopy").textContent = `Every spin will cost ${formatMoney(costPerSpin)} instead of ${formatMoney(bet)} and guarantees +${request.value} ${request.value === 1 ? game.collectionName : game.collectionPlural} on every spin. RTP stays exactly 99%, and you can return to Standard at any time.`;
+  }
+  ui.featureMarketOverlay.classList.add("is-confirming");
+  $("featureConfirm").hidden = false;
+  audio.uiOpen();
+  window.requestAnimationFrame(() => $("featureConfirmCancel").focus());
+}
+
+function hideFeatureConfirm() {
+  const request = pendingFeatureConfirm;
+  pendingFeatureConfirm = null;
+  $("featureConfirm").hidden = true;
+  ui.featureMarketOverlay.classList.remove("is-confirming");
+  return request;
+}
+
 function closeFeatureMarket({ returnFocus = true } = {}) {
   const returnTarget = ui.featureMarketOverlay.dataset.panel === "buy" ? ui.buyFeatureButton : ui.specialBetButton;
   if (!ui.featureMarketOverlay.hidden) audio.uiBack();
+  hideFeatureConfirm();
   ui.featureMarketOverlay.hidden = true;
   ui.featureMarketOverlay.setAttribute("aria-hidden", "true");
   $("appShell").inert = false;
@@ -2302,19 +2337,45 @@ function bindEvents() {
   ui.featureMarketOverlay.addEventListener("click", (event) => {
     if (event.target === ui.featureMarketOverlay) closeFeatureMarket();
   });
+  const applySpecialBetBoost = (boost) => {
+    state.specialBetBoost = boost;
+    updateUi();
+    const game = currentGame();
+    setStatus(state.specialBetBoost
+      ? `Special bet active · +${state.specialBetBoost} guaranteed ${state.specialBetBoost === 1 ? game.collectionName : game.collectionPlural}`
+      : "Standard bet active");
+    audio.uiConfirm();
+  };
   document.querySelectorAll("[data-progress-boost]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.specialBetBoost = Number(button.dataset.progressBoost);
-      updateUi();
-      const game = currentGame();
-      setStatus(state.specialBetBoost
-        ? `Special bet active · +${state.specialBetBoost} guaranteed ${state.specialBetBoost === 1 ? game.collectionName : game.collectionPlural}`
-        : "Standard bet active");
-      audio.uiConfirm();
+      const boost = Number(button.dataset.progressBoost);
+      if (boost === 0) {
+        applySpecialBetBoost(0);
+        return;
+      }
+      showFeatureConfirm({ type: "boost", value: boost, name: button.querySelector("span")?.textContent ?? "special bet" });
     });
   });
   document.querySelectorAll("[data-buy-feature]").forEach((button) => {
-    button.addEventListener("click", () => buyAstralFeature(Number(button.dataset.buyFeature)));
+    button.addEventListener("click", () => {
+      const value = Number(button.dataset.buyFeature);
+      showFeatureConfirm({ type: "buy", value, name: button.querySelector("span")?.textContent ?? "feature" });
+    });
+  });
+  $("featureConfirmCancel").addEventListener("click", () => {
+    const request = hideFeatureConfirm();
+    audio.uiBack();
+    const panel = request?.type === "buy" ? "[data-buy-feature]" : `[data-progress-boost="${state.specialBetBoost}"]`;
+    ui.featureMarketOverlay.querySelector(panel)?.focus();
+  });
+  $("featureConfirmAccept").addEventListener("click", () => {
+    const request = hideFeatureConfirm();
+    if (!request) return;
+    if (request.type === "buy") {
+      buyAstralFeature(request.value);
+      return;
+    }
+    applySpecialBetBoost(request.value);
   });
   ui.spinButton.addEventListener("click", () => {
     if (state.autoActive) {

@@ -6220,6 +6220,73 @@ body {
 
 .feature-market-overlay[data-panel="special"] #buyFeaturePanel,
 .feature-market-overlay[data-panel="buy"] #specialBetPanel { display: none; }
+.feature-market-overlay.is-confirming .feature-market-grid,
+.feature-market-overlay.is-confirming .feature-market-note { display: none; }
+
+.feature-confirm {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: 7.5%;
+  transform: translateX(-50%);
+  width: min(560px, 94%);
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 55%, rgba(178, 217, 255, .45));
+  border-radius: 18px 6px 18px 6px;
+  background: linear-gradient(145deg, rgba(15, 28, 71, .95), rgba(5, 8, 28, .97));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .14), 0 18px 38px rgba(0, 0, 0, .6);
+  backdrop-filter: blur(12px);
+  text-align: left;
+}
+.feature-confirm-eyebrow {
+  margin: 0 0 6px;
+  color: color-mix(in srgb, var(--game-accent) 70%, white);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.feature-confirm h3 { margin: 0 0 10px; color: white; font: 600 20px/1.1 var(--serif); }
+.feature-confirm-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--game-accent) 45%, transparent);
+  border-radius: 10px 3px 10px 3px;
+  background: color-mix(in srgb, var(--game-accent) 10%, transparent);
+}
+.feature-confirm-price span { color: #c6d8ef; font-size: 9px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.feature-confirm-price strong { color: #fff; font: 700 22px/1 var(--sans); }
+.feature-confirm-price small { color: #aab7d2; font-size: 11px; }
+.feature-confirm-copy { margin: 0 0 14px; color: #c9d8ee; font-size: 12px; line-height: 1.5; }
+.feature-confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.feature-confirm-actions button {
+  min-height: 44px;
+  border-radius: 12px 4px 12px 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 160ms ease;
+}
+#featureConfirmCancel { border: 1px solid rgba(178, 199, 255, .4); background: rgba(255, 255, 255, .06); color: var(--ink); }
+#featureConfirmCancel:hover { background: rgba(255, 255, 255, .12); }
+#featureConfirmAccept {
+  border: 1px solid color-mix(in srgb, var(--game-accent) 70%, white);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--game-accent) 75%, white), color-mix(in srgb, var(--game-accent) 45%, #0a1030));
+  color: #051022;
+}
+#featureConfirmAccept:hover { transform: translateY(-1px); }
+
+@media (max-width: 720px) {
+  .feature-confirm { bottom: 34px; padding: 14px; }
+  .feature-confirm h3 { font-size: 17px; }
+  .feature-confirm-price strong { font-size: 18px; }
+}
 .feature-market-overlay[data-panel="special"] .feature-market-grid,
 .feature-market-overlay[data-panel="buy"] .feature-market-grid {
   grid-template-columns: minmax(0, 620px);

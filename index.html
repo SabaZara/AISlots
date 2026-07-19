@@ -20,7 +20,7 @@
     <meta name="twitter:description" content="Choose a world, character, atmosphere, and relic set to forge your slot." />
     <meta name="twitter:image" content="https://aislots-gcga.onrender.com/assets/aislots-world-forge-preview.png?v=1" />
     <link rel="icon" href="/assets/favicon.svg?v=3" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="./styles.css?v=4.8.13" />
+    <link rel="stylesheet" href="./styles.css?v=4.8.14" />
     <title>AISlots · World Forge</title>
   </head>
   <body class="is-lobby-open">
@@ -362,6 +362,18 @@
             </div>
           </article>
         </div>
+        <div class="feature-confirm" id="featureConfirm" hidden>
+          <p class="feature-confirm-eyebrow">Are you sure?</p>
+          <h3 id="featureConfirmTitle">Buy bonus</h3>
+          <div class="feature-confirm-price">
+            <span>Price</span><strong id="featureConfirmPrice">$0.00</strong><small id="featureConfirmPriceNote"></small>
+          </div>
+          <p class="feature-confirm-copy" id="featureConfirmCopy"></p>
+          <div class="feature-confirm-actions">
+            <button id="featureConfirmCancel" type="button">Cancel</button>
+            <button id="featureConfirmAccept" type="button">Yes, I'm sure</button>
+          </div>
+        </div>
         <p class="feature-market-note">Feature prizes are sealed before animation.</p>
       </section>
     </div>
@@ -372,6 +384,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.8.13"></script>
+    <script type="module" src="./app.js?v=4.8.14"></script>
   </body>
 </html>
