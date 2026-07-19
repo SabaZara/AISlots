@@ -82,6 +82,86 @@ test("line evaluation pays identical symbols from the leftmost reel only", () =>
   assert.equal(model.evaluateLines(firstReelBreak, 20, "astral").length, 0);
 });
 
+test("the Scatter bet bank pays rollovers from banked bets, FIFO, with carry", () => {
+  const result = model.advanceScatterBetBank({
+    scatterBetBankBefore: [1, 1, 1],
+    bet: 20,
+    collectorCount: 2,
+    progressBoost: 1,
+    threshold: 4
+  });
+  // FIFO round: three banked $1 Scatters + the first new $20 one.
+  assert.deepEqual(result.scatterBetsAdded, [20, 20, 20]);
+  assert.deepEqual(result.bonusRoundBets, [(1 + 1 + 1 + 20) / 4]);
+  // The excess Scatters carry over at the bet that collected them.
+  assert.deepEqual(result.scatterBetBankAfter, [20, 20]);
+  assert.equal(result.progressAfter, 2);
+
+  const doubleRollover = model.advanceScatterBetBank({
+    scatterBetBankBefore: [5, 5],
+    bet: 2,
+    collectorCount: 7,
+    threshold: 4
+  });
+  assert.deepEqual(doubleRollover.bonusRoundBets, [(5 + 5 + 2 + 2) / 4, 2]);
+  assert.deepEqual(doubleRollover.scatterBetBankAfter, [2]);
+});
+
+test("bet ramping cannot revalue banked Scatters at the trigger bet", async () => {
+  const game = model.GAMES.astral;
+  const lowBet = 1;
+  const highBet = 20;
+  let bank = [];
+  let triggersAtHighBet = 0;
+
+  for (let nonce = 0; nonce < 400; nonce += 1) {
+    // Exploit strategy: collect cheap, switch to the max bet near the threshold.
+    const bet = bank.length >= game.threshold - 3 ? highBet : lowBet;
+    const outcome = await model.simulateSpin({
+      serverSeed: "c4".repeat(32),
+      clientSeed: "ramp-regression",
+      nonce,
+      bet,
+      scatterBetBankBefore: bank,
+      gameId: "astral"
+    });
+
+    assert.deepEqual(outcome.scatterBetBankBefore, bank);
+    const pendingBank = [...bank, ...outcome.scatterBetsAdded];
+    outcome.bonusRoundBets.forEach((roundBet, round) => {
+      const roundBank = pendingBank.slice(round * game.threshold, (round + 1) * game.threshold);
+      const bankedAverage = roundBank.reduce((total, value) => total + value, 0) / game.threshold;
+      assert.ok(Math.abs(roundBet - bankedAverage) < 1e-12, "bonus must pay the banked average bet");
+      if (bet === highBet && roundBank.includes(lowBet)) {
+        triggersAtHighBet += 1;
+        assert.ok(roundBet < highBet, "a max-bet trigger must not revalue cheap Scatters");
+      }
+    });
+    const expectedBonusWin = outcome.bonusRounds.reduce(
+      (total, round, index) => total + round.reduce((sum, value) => sum + value, 0) * outcome.bonusRoundBets[index],
+      0
+    );
+    assert.ok(Math.abs(outcome.bonusWin - expectedBonusWin) < 1e-9);
+    bank = outcome.scatterBetBankAfter;
+  }
+
+  assert.ok(triggersAtHighBet >= 5, "the run must actually exercise ramped triggers");
+});
+
+test("receipts without a bet bank replay by valuing progress at the receipt bet", async () => {
+  const legacyInput = {
+    serverSeed: "3f".repeat(32),
+    clientSeed: "legacy-receipt",
+    nonce: 9,
+    bet: 5,
+    progressBefore: 7,
+    gameId: "astral"
+  };
+  const outcome = await model.simulateSpin(legacyInput);
+  assert.deepEqual(outcome.scatterBetBankBefore, Array.from({ length: 7 }, () => 5));
+  assert.deepEqual(await model.simulateSpin(legacyInput), outcome);
+});
+
 test("each collection meter rolls over into its configured bonus reveal count", async () => {
   for (const [gameId, game] of Object.entries(model.GAMES)) {
     let found;

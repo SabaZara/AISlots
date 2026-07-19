@@ -9,7 +9,7 @@ if (!Number.isSafeInteger(spins) || spins < 1) throw new Error("Spin count must 
 const reports = {};
 for (const [gameId, game] of Object.entries(GAMES)) {
   const bet = 20;
-  let progress = 0;
+  let bank = [];
   let baseReturned = 0;
   let bonusReturned = 0;
   let collectors = 0;
@@ -21,10 +21,10 @@ for (const [gameId, game] of Object.entries(GAMES)) {
       clientSeed: `lumen-audit-${gameId}`,
       nonce: index,
       bet,
-      progressBefore: progress,
+      scatterBetBankBefore: bank,
       gameId
     });
-    progress = outcome.progressAfter;
+    bank = outcome.scatterBetBankAfter;
     baseReturned += outcome.baseWin;
     bonusReturned += outcome.bonusWin;
     collectors += outcome.collectorCount;
@@ -43,7 +43,7 @@ for (const [gameId, game] of Object.entries(GAMES)) {
     theoretical: theoreticalRtp(gameId),
     collectors,
     bonusRounds,
-    endingMeter: `${progress}/${game.threshold}`
+    endingMeter: `${bank.length}/${game.threshold}`
   };
 }
 

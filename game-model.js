@@ -86,174 +86,6 @@ const GAME_TEMPLATES = {
       dew: "Magma Drop", leaf: "Dragon Scale", petal: "Flame Crown"
     }, 12.967838362016055)
   },
-  neon: {
-    id: "neon",
-    name: "Neon Tides",
-    shortName: "Tides",
-    subtitle: "Pearl current",
-    intro: "Descend into the sapphire treasury",
-    accent: "#59f1ff",
-    secondary: "#ff8fda",
-    background: "./assets/neon-tides-bg.jpg",
-    characterLayer: "./assets/neon-characters-cutout-v1.png",
-    symbolSheet: "./assets/symbols-neon-v2.png",
-    bonusBarArt: "./assets/neon-bonusbar-frame-v1.png",
-    actionLabel: "Dive",
-    lobbyTag: "Four-orb current",
-    volatility: "Flowing",
-    lobbyCopy: "A luminous ocean treasury with faster 10-key pacing and four pearl-orb reveals in every feature.",
-    meterMode: "current",
-    meterGlyph: "●",
-    meterColumns: 5,
-    meterCarryCopy: "The pearl current never drains",
-    reelMotion: "wave",
-    reelStopGap: 72,
-    spinInterval: 205,
-    anticipationCopy: "A pearl surge is approaching…",
-    winLabels: { big: "Tidal Win", mega: "Pearl Storm", epic: "Ocean Fortune" },
-    featureName: "Pearl Current",
-    featureEyebrow: "Flowing collection",
-    featureCopy: "Every Pearl Key joins the current. Collect 10 to release four tidal prize orbs.",
-    collectionName: "Pearl Key",
-    collectionPlural: "Pearl Keys",
-    threshold: 10,
-    featureSteps: [3, 6, 10],
-    featureStepLabels: ["Current wakes", "Pearls align", "Vault opens"],
-    bonusTitle: "The tide has turned.",
-    bonusCopy: "Four pearl currents are sealed into your receipt. Release them into the treasury.",
-    bonusMode: "cluster-cascade",
-    bonusMechanicName: "Pearl Cluster Cascade",
-    bonusCardLabel: "Cascade",
-    bonusStartLabel: "Release 4 cascades",
-    bonusProgressLabel: "Clusters cleared",
-    bonusMechanicCopy: "Four sealed pearl clusters burst in sequence. Every cleared cluster adds its displayed multiplier to the cascade total.",
-    bonusDraws: 4,
-    bonusPrizes: [
-      { multiplier: 0.1, weight: 2500 },
-      { multiplier: 0.25, weight: 2500 },
-      { multiplier: 0.5, weight: 2200 },
-      { multiplier: 1, weight: 1600 },
-      { multiplier: 2, weight: 800 },
-      { multiplier: 3, weight: 350 },
-      { multiplier: 5, weight: 50 }
-    ],
-    symbols: symbolsFor({
-      luma: "Royal Pearl", orbit: "Tide Ring", nova: "Starfish Gem", comet: "Coral Spear",
-      dew: "Aqua Drop", leaf: "Seashell", petal: "Pearl Key"
-    }, 17.963253894129203)
-  },
-  ember: {
-    id: "ember",
-    name: "Ember Crown",
-    shortName: "Ember",
-    subtitle: "Skyforge edition",
-    intro: "Claim the throne of the celestial forge",
-    accent: "#ffb052",
-    secondary: "#ff5c7c",
-    background: "./assets/ember-crown-bg.jpg",
-    characterLayer: "./assets/ember-characters-cutout-v1.png",
-    symbolSheet: "./assets/symbols-ember-v2.png",
-    bonusBarArt: "./assets/ember-bonusbar-frame-v1.png",
-    actionLabel: "Forge",
-    lobbyTag: "High-heat seals",
-    volatility: "High",
-    lobbyCopy: "An obsidian sky forge with a longer 15-rune charge and two heavier, high-volatility fire seals.",
-    meterMode: "forge",
-    meterGlyph: "◆",
-    meterColumns: 3,
-    meterCarryCopy: "Every rune raises the forge heat",
-    reelMotion: "slam",
-    reelStopGap: 132,
-    spinInterval: 235,
-    anticipationCopy: "Critical heat — the forge is shaking…",
-    winLabels: { big: "Forge Win", mega: "Inferno Win", epic: "Crown Fortune" },
-    featureName: "Crown Forge",
-    featureEyebrow: "Forged collection",
-    featureCopy: "Every Crown Rune heats the forge. Collect 15 to strike two high-volatility fire seals.",
-    collectionName: "Crown Rune",
-    collectionPlural: "Crown Runes",
-    threshold: 15,
-    featureSteps: [5, 10, 15],
-    featureStepLabels: ["Coals ignite", "Anvil charged", "Crown forged"],
-    bonusTitle: "The crown is forged.",
-    bonusCopy: "Two fire seals are locked into your receipt. Strike them to reveal their power.",
-    bonusMode: "multiplier-forge",
-    bonusMechanicName: "Crown Multiplier Forge",
-    bonusCardLabel: "Forge strike",
-    bonusStartLabel: "Strike 2 multipliers",
-    bonusProgressLabel: "Multipliers forged",
-    bonusMechanicCopy: "Two sealed forge strikes reveal weighted multipliers. Both multipliers are added before the Crown Forge prize is awarded.",
-    bonusDraws: 2,
-    bonusPrizes: [
-      { multiplier: 0.5, weight: 2500 },
-      { multiplier: 1, weight: 2600 },
-      { multiplier: 2, weight: 2400 },
-      { multiplier: 3, weight: 1300 },
-      { multiplier: 5, weight: 800 },
-      { multiplier: 10, weight: 350 },
-      { multiplier: 25, weight: 50 }
-    ],
-    symbols: symbolsFor({
-      luma: "Sunsteel Seal", orbit: "Forge Ring", nova: "Star Anvil", comet: "Ember Spear",
-      dew: "Magma Drop", leaf: "Dragon Scale", petal: "Crown Rune"
-    }, 15.828460931687681)
-  },
-  ufc: {
-    id: "ufc",
-    name: "UFC Octagon Gold",
-    shortName: "UFC",
-    subtitle: "Fight Night edition",
-    intro: "Step into championship fight night",
-    accent: "#ff493f",
-    secondary: "#f2c35b",
-    background: "./assets/ufc-octagon-bg.jpg",
-    characterLayer: "./assets/ufc-characters-cutout-v1.png",
-    symbolSheet: "./assets/symbols-ufc-v2.png",
-    bonusBarArt: "./assets/ufc-bonusbar-frame-v1.png",
-    actionLabel: "Fight",
-    lobbyTag: "Fight-night cards",
-    volatility: "Punchy",
-    lobbyCopy: "A championship arena where 10 Fight Tokens unlock three main-event prize cards.",
-    meterMode: "fightcard",
-    meterGlyph: "•",
-    meterColumns: 5,
-    meterCarryCopy: "Every token advances the fight card",
-    reelMotion: "strike",
-    reelStopGap: 108,
-    spinInterval: 145,
-    anticipationCopy: "Championship moment — final reel…",
-    winLabels: { big: "Knockout Win", mega: "Main Event Win", epic: "Championship Fortune" },
-    featureName: "Fight Card Frenzy",
-    featureEyebrow: "Main-event collection",
-    featureCopy: "Every Fight Token fills the card. Collect 10 to reveal three championship prizes.",
-    collectionName: "Fight Token",
-    collectionPlural: "Fight Tokens",
-    threshold: 10,
-    featureSteps: [3, 6, 10],
-    featureStepLabels: ["Prelims set", "Main card ready", "Title fight"],
-    bonusTitle: "The main event is live.",
-    bonusCopy: "Three championship cards are sealed into your receipt. Reveal the fight-night prizes.",
-    bonusMode: "hold-and-win",
-    bonusMechanicName: "Championship Hold & Win",
-    bonusCardLabel: "Fight card",
-    bonusStartLabel: "Lock 3 fight cards",
-    bonusProgressLabel: "Cards locked",
-    bonusMechanicCopy: "Three pre-sealed fight cards lock into the octagon. Each card holds one weighted multiplier and the final purse combines all three.",
-    bonusDraws: 3,
-    bonusPrizes: [
-      { multiplier: 0.25, weight: 2500 },
-      { multiplier: 0.5, weight: 2500 },
-      { multiplier: 1, weight: 2200 },
-      { multiplier: 2, weight: 1500 },
-      { multiplier: 3, weight: 800 },
-      { multiplier: 5, weight: 400 },
-      { multiplier: 10, weight: 100 }
-    ],
-    symbols: symbolsFor({
-      luma: "Championship Belt", orbit: "Octagon", nova: "Main Event Star", comet: "Power Strike",
-      dew: "Round Clock", leaf: "Fight Glove", petal: "Fight Token"
-    }, 8.121858337273801)
-  }
 };
 
 export const GAMES = Object.freeze({ astral: GAME_TEMPLATES.astral });
@@ -318,6 +150,49 @@ export function evaluateLines(grid, totalBet, gameId = DEFAULT_GAME_ID) {
   return wins;
 }
 
+export function advanceScatterBetBank({
+  scatterBetBankBefore,
+  progressBefore = scatterBetBankBefore?.length ?? 0,
+  bet,
+  collectorCount = 0,
+  progressBoost = 0,
+  threshold
+}) {
+  if (!Number.isInteger(progressBefore) || progressBefore < 0) throw new Error("Scatter progress must be a non-negative integer");
+  if (!Number.isFinite(bet) || bet <= 0) throw new Error("Bet must be a positive number");
+  if (!Number.isInteger(collectorCount) || collectorCount < 0) throw new Error("Scatter count must be a non-negative integer");
+  if (!Number.isInteger(progressBoost) || progressBoost < 0) throw new Error("Progress boost must be a non-negative integer");
+  if (!Number.isInteger(threshold) || threshold < 1) throw new Error("Scatter threshold must be a positive integer");
+
+  // Receipts created before bet banking did not include the ledger. Treat their
+  // existing progress as having been collected at the receipt's bet so they
+  // remain replayable, while all new receipts carry the exact FIFO bank.
+  const startingBank = scatterBetBankBefore === undefined
+    ? Array.from({ length: progressBefore }, () => bet)
+    : [...scatterBetBankBefore];
+  if (startingBank.length !== progressBefore) throw new Error("Scatter bet bank must match progress before the spin");
+  if (startingBank.some((bankedBet) => !Number.isFinite(bankedBet) || bankedBet <= 0)) {
+    throw new Error("Every banked Scatter bet must be a positive number");
+  }
+
+  const scatterBetsAdded = Array.from({ length: collectorCount + progressBoost }, () => bet);
+  const pendingBank = [...startingBank, ...scatterBetsAdded];
+  const bonusRoundCount = Math.floor(pendingBank.length / threshold);
+  const bonusRoundBets = Array.from({ length: bonusRoundCount }, (_, round) => {
+    const roundBank = pendingBank.slice(round * threshold, (round + 1) * threshold);
+    return roundBank.reduce((total, bankedBet) => total + bankedBet, 0) / threshold;
+  });
+  const scatterBetBankAfter = pendingBank.slice(bonusRoundCount * threshold);
+
+  return {
+    scatterBetBankBefore: startingBank,
+    scatterBetsAdded,
+    scatterBetBankAfter,
+    bonusRoundBets,
+    progressAfter: scatterBetBankAfter.length
+  };
+}
+
 export async function simulateSpin({
   serverSeed,
   clientSeed,
@@ -325,11 +200,12 @@ export async function simulateSpin({
   bet,
   progressBefore,
   petalsBefore,
+  scatterBetBankBefore,
   progressBoost = 0,
   gameId = DEFAULT_GAME_ID
 }) {
   const game = getGame(gameId);
-  const startingProgress = progressBefore ?? petalsBefore ?? 0;
+  const startingProgress = progressBefore ?? petalsBefore ?? scatterBetBankBefore?.length ?? 0;
   const symbolWeight = game.symbols.reduce((total, symbol) => total + symbol.weight, 0);
   const prizeWeight = game.bonusPrizes.reduce((total, prize) => total + prize.weight, 0);
   const rng = await createFairRng(serverSeed, clientSeed, nonce);
@@ -342,9 +218,15 @@ export async function simulateSpin({
 
   const wins = evaluateLines(grid, bet, gameId);
   const collectorCount = grid.filter((symbol) => symbol === "petal").length;
-  const collectedTotal = startingProgress + collectorCount + progressBoost;
-  const bonusRoundCount = Math.floor(collectedTotal / game.threshold);
-  const progressAfter = collectedTotal % game.threshold;
+  const bank = advanceScatterBetBank({
+    scatterBetBankBefore,
+    progressBefore: startingProgress,
+    bet,
+    collectorCount,
+    progressBoost,
+    threshold: game.threshold
+  });
+  const bonusRoundCount = bank.bonusRoundBets.length;
   const bonusRounds = [];
 
   for (let round = 0; round < bonusRoundCount; round += 1) {
@@ -358,7 +240,10 @@ export async function simulateSpin({
 
   const baseWin = wins.reduce((total, win) => total + win.amount, 0);
   const bonusMultiplier = bonusRounds.flat().reduce((total, value) => total + value, 0);
-  const bonusWin = bonusMultiplier * bet;
+  const bonusRoundWins = bonusRounds.map((round, index) => (
+    round.reduce((total, value) => total + value, 0) * bank.bonusRoundBets[index]
+  ));
+  const bonusWin = bonusRoundWins.reduce((total, value) => total + value, 0);
 
   return {
     gameId,
@@ -368,10 +253,15 @@ export async function simulateSpin({
     scatterCount: collectorCount,
     progressBoost,
     progressBefore: startingProgress,
-    progressAfter,
+    progressAfter: bank.progressAfter,
     petalsBefore: startingProgress,
-    petalsAfter: progressAfter,
+    petalsAfter: bank.progressAfter,
+    scatterBetBankBefore: bank.scatterBetBankBefore,
+    scatterBetsAdded: bank.scatterBetsAdded,
+    scatterBetBankAfter: bank.scatterBetBankAfter,
     bonusRounds,
+    bonusRoundBets: bank.bonusRoundBets,
+    bonusRoundWins,
     baseWin,
     bonusMultiplier,
     bonusWin,

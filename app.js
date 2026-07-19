@@ -150,11 +150,13 @@ const state = {
   betIndex: 1,
   gameId: DEFAULT_GAME_ID,
   progress: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0])),
+  scatterBank: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, []])),
   gameStats: Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()])),
   nonce: 0,
   serverSeed: "",
   serverHash: "",
   clientSeed: `garden-${randomSeed(6)}`,
+  balanceHold: 0,
   isSpinning: false,
   autoActive: false,
   autoStopRequested: false,
@@ -171,6 +173,13 @@ const state = {
 };
 
 const audio = new SlotAudioEngine(() => state.visualConfig);
+
+// Wallet mutations settle in whole cents so repeated float credits never
+// accumulate drift; balanceHold masks an already-credited bonus win from the
+// display until its reveal animation has played.
+function creditBalance(amount) {
+  state.balance = Math.round((state.balance + amount) * 100) / 100;
+}
 
 function currentGame() {
   return getGame(state.gameId);
@@ -298,18 +307,6 @@ function jumpText(element) {
 
 function symbolSvg(id) {
   const common = 'viewBox="0 0 100 100" role="img" focusable="false"';
-  if (state.gameId === "ufc") {
-    const fightSvgs = {
-      luma: `<svg ${common} aria-label="Championship Belt symbol"><path d="M4 38c16-7 30-10 46-10s30 3 46 10v24c-16 7-30 10-46 10S20 69 4 62Z" fill="#3b1720" stroke="#f5c45c" stroke-width="4"/><path d="m50 18 21 11 7 21-10 23-18 9-18-9-10-23 7-21Z" fill="#f5c45c"/><path d="m50 28 13 8 4 15-7 14-10 6-10-6-7-14 4-15Z" fill="#fff2ad"/><path d="m50 35 4 10 11 1-8 7 3 11-10-6-10 6 3-11-8-7 11-1Z" fill="#a71f27"/></svg>`,
-      orbit: `<svg ${common} aria-label="Octagon symbol"><path d="m31 8 38 0 23 23v38L69 92H31L8 69V31Z" fill="#1b1b22" stroke="#ff5148" stroke-width="7"/><path d="m36 24 28 0 12 12v28L64 76H36L24 64V36Z" fill="none" stroke="#f4d27a" stroke-width="4"/><path d="M24 36h52M24 64h52M36 24v52M64 24v52" stroke="#d5d8de" stroke-width="2" opacity=".5"/></svg>`,
-      nova: `<svg ${common} aria-label="Main Event Star symbol"><path d="m50 5 11 29 31 2-24 20 8 31-26-17-26 17 8-31L8 36l31-2Z" fill="#f5f5f2" stroke="#ff493f" stroke-width="4"/><path d="m50 25 7 17 18 1-14 12 4 18-15-10-15 10 4-18-14-12 18-1Z" fill="#f2c35b"/></svg>`,
-      comet: `<svg ${common} aria-label="Power Strike symbol"><path d="M15 63c19-3 33-14 45-34l13 9C59 59 42 71 19 76Z" fill="#ff493f" opacity=".45"/><path d="m57 7 29 29-20 7 9 17-38 33 12-36-19-8Z" fill="#f2c35b" stroke="#fff2b5" stroke-width="3"/><path d="m58 27 11 10-15 5 5 10-9 9 4-18-9-3Z" fill="#ff493f"/></svg>`,
-      dew: `<svg ${common} aria-label="Round Clock symbol"><circle cx="50" cy="52" r="38" fill="#171a21" stroke="#f4f4f1" stroke-width="6"/><path d="M50 15V7M39 7h22" stroke="#ff493f" stroke-width="6" stroke-linecap="round"/><path d="M50 52V27M50 52l18 11" stroke="#f2c35b" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="52" r="6" fill="#ff493f"/><path d="M20 52h8M72 52h8M50 22v8M50 74v8" stroke="#fff" stroke-width="3"/></svg>`,
-      leaf: `<svg ${common} aria-label="Fight Glove symbol"><path d="M30 15c7-7 18-4 21 4 7-7 18-2 18 7 8-4 17 3 14 12 8 0 13 9 8 16L70 82c-8 11-24 14-35 6L20 77c-8-6-10-18-5-27Z" fill="#d92f35" stroke="#ff8a78" stroke-width="4"/><path d="M24 70c17 8 33 7 49-1l-3 13c-8 11-24 14-35 6Z" fill="#f2c35b"/><path d="M29 31c10 5 18 13 23 25M51 19c4 8 5 16 4 25M69 27c1 8-1 14-5 20" fill="none" stroke="#ffb0a3" stroke-width="3" stroke-linecap="round"/></svg>`,
-      petal: `<svg ${common} aria-label="Fight Token collection symbol"><path d="m31 6 38 0 25 25v38L69 94H31L6 69V31Z" fill="#f2c35b" stroke="#fff0a8" stroke-width="5"/><path d="m36 22 28 0 14 14v28L64 78H36L22 64V36Z" fill="#9c1f27" stroke="#351115" stroke-width="4"/><path d="m50 29 6 14 16 2-12 10 4 16-14-8-14 8 4-16-12-10 16-2Z" fill="#fff2b5"/></svg>`
-    };
-    return fightSvgs[id] ?? fightSvgs.leaf;
-  }
   const svgs = {
     luma: `<svg ${common} aria-label="Luma symbol" style="color:#ffe6a1"><circle cx="50" cy="50" r="17" fill="currentColor"/><g fill="currentColor" opacity=".88"><path d="M46 5h8l-2 27h-4zM46 95h8l-2-27h-4zM5 46v8l27-2v-4zM95 46v8l-27-2v-4zM18 14l6-5 15 23-4 3zM82 86l-6 5-15-23 4-3zM86 18l5 6-23 15-3-4zM14 82l-5-6 23-15 3 4z"/></g><circle cx="44" cy="43" r="5" fill="#fff8d8" opacity=".9"/><circle cx="50" cy="50" r="27" fill="none" stroke="#ffe8a8" stroke-width="2" opacity=".4"/></svg>`,
     orbit: `<svg ${common} aria-label="Orbit symbol" style="color:#9eeaff"><circle cx="48" cy="50" r="23" fill="currentColor" opacity=".92"/><circle cx="41" cy="42" r="7" fill="#e8fdff" opacity=".75"/><ellipse cx="50" cy="52" rx="43" ry="14" fill="none" stroke="#d7f9ff" stroke-width="5" transform="rotate(-12 50 52)"/><path d="M13 58c14 7 54 9 76-10" fill="none" stroke="#665bd0" stroke-width="3" opacity=".75"/></svg>`,
@@ -323,7 +320,7 @@ function symbolSvg(id) {
 }
 
 function symbolGlow(id) {
-  const base = {
+  return {
     luma: "rgba(255, 222, 132, .34)",
     orbit: "rgba(103, 225, 255, .34)",
     nova: "rgba(197, 137, 255, .34)",
@@ -332,15 +329,6 @@ function symbolGlow(id) {
     leaf: "rgba(95, 226, 188, .34)",
     petal: "rgba(198, 112, 255, .48)"
   }[id];
-  if (state.gameId === "neon") return id === "petal" ? "rgba(82, 242, 255, .72)" : base;
-  if (state.gameId === "ember") return id === "petal" ? "rgba(255, 117, 61, .75)" : base;
-  if (state.gameId === "ufc") {
-    return {
-      luma: "rgba(245, 196, 92, .7)", orbit: "rgba(255, 73, 63, .58)", nova: "rgba(255, 255, 245, .62)",
-      comet: "rgba(255, 134, 57, .62)", dew: "rgba(225, 239, 255, .5)", leaf: "rgba(255, 73, 63, .58)", petal: "rgba(245, 196, 92, .76)"
-    }[id];
-  }
-  return base;
 }
 
 function symbolGraphic(id) {
@@ -608,7 +596,7 @@ function updateUi() {
   const bet = currentBaseBet();
   const spinWager = currentSpinWager();
   const speed = currentSpinSpeed();
-  ui.balance.textContent = formatCredits(state.balance);
+  ui.balance.textContent = formatCredits(state.balance - state.balanceHold);
   ui.betAmount.textContent = formatCredits(bet);
   const autoplayStopping = state.autoActive && state.autoStopRequested;
   ui.spinButton.setAttribute("aria-label", state.autoActive
@@ -1400,6 +1388,11 @@ function stableOutcome(outcome) {
     progressAfter: outcome.progressAfter,
     petalsBefore: outcome.petalsBefore,
     petalsAfter: outcome.petalsAfter,
+    scatterBetBankBefore: outcome.scatterBetBankBefore ?? null,
+    scatterBetsAdded: outcome.scatterBetsAdded ?? null,
+    scatterBetBankAfter: outcome.scatterBetBankAfter ?? null,
+    bonusRoundBets: outcome.bonusRoundBets ?? null,
+    bonusRoundWins: outcome.bonusRoundWins ?? null,
     bonusRounds: outcome.bonusRounds,
     baseWin: outcome.baseWin,
     bonusMultiplier: outcome.bonusMultiplier,
@@ -1458,7 +1451,7 @@ function renderWinDetails() {
     ? outcome.wins.map((win, index) => `<div class="win-line-item"><span>Payout ${index + 1} · <b>${win.count}× ${win.symbolName}</b></span><strong>${formatMoney(win.amount)}</strong></div>`).join("")
     : `<div class="win-line-item"><span>No base-game payout</span><strong>$0.00</strong></div>`;
   const bonus = outcome.bonusWin > 0
-    ? `<div class="win-line-item"><span>${game.featureName} · <b>${outcome.bonusMultiplier}× total bet</b></span><strong>${formatMoney(outcome.bonusWin)}</strong></div>`
+    ? `<div class="win-line-item"><span>${game.featureName} · <b>${outcome.bonusMultiplier}× ${outcome.mode === "feature-buy" ? "total bet" : "banked bet"}</b></span><strong>${formatMoney(outcome.bonusWin)}</strong></div>`
     : "";
   ui.winDetailsContent.innerHTML = `<div class="win-summary"><div><span>${game.name} total</span><strong>${formatMoney(outcome.totalWin)}</strong></div><div><span>${game.collectionPlural} landed</span><strong>${outcome.collectorCount}</strong></div></div><div class="win-line-list">${wins}${bonus}</div>`;
 }
@@ -1587,7 +1580,7 @@ function animateAstralFlightLanding({ fromProgress, toProgress, fromMultiplier, 
   });
 }
 
-function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRounds) {
+function beginAstralFlight(roundIndex, multiplier, winTotal, multiplierTotal, totalRounds) {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const profile = astralFlightProfile(multiplier);
   const cruiseCeiling = Math.min(profile.progress - .08, .32);
@@ -1662,7 +1655,7 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
     burstParticles(multiplier >= 5 ? 18 : 8, .55);
     ui.bonusMechanicProgress.textContent = (roundIndex + 1) + " / " + totalRounds;
     ui.bonusMechanicBar.style.width = (roundIndex + 1) / totalRounds * 100 + "%";
-    await animateCreditValue(ui.bonusTotal, multiplierTotal * bet, 620, { sound: true, tierId: multiplier >= 5 ? "big" : "nice" });
+    await animateCreditValue(ui.bonusTotal, winTotal, 620, { sound: true, tierId: multiplier >= 5 ? "big" : "nice" });
     await cinematicDelay(420);
     resolveFinished();
     return finished;
@@ -1672,9 +1665,10 @@ function beginAstralFlight(roundIndex, multiplier, bet, multiplierTotal, totalRo
   return { finished, land };
 }
 
-async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview = false, purchased = false } = {}) {
+async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview = false, purchased = false, roundBets } = {}) {
   const game = currentGame();
   const picks = bonusRounds.flat();
+  const pickBets = flattenPickBets(bonusRounds, bet, roundBets);
   await runAstralCinematicTransition({ preview, multiplierCount: picks.length });
   audio.bonusSceneStart();
   return new Promise((resolve) => {
@@ -1712,6 +1706,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
     let animating = false;
     let roundIndex = 0;
     let multiplierTotal = 0;
+    let winTotal = 0;
     let activeRound = null;
 
     const close = () => {
@@ -1732,6 +1727,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       animating = false;
       roundIndex = 0;
       multiplierTotal = 0;
+      winTotal = 0;
       activeRound = null;
       ui.astralLockedMultipliers.replaceChildren(...buildAstralFlightLocks(picks.length));
       ui.astralRoundAward.textContent = "0.00×";
@@ -1774,10 +1770,12 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       ui.bonusAction.classList.add("is-stop");
       ui.bonusAction.disabled = false;
       const nextTotal = multiplierTotal + picks[roundIndex];
-      activeRound = beginAstralFlight(roundIndex, picks[roundIndex], bet, nextTotal, picks.length);
+      const nextWinTotal = winTotal + picks[roundIndex] * pickBets[roundIndex];
+      activeRound = beginAstralFlight(roundIndex, picks[roundIndex], nextWinTotal, nextTotal, picks.length);
       await activeRound.finished;
       activeRound = null;
       multiplierTotal = nextTotal;
+      winTotal = nextWinTotal;
       roundIndex += 1;
       animating = false;
       ui.bonusAction.classList.remove("is-stop");
@@ -1800,7 +1798,7 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
       jumpText(ui.astralCascadeLabel);
       playWinChord();
       burstParticles(54, 1.45);
-      ui.bonusAction.textContent = preview ? "Play again" : "Collect " + formatMoney(multiplierTotal * bet);
+      ui.bonusAction.textContent = preview ? "Play again" : "Collect " + formatMoney(winTotal);
       ui.bonusExit.hidden = !preview;
       ui.bonusAction.disabled = false;
       ui.bonusAction.focus();
@@ -1823,10 +1821,11 @@ async function showAstralBonus(bonusRounds, bet, { autoAdvance = false, preview 
   });
 }
 
-function showCardBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
+function showCardBonus(bonusRounds, bet, { autoAdvance = false, roundBets } = {}) {
   return new Promise((resolve) => {
     const game = currentGame();
     const picks = bonusRounds.flat();
+    const pickBets = flattenPickBets(bonusRounds, bet, roundBets);
     ui.bonusOverlay.dataset.mode = game.bonusMode;
     ui.astralBonusStage.hidden = true;
     ui.constellationPicks.hidden = false;
@@ -1873,10 +1872,12 @@ function showCardBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
       ui.bonusOverlay.classList.add("is-playing");
       ui.bonusAction.disabled = true;
       let multiplierTotal = 0;
+      let winTotal = 0;
       const cards = Array.from(ui.constellationPicks.children);
       for (let index = 0; index < cards.length; index += 1) {
         await delay(index === 0 ? 160 : 430);
         multiplierTotal += picks[index];
+        winTotal += picks[index] * pickBets[index];
         cards[index].classList.add("is-revealed");
         const bonusScene = ui.bonusOverlay.querySelector(".bonus-scene");
         bonusScene.classList.remove("is-bonus-impact");
@@ -1884,7 +1885,7 @@ function showCardBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
         bonusScene.classList.add("is-bonus-impact");
         ui.bonusMechanicProgress.textContent = `${index + 1} / ${picks.length} · ${game.bonusProgressLabel}`;
         ui.bonusMechanicBar.style.width = `${(index + 1) / picks.length * 100}%`;
-        void animateCreditValue(ui.bonusTotal, multiplierTotal * bet, 320);
+        void animateCreditValue(ui.bonusTotal, winTotal, 320);
         audio.bonusReveal(index, picks[index]);
         burstParticles(12, .68);
       }
@@ -1893,7 +1894,7 @@ function showCardBonus(bonusRounds, bet, { autoAdvance = false } = {}) {
       ui.bonusOverlay.classList.remove("is-playing");
       ui.bonusOverlay.classList.add("is-resolved");
       burstParticles(34, 1.15);
-      ui.bonusAction.textContent = `Collect ${formatMoney(multiplierTotal * bet)}`;
+      ui.bonusAction.textContent = `Collect ${formatMoney(winTotal)}`;
       ui.bonusAction.disabled = false;
       ui.bonusAction.focus();
     };
@@ -1913,6 +1914,12 @@ function showBonus(bonusRounds, bet, options = {}) {
   return state.gameId === "astral"
     ? showAstralBonus(bonusRounds, bet, options)
     : showCardBonus(bonusRounds, bet, options);
+}
+
+// Bonus rounds pay against the bets banked with their Scatters, not the
+// trigger-spin bet — map each flattened pick to its round's banked bet.
+function flattenPickBets(bonusRounds, bet, roundBets) {
+  return bonusRounds.flatMap((round, index) => round.map(() => roundBets?.[index] ?? bet));
 }
 
 function openFeatureMarket(panel = "special") {
@@ -1953,7 +1960,7 @@ async function buyAstralFeature(costMultiplier) {
   const progressBefore = state.progress.astral;
   closeFeatureMarket({ returnFocus: false });
   state.isSpinning = true;
-  state.balance -= purchaseCost;
+  creditBalance(-purchaseCost);
   updateUi();
 
   const outcome = await simulateBonusPurchase({
@@ -1966,8 +1973,10 @@ async function buyAstralFeature(costMultiplier) {
     gameId: "astral"
   });
   state.lastOutcome = outcome;
+  creditBalance(outcome.totalWin);
+  state.balanceHold = outcome.totalWin;
   await showAstralBonus(outcome.bonusRounds, bet, { purchased: true });
-  state.balance += outcome.totalWin;
+  state.balanceHold = 0;
   state.gameStats.astral = recordGameResult(state.gameStats.astral, outcome.totalWin, purchaseCost);
   updateUi();
 
@@ -2012,7 +2021,7 @@ async function spin({ fromAuto = false } = {}) {
   }
 
   state.isSpinning = true;
-  state.balance -= wager;
+  creditBalance(-wager);
   updateUi();
   ui.spinButton.classList.add("is-spinning");
   setAnticipationUi(false);
@@ -2030,12 +2039,14 @@ async function spin({ fromAuto = false } = {}) {
   const spinClientSeed = state.clientSeed;
   const spinNonce = state.nonce;
   const progressBefore = state.progress[state.gameId];
+  const scatterBankBefore = [...state.scatterBank[state.gameId]];
   const outcomePromise = simulateSpin({
     serverSeed: spinServerSeed,
     clientSeed: spinClientSeed,
     nonce: spinNonce,
     bet,
     progressBefore,
+    scatterBetBankBefore: scatterBankBefore,
     progressBoost: state.gameId === "astral" ? state.specialBetBoost : 0,
     gameId: state.gameId
   });
@@ -2067,8 +2078,11 @@ async function spin({ fromAuto = false } = {}) {
 
   await settleOutcome(outcome);
   state.progress[state.gameId] = outcome.progressAfter;
+  state.scatterBank[state.gameId] = [...outcome.scatterBetBankAfter];
   state.lastOutcome = outcome;
-  state.balance += outcome.baseWin;
+  // The full win settles into the wallet now; the bonus reveal only lifts the hold.
+  creditBalance(outcome.baseWin + outcome.bonusWin);
+  state.balanceHold = outcome.bonusWin;
   updateUi();
   const baseOutcomeClass = outcomeClassFor(outcome.baseWin, wager);
 
@@ -2102,8 +2116,8 @@ async function spin({ fromAuto = false } = {}) {
   if (outcome.bonusRounds.length > 0) {
     setStatus(`${game.featureName} complete · bonus unlocked`);
     await delay(650);
-    await showBonus(outcome.bonusRounds, bet, { autoAdvance: fromAuto });
-    state.balance += outcome.bonusWin;
+    await showBonus(outcome.bonusRounds, bet, { autoAdvance: fromAuto, roundBets: outcome.bonusRoundBets });
+    state.balanceHold = 0;
     updateUi();
   }
 
@@ -2125,6 +2139,7 @@ async function spin({ fromAuto = false } = {}) {
     gameId: state.gameId,
     visualConfig: { ...state.visualConfig },
     progressBefore,
+    scatterBetBankBefore: scatterBankBefore,
     progressBoost: outcome.progressBoost,
     petalsBefore: progressBefore,
     outcome
@@ -2357,7 +2372,9 @@ function bindEvents() {
     if (state.isSpinning) return;
     stopAutoplay();
     state.balance = INITIAL_BALANCE;
+    state.balanceHold = 0;
     state.progress = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, 0]));
+    state.scatterBank = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, []]));
     state.gameStats = Object.fromEntries(Object.keys(GAMES).map((gameId) => [gameId, emptyGameStats()]));
     state.specialBetBoost = 0;
     state.lastOutcome = null;
@@ -2366,7 +2383,7 @@ function bindEvents() {
     setAnticipationUi(false);
     ui.reelViewport.classList.remove("is-spinning", "is-stopping");
     ui.reelImpactLayer.replaceChildren();
-    setStatus("Balance reset. All four feature meters start anew.");
+    setStatus("Balance reset. The Scatter meter starts anew.");
     updateUi();
   });
 
