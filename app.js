@@ -27,7 +27,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.14";
+} from "./asset-catalog.js?v=4.8.15";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -2267,6 +2267,19 @@ function enableSoundFromGesture() {
   setSoundEnabled(true, { remember: true, cue: true });
 }
 
+// Autoplay policies block audio until the visitor interacts once, so music
+// starts on the very first gesture of the visit instead of waiting for the
+// sound button or the end of the World Forge wizard.
+let audioAutoStarted = false;
+function autoEnableAudioOnFirstGesture(event) {
+  if (audioAutoStarted) return;
+  audioAutoStarted = true;
+  // A first click on the sound button itself must keep its normal toggle
+  // meaning instead of being swallowed by the auto-enable.
+  if (event.target instanceof Element && event.target.closest("#soundButton")) return;
+  if (!state.soundEnabled) setSoundEnabled(true, { remember: true, cue: false });
+}
+
 function bindEvents() {
   // Subtle premium hover feedback on every interactive control. The engine
   // throttles and randomizes it so it never becomes noise.
@@ -2466,6 +2479,8 @@ function bindEvents() {
     event.preventDefault();
     spin();
   });
+  window.addEventListener("pointerdown", autoEnableAudioOnFirstGesture);
+  window.addEventListener("keydown", autoEnableAudioOnFirstGesture);
 }
 
 async function init() {
