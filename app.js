@@ -27,7 +27,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.12";
+} from "./asset-catalog.js?v=4.8.13";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -1020,7 +1020,11 @@ function applyGameTheme({ resetGrid = false } = {}) {
   ui.bonusCopy.textContent = game.bonusCopy;
 
   const featureHeading = $("featureMarketTitle");
-  if (featureHeading) featureHeading.textContent = `${visuals.theme.name} vault features`;
+  if (featureHeading) {
+    featureHeading.textContent = `${visuals.theme.name} vault features`;
+    featureHeading.dataset.specialTitle = `${visuals.theme.name} special bets`;
+    featureHeading.dataset.buyTitle = `${visuals.theme.name} buy bonus`;
+  }
   document.querySelectorAll("[data-progress-boost]").forEach((button) => {
     const boost = Number(button.dataset.progressBoost);
     const small = button.querySelector("small");
@@ -1926,6 +1930,11 @@ function openFeatureMarket(panel = "special") {
   if (state.gameId !== "astral" || state.isSpinning || state.autoActive || !state.ageConfirmed || !ui.lobbyOverlay.hidden) return;
   updateAstralFeatureUi(false);
   ui.featureMarketOverlay.dataset.panel = panel;
+  const marketHeading = $("featureMarketTitle");
+  if (marketHeading) {
+    const title = panel === "buy" ? marketHeading.dataset.buyTitle : marketHeading.dataset.specialTitle;
+    if (title) marketHeading.textContent = title;
+  }
   ui.featureMarketOverlay.hidden = false;
   ui.featureMarketOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;

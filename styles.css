@@ -6218,6 +6218,14 @@ body {
   gap: 13px;
 }
 
+.feature-market-overlay[data-panel="special"] #buyFeaturePanel,
+.feature-market-overlay[data-panel="buy"] #specialBetPanel { display: none; }
+.feature-market-overlay[data-panel="special"] .feature-market-grid,
+.feature-market-overlay[data-panel="buy"] .feature-market-grid {
+  grid-template-columns: minmax(0, 620px);
+  justify-content: center;
+}
+
 .feature-market-card {
   position: relative;
   min-width: 0;
