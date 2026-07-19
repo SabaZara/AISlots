@@ -1,0 +1,54 @@
+{
+  "music_base": "rise-of-fortuna/music_level_2.mp4",
+  "music_bonus": "rise-of-fortuna/music_bonus_level_2.mp4",
+  "ambience": "rise-of-fortuna/ambience_1.mp4",
+  "spin_loop": "rise-of-fortuna/roulette_wheel_spin_1.mp4",
+  "spin_loop_fast": "rise-of-fortuna/roulette_wheel_spin_turbo_1.mp4",
+  "spin_start": [
+    "rise-of-fortuna/bells_shuffle.mp4"
+  ],
+  "spin_start_fast": [
+    "rise-of-fortuna/bells_shuffle_faster.mp4"
+  ],
+  "reel_stop": [
+    "rise-of-fortuna/mechanism_stop_1.mp4",
+    "rise-of-fortuna/mechanism_stop_2.mp4",
+    "rise-of-fortuna/mechanism_stop_3.mp4",
+    "rise-of-fortuna/mechanism_stop_4.mp4",
+    "rise-of-fortuna/mechanism_stop_5.mp4"
+  ],
+  "scatter_land": [
+    "rise-of-fortuna/choir_bell_1.mp4",
+    "rise-of-fortuna/choir_bell_2.mp4",
+    "rise-of-fortuna/choir_bell_3.mp4"
+  ],
+  "anticipation": "rise-of-fortuna/magic_aura_sub.mp4",
+  "line_win": [
+    "rise-of-fortuna/coins_jewels_1.mp4",
+    "rise-of-fortuna/coins_jewels_2.mp4",
+    "rise-of-fortuna/coins_jewels_3.mp4"
+  ],
+  "win_count_end": [
+    "rise-of-fortuna/win_end_bet_low.mp4",
+    "rise-of-fortuna/win_end_bet_high.mp4",
+    "rise-of-fortuna/win_end_bet_over.mp4"
+  ],
+  "wintier_big": "rise-of-fortuna/wintier_2.mp4",
+  "wintier_mega": "rise-of-fortuna/wintier_3.mp4",
+  "wintier_epic": "rise-of-fortuna/wintier_4.mp4",
+  "bonus_trigger": "rise-of-fortuna/bonus_triggered.mp4",
+  "bonus_reveal": [
+    "rise-of-fortuna/multi_1.mp4",
+    "rise-of-fortuna/multi_2.mp4",
+    "rise-of-fortuna/multi_3.mp4",
+    "rise-of-fortuna/multi_4.mp4",
+    "rise-of-fortuna/multi_5.mp4",
+    "rise-of-fortuna/multi_6.mp4",
+    "rise-of-fortuna/multi_7.mp4",
+    "rise-of-fortuna/multi_8.mp4",
+    "rise-of-fortuna/multi_9.mp4",
+    "rise-of-fortuna/multi_10.mp4"
+  ],
+  "coin_rain": "rise-of-fortuna/coins_boom.mp4",
+  "ui_click": "rise-of-fortuna/click.mp4"
+}

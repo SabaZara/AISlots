@@ -189,7 +189,7 @@ Measured reference targets we mix to: reel stops ≈ −32 dB RMS (quiet, ~3.8 k
 
 ## 9. Licensed sample slots (how to ship real audio files)
 
-The essential sounds are exposed as **slots**. Put licensed files (webm/mp3/ogg) in `assets/audio/` and list them in `assets/audio/manifest.json`; the engine loads them when sound is enabled. Filled slot → the produced file plays (through the correct bus, with pitch variation on one-shots). Empty slot → the synth plays. No code changes needed.
+The essential sounds are exposed as **slots**. Put licensed files (webm/mp3/ogg/mp4) in `assets/audio/` and list them in `assets/audio/manifest.json`; the engine loads them when sound is enabled. Keep both the manifest and every file it names tracked in Git so Render includes them in the static deployment. Filled slot → the produced file plays (through the correct bus, with pitch variation on one-shots). Empty slot → the synth plays. No code changes needed.
 
 The audio engine and every manifest/sample request are cache-busted. After an audio change is committed and pushed to `main`, a newly opened or refreshed game requests the current engine, manifest, and sound files from Render—even when a replacement keeps the same filename. An already-open game keeps its decoded audio until the page is refreshed.
 
