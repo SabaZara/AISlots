@@ -20,7 +20,7 @@
     <meta name="twitter:description" content="Choose a world, character, atmosphere, and relic set to forge your slot." />
     <meta name="twitter:image" content="https://aislots-gcga.onrender.com/assets/aislots-world-forge-preview.png?v=1" />
     <link rel="icon" href="/assets/favicon.svg?v=3" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="./styles.css?v=4.8.15" />
+    <link rel="stylesheet" href="./styles.css?v=4.8.16" />
     <title>AISlots · World Forge</title>
   </head>
   <body class="is-lobby-open">
@@ -161,15 +161,26 @@
       </div>
       <div class="modal-scroll">
         <section class="rules-hero">
-          <div><span>99.00%</span><small>Theoretical RTP</small></div>
+          <div><span id="rulesGridSize">6×5</span><small>Reel grid</small></div>
           <div><span id="rulesPaylineCount">25</span><small>Fixed paylines</small></div>
           <div><span id="rulesThreshold">12</span><small id="rulesCollectorLabel">Collectors to bonus</small></div>
         </section>
 
         <section>
           <h3>Win on the lines</h3>
-          <p>Match three or more identical symbols on adjacent reels, beginning on the leftmost reel. Your total bet is divided equally across <span id="rulesPaylineCopyCount">25</span> fixed lines. More than one line may win on the same spin.</p>
+          <ul class="rules-list">
+            <li>A line wins when <b>3 or more identical symbols</b> land on consecutive reels along its path, always starting on reel 1 at the left.</li>
+            <li>A different symbol ends the match — symbols after the break do not count, and each line pays its longest match only.</li>
+            <li>A winning line pays <b>(total bet ÷ <span id="rulesPaylineCopyCount">25</span>) × the multiplier</b> shown below for the matched length.</li>
+            <li>Several lines can win on the same spin; their payouts are added together.</li>
+          </ul>
           <div class="paytable" id="paytable"></div>
+        </section>
+
+        <section>
+          <h3>All <span id="paylineMapCount">25</span> line patterns</h3>
+          <p>Every spin checks each of these patterns. Matching symbols must sit exactly on the highlighted cells, reel by reel from the left.</p>
+          <div class="payline-map" id="paylineMap" aria-label="Payline patterns"></div>
         </section>
 
         <section class="bonus-explainer">
@@ -178,15 +189,9 @@
         </section>
 
         <section>
-          <h3 id="prizeOddsTitle">Feature prize odds</h3>
-          <div class="bonus-prize-table" id="bonusPrizeTable" aria-label="Bonus prize probabilities"></div>
+          <h3 id="prizeOddsTitle">Feature prizes</h3>
+          <div class="bonus-prize-table" id="bonusPrizeTable" aria-label="Bonus prizes"></div>
           <p id="prizeOddsCopy">Prizes are multiplied by the total bet and added together.</p>
-        </section>
-
-        <section>
-          <h3>Published return model</h3>
-          <div class="rtp-breakdown"><span id="baseRtpPart" style="--part:76.16%">Base lines <b id="baseRtpValue">75.400%</b></span><span id="bonusRtpPart" style="--part:23.84%">Feature <b id="bonusRtpValue">23.600%</b></span></div>
-          <p>The combined long-run theoretical return is exactly 99.00% for every visual configuration. Actual sessions vary. The model uses fixed symbol and prize weights; it never adapts to balance, wins, losses, mood, theme, or play history.</p>
         </section>
 
       </div>
@@ -384,6 +389,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.8.15"></script>
+    <script type="module" src="./app.js?v=4.8.16"></script>
   </body>
 </html>

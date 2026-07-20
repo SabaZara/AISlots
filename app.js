@@ -14,7 +14,6 @@ import {
   cellIndex,
   getGame,
   simulateBonusPurchase,
-  theoreticalRtp,
   specialBetCostMultiplier,
   simulateSpin
 } from "./game-model.js";
@@ -27,7 +26,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.15";
+} from "./asset-catalog.js?v=4.8.16";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -666,37 +665,49 @@ function buildPaytable() {
   payingSymbols.forEach((symbol) => {
     const row = document.createElement("div");
     row.className = "paytable-row";
-    row.innerHTML = `${symbolGraphic(symbol.id)}<div><strong>${symbol.name} · ${(symbol.weight / 100).toFixed(1)}% per cell</strong><div class="paytable-values"><span>3× <b>${Number(symbol.payouts[3].toFixed(2))}</b></span><span>4× <b>${symbol.payouts[4]}</b></span><span>5× <b>${symbol.payouts[5]}</b></span><span>6× <b>${symbol.payouts[6]}</b></span></div></div>`;
+    row.innerHTML = `${symbolGraphic(symbol.id)}<div><strong>${symbol.name}</strong><div class="paytable-values"><span>3× <b>${Number(symbol.payouts[3].toFixed(2))}</b></span><span>4× <b>${symbol.payouts[4]}</b></span><span>5× <b>${symbol.payouts[5]}</b></span><span>6× <b>${symbol.payouts[6]}</b></span></div></div>`;
     fragment.append(row);
   });
   $("paytable").replaceChildren(fragment);
+  buildPaylineMap();
+}
+
+function buildPaylineMap() {
+  $("paylineMapCount").textContent = String(PAYLINES.length);
+  const fragment = document.createDocumentFragment();
+  PAYLINES.forEach((rows, lineIndex) => {
+    const tile = document.createElement("div");
+    tile.className = "payline-tile";
+    const cells = [];
+    for (let row = 0; row < ROWS; row += 1) {
+      for (let col = 0; col < COLS; col += 1) {
+        cells.push(rows[col] === row ? '<i class="on"></i>' : "<i></i>");
+      }
+    }
+    tile.innerHTML = `<small>${lineIndex + 1}</small><span class="payline-grid">${cells.join("")}</span>`;
+    fragment.append(tile);
+  });
+  $("paylineMap").replaceChildren(fragment);
 }
 
 function buildRules() {
   const game = currentGame();
-  const rtp = theoreticalRtp(game.id);
   $("rulesTitle").textContent = `How ${game.name} works`;
+  $("rulesGridSize").textContent = `${COLS}×${ROWS}`;
   $("rulesThreshold").textContent = String(game.threshold);
   $("rulesCollectorLabel").textContent = `${game.collectionPlural} to bonus`;
   $("rulesFeatureTitle").textContent = `${game.featureName} bonus`;
   $("rulesFeatureCopy").textContent = `${game.collectionPlural} do not pay on lines. Every ${game.collectionName} anywhere on the grid fills one permanent meter position. At ${game.threshold}, ${game.bonusMechanicCopy} The meter then rolls over.`;
-  $("prizeOddsTitle").textContent = `${game.featureName} prize odds`;
-  $("prizeOddsCopy").textContent = `${game.bonusDraws} prizes are drawn from this table. Values are multiplied by the total bet and added together.`;
+  $("prizeOddsTitle").textContent = `${game.featureName} prizes`;
+  $("prizeOddsCopy").textContent = `${game.bonusDraws} prizes are drawn from this pool. Each one is multiplied by the total bet, and the results are added together into a single bonus payout.`;
 
   const prizeFragment = document.createDocumentFragment();
-  const totalWeight = game.bonusPrizes.reduce((total, prize) => total + prize.weight, 0);
   game.bonusPrizes.forEach((prize) => {
     const item = document.createElement("span");
-    item.innerHTML = `<b>${prize.multiplier}×</b><small>${(prize.weight / totalWeight * 100).toFixed(1).replace(".0", "")}%</small>`;
+    item.innerHTML = `<b>${prize.multiplier}×</b>`;
     prizeFragment.append(item);
   });
   $("bonusPrizeTable").replaceChildren(prizeFragment);
-
-  const baseShare = rtp.baseRtp / rtp.totalRtp * 100;
-  $("baseRtpPart").style.setProperty("--part", `${baseShare}%`);
-  $("bonusRtpPart").style.setProperty("--part", `${100 - baseShare}%`);
-  $("baseRtpValue").textContent = `${(rtp.baseRtp * 100).toFixed(3)}%`;
-  $("bonusRtpValue").textContent = `${(rtp.bonusRtp * 100).toFixed(3)}%`;
 }
 
 function buildLobby() {
