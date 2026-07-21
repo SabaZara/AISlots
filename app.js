@@ -16,7 +16,7 @@ import {
   simulateBonusPurchase,
   specialBetCostMultiplier,
   simulateSpin
-} from "./game-model.js?v=4.8.21";
+} from "./game-model.js?v=4.8.22";
 import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
 import {
   COMPANIONS,
@@ -26,7 +26,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.21";
+} from "./asset-catalog.js?v=4.8.22";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
