@@ -16,7 +16,7 @@ import {
   simulateBonusPurchase,
   specialBetCostMultiplier,
   simulateSpin
-} from "./game-model.js?v=4.8.18";
+} from "./game-model.js?v=4.8.20";
 import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
 import {
   COMPANIONS,
@@ -26,7 +26,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.18";
+} from "./asset-catalog.js?v=4.8.20";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -390,8 +390,13 @@ function renderGrid(grid, {
 // the sealed outcome grid for its column without widening its pinned single-arg call.
 let settlingOutcomeGrid = null;
 
+// The spin layer is expensive to build (6 columns × 10 sprite items), and
+// tearing it down and recreating it every spin made each new spin visibly
+// "start from new" on phones. Instead the layer is built once and kept in the
+// DOM; clearSpinReelLayer() only hides it, and startSpinReelLayer() reuses the
+// existing element — re-seeding its strips in place — so back-to-back spins
+// stay continuous with no rebuild flash.
 function clearSpinReelLayer() {
-  ui.reelViewport.querySelector(".reel-spin-layer")?.remove();
   ui.reelViewport.classList.remove("has-spin-reels");
 }
 
@@ -404,13 +409,20 @@ function makeReelSpinItem(id) {
   return item;
 }
 
-function startSpinReelLayer(seed = 0) {
-  clearSpinReelLayer();
-  const ids = currentSymbols().map((symbol) => symbol.id);
+// Reset a strip back to its clean 10-item looping state, stripping the inline
+// height/rows/transform overrides that stopSpinReelColumn() leaves behind.
+function seedReelSpinStrip(strip, sequence) {
+  strip.style.animation = "";
+  strip.style.transform = "";
+  strip.style.height = "";
+  strip.style.gridTemplateRows = "";
+  strip.replaceChildren(...[...sequence, ...sequence].map((id) => makeReelSpinItem(id)));
+}
+
+function buildSpinReelLayer() {
   const layer = document.createElement("div");
   layer.className = "reel-spin-layer";
   layer.setAttribute("aria-hidden", "true");
-
   for (let col = 0; col < COLS; col += 1) {
     const column = document.createElement("div");
     column.className = "reel-spin-column";
@@ -419,14 +431,35 @@ function startSpinReelLayer(seed = 0) {
     column.style.setProperty("--reel-start-delay", `${col * 70}ms`);
     const strip = document.createElement("div");
     strip.className = "reel-spin-strip";
-    const sequence = Array.from({ length: ROWS }, (_, row) => ids[(seed + col * 2 + row * 3) % ids.length]);
-
-    [...sequence, ...sequence].forEach((id) => strip.append(makeReelSpinItem(id)));
     column.append(strip);
     layer.append(column);
   }
-
   ui.reelViewport.append(layer);
+  return layer;
+}
+
+function startSpinReelLayer(seed = 0) {
+  const ids = currentSymbols().map((symbol) => symbol.id);
+  // Reuse the persistent layer when it exists and still matches the current
+  // symbol set; only rebuild the DOM when it is missing (first spin, or the
+  // symbol art changed after a lobby reconfigure).
+  let layer = ui.reelViewport.querySelector(".reel-spin-layer");
+  const symbolStamp = ids.join(",");
+  if (layer && layer.dataset.symbols !== symbolStamp) {
+    layer.remove();
+    layer = null;
+  }
+  if (!layer) layer = buildSpinReelLayer();
+  layer.dataset.symbols = symbolStamp;
+
+  layer.querySelectorAll(".reel-spin-column").forEach((column) => {
+    const col = Number(column.dataset.col);
+    column.classList.remove("is-decelerating", "is-landed");
+    const strip = column.querySelector(".reel-spin-strip");
+    const sequence = Array.from({ length: ROWS }, (_, row) => ids[(seed + col * 2 + row * 3) % ids.length]);
+    seedReelSpinStrip(strip, sequence);
+  });
+
   ui.reelViewport.classList.add("has-spin-reels");
 }
 

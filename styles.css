@@ -10200,6 +10200,12 @@ input,
   pointer-events: none;
 }
 
+/* The spin layer persists between spins so it never rebuilds; it is only
+   visible while a spin is actually in progress. */
+.reel-viewport:not(.has-spin-reels) .reel-spin-layer {
+  display: none;
+}
+
 .reel-spin-column {
   position: relative;
   min-width: 0;
