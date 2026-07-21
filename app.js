@@ -16,7 +16,7 @@ import {
   simulateBonusPurchase,
   specialBetCostMultiplier,
   simulateSpin
-} from "./game-model.js?v=4.8.20";
+} from "./game-model.js?v=4.8.21";
 import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
 import {
   COMPANIONS,
@@ -26,7 +26,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.20";
+} from "./asset-catalog.js?v=4.8.21";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -246,8 +246,21 @@ function updateAstralFeatureUi(controlsLocked = false) {
     const price = button.querySelector(`[data-buy-price="${costMultiplier}"]`);
     if (price) price.textContent = formatMoney(cost);
     button.disabled = controlsLocked || state.balance < cost;
-    button.setAttribute("aria-label", `Buy ${costMultiplier} times bet ${game.featureName} bonus for ${formatMoney(cost)}`);
+    button.setAttribute("aria-label", `Buy ${game.featureName} bonus for ${formatMoney(cost)} (${costMultiplier} times the ${formatMoney(currentBaseBet())} bet)`);
   });
+
+  // Buy-bonus panel: the bet stepper drives the live price. Bet is shared with
+  // the main game bet so the two never disagree.
+  const buyBetAmount = $("buyBonusBetAmount");
+  if (buyBetAmount) buyBetAmount.textContent = formatCredits(currentBaseBet());
+  const buyBetDown = $("buyBonusBetDown");
+  const buyBetUp = $("buyBonusBetUp");
+  if (buyBetDown) buyBetDown.disabled = controlsLocked || state.betIndex === 0;
+  if (buyBetUp) buyBetUp.disabled = controlsLocked || state.betIndex === BET_OPTIONS.length - 1;
+  const buyNote = $("buyBonusActionNote");
+  if (buyNote) buyNote.textContent = `25× your ${formatMoney(currentBaseBet())} bet · charged once`;
+  const buyName = $("buyBonusName");
+  if (buyName) buyName.textContent = game.featureName;
 }
 
 function delay(ms) {
@@ -2019,7 +2032,7 @@ function showFeatureConfirm(request) {
   const bet = currentBaseBet();
   if (request.type === "buy") {
     const cost = bet * request.value;
-    $("featureConfirmTitle").textContent = `Buy the ${request.name} bonus (${request.value}×)`;
+    $("featureConfirmTitle").textContent = `Buy the ${game.featureName} bonus`;
     $("featureConfirmPrice").textContent = formatMoney(cost);
     $("featureConfirmPriceNote").textContent = `${request.value}× your ${formatMoney(bet)} bet · charged once, right now`;
     $("featureConfirmCopy").textContent = `Paying ${formatMoney(cost)} launches three sealed multiplier flights of the ${game.featureName} bonus immediately. The prizes are already sealed before the animation plays, and RTP stays 99%.`;
@@ -2400,6 +2413,16 @@ function bindEvents() {
   });
   ui.specialBetButton.addEventListener("click", () => openFeatureMarket("special"));
   ui.buyFeatureButton.addEventListener("click", () => openFeatureMarket("buy"));
+  $("buyBonusBetDown").addEventListener("click", () => {
+    if (state.betIndex > 0) state.betIndex -= 1;
+    updateUi();
+    audio.uiSelect(state.betIndex);
+  });
+  $("buyBonusBetUp").addEventListener("click", () => {
+    if (state.betIndex < BET_OPTIONS.length - 1) state.betIndex += 1;
+    updateUi();
+    audio.uiSelect(state.betIndex);
+  });
   ui.closeFeatureMarket.addEventListener("click", () => closeFeatureMarket());
   ui.featureMarketOverlay.addEventListener("click", (event) => {
     if (event.target === ui.featureMarketOverlay) closeFeatureMarket();

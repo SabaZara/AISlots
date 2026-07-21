@@ -20,7 +20,7 @@
     <meta name="twitter:description" content="Choose a world, character, atmosphere, and relic set to forge your slot." />
     <meta name="twitter:image" content="https://aislots-gcga.onrender.com/assets/aislots-world-forge-preview.png?v=1" />
     <link rel="icon" href="/assets/favicon.svg?v=3" type="image/svg+xml" sizes="any" />
-    <link rel="stylesheet" href="./styles.css?v=4.8.20" />
+    <link rel="stylesheet" href="./styles.css?v=4.8.21" />
     <title>AISlots · World Forge</title>
   </head>
   <body class="is-lobby-open">
@@ -358,12 +358,22 @@
           </article>
           <article class="feature-market-card is-buy-card" id="buyFeaturePanel">
             <div class="market-card-emblem" aria-hidden="true">☾</div>
-            <h3>Buy bonus</h3>
-            <p class="market-card-copy">Pay 25×, 50×, or 100× the bet to launch three sealed multiplier flights now. Land changes reveal timing only. RTP stays 99%.</p>
-            <div class="buy-feature-options" role="group" aria-label="Buy a sealed Relic Vault bonus">
-              <button type="button" data-buy-feature="25"><span>Vault</span><strong>25×</strong><small data-buy-price="25">$50.00</small></button>
-              <button type="button" data-buy-feature="50"><span>Super</span><strong>50×</strong><small data-buy-price="50">$100.00</small></button>
-              <button type="button" data-buy-feature="100"><span>Grand</span><strong>100×</strong><small data-buy-price="100">$200.00</small></button>
+            <h3>Bonus</h3>
+            <p class="market-card-copy">Instantly launch the <span id="buyBonusName">Scatter Flight</span> bonus: three sealed multiplier flights, added together and paid at your bet. No spinning to trigger it — RTP stays exactly 99%.</p>
+            <div class="buy-bonus-panel">
+              <div class="buy-bonus-bet">
+                <span class="buy-bonus-bet-label">Bet</span>
+                <div class="buy-bonus-stepper">
+                  <button type="button" id="buyBonusBetDown" aria-label="Decrease bet">−</button>
+                  <strong>$<span id="buyBonusBetAmount">2.00</span></strong>
+                  <button type="button" id="buyBonusBetUp" aria-label="Increase bet">+</button>
+                </div>
+              </div>
+              <button type="button" class="buy-bonus-action" data-buy-feature="25" id="buyBonusAction">
+                <span class="buy-bonus-action-label">Buy bonus</span>
+                <strong class="buy-bonus-action-price" data-buy-price="25">$50.00</strong>
+                <small class="buy-bonus-action-note" id="buyBonusActionNote">25× your bet</small>
+              </button>
             </div>
           </article>
         </div>
@@ -389,6 +399,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=4.8.20"></script>
+    <script type="module" src="./app.js?v=4.8.21"></script>
   </body>
 </html>

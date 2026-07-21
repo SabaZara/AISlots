@@ -6392,6 +6392,78 @@ body {
 .buy-feature-options strong { color: #fff0a6; font: 500 clamp(18px, 2.5vw, 26px)/1 var(--serif); text-shadow: 0 0 14px rgba(255,225,107,.28); }
 .special-bet-options small,
 .buy-feature-options small { color: #9fb7d4; font-size: 7px; line-height: 1.25; }
+
+/* Buy-bonus panel: a shared bet stepper drives one Bonus action whose price
+   updates live. One rectangle, no tier grid. */
+.buy-bonus-panel { display: grid; gap: 9px; }
+.buy-bonus-bet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(176,212,255,.24);
+  border-radius: 10px 3px 10px 3px;
+  background: rgba(7,11,35,.6);
+}
+.buy-bonus-bet-label {
+  color: #dbeaff;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.buy-bonus-stepper { display: flex; align-items: center; gap: 12px; }
+.buy-bonus-stepper strong { color: #fff; font: 500 clamp(16px, 2.4vw, 22px)/1 var(--serif); }
+.buy-bonus-stepper button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(176,212,255,.4);
+  border-radius: 50%;
+  color: #eafaff;
+  background: rgba(20,26,60,.9);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 150ms ease;
+}
+.buy-bonus-stepper button:hover:not(:disabled),
+.buy-bonus-stepper button:focus-visible {
+  border-color: #f4f9ff;
+  background: rgba(52,49,116,.9);
+  box-shadow: 0 0 16px rgba(102,221,255,.3);
+}
+.buy-bonus-stepper button:disabled { opacity: .4; cursor: default; }
+.buy-bonus-action {
+  min-height: 74px;
+  padding: 12px 14px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+  border: 1px solid rgba(244,216,112,.5);
+  border-radius: 12px 3px 12px 3px;
+  color: white;
+  background:
+    radial-gradient(circle at 50% 0, rgba(255,220,102,.2), transparent 58%),
+    linear-gradient(145deg, rgba(72,45,112,.92), rgba(12,10,36,.96));
+  box-shadow: inset 0 1px rgba(255,255,255,.12);
+  cursor: pointer;
+  transition: 170ms ease;
+}
+.buy-bonus-action:hover:not(:disabled),
+.buy-bonus-action:focus-visible {
+  border-color: #fff0a4;
+  transform: translateY(-2px);
+  box-shadow: 0 0 26px rgba(255,214,102,.32), inset 0 1px rgba(255,255,255,.18);
+}
+.buy-bonus-action:disabled { opacity: .43; cursor: default; }
+.buy-bonus-action-label { color: #ffe9b0; font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.buy-bonus-action-price { color: #fff0a6; font: 500 clamp(22px, 3.2vw, 30px)/1 var(--serif); text-shadow: 0 0 16px rgba(255,225,107,.3); }
+.buy-bonus-action-note { color: #c9b9e6; font-size: 7px; line-height: 1.25; }
+
 .feature-market-note {
   position: absolute;
   z-index: 5;
