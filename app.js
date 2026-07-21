@@ -16,7 +16,7 @@ import {
   simulateBonusPurchase,
   specialBetCostMultiplier,
   simulateSpin
-} from "./game-model.js";
+} from "./game-model.js?v=4.8.18";
 import { emptyGameStats, outcomeClassFor, recordGameResult, winTierFor } from "./presentation.js";
 import {
   COMPANIONS,
@@ -26,7 +26,7 @@ import {
   THEMES,
   resolveVisualConfig,
   visualConfigLabel
-} from "./asset-catalog.js?v=4.8.16";
+} from "./asset-catalog.js?v=4.8.18";
 
 const BET_OPTIONS = [1, 2, 5, 10, 20];
 const MIN_RESULT_DISPLAY_MS = 2500;
@@ -862,6 +862,24 @@ function setVisualConfigChoice(group, id) {
   state.visualConfig[group] = id;
   state.lobbyChoices[group] = true;
   updateLobbyPreview();
+  // Previewing an atmosphere plays its own soundtrack immediately, and swaps to
+  // the new theme whenever another mood is picked. Music is otherwise silent
+  // until then — picking a mood is the gesture that unlocks and starts audio
+  // (unless the visitor has explicitly turned sound off).
+  if (group === "mood") previewMoodMusic();
+}
+
+// Start (or swap) the atmosphere soundtrack from the World Forge mood step.
+// The click is a user gesture, so it satisfies autoplay policies and lets us
+// enable audio here rather than on the first arbitrary interaction of the
+// visit. A visitor who has explicitly muted keeps silence.
+function previewMoodMusic() {
+  if (state.soundPreference === false) return;
+  if (!state.soundEnabled) {
+    setSoundEnabled(true, { remember: true, cue: false });
+    return; // setEnabled(true) already starts music for the current mood
+  }
+  audio.restartMusic();
 }
 
 function randomizeVisualConfig() {
@@ -905,6 +923,9 @@ function restoreVisualConfig() {
 
 function openLobby() {
   if (state.isSpinning || state.autoActive) return;
+  // Leaving the slot silences its soundtrack; the World Forge only plays music
+  // again once a mood is previewed (see setVisualConfigChoice).
+  audio.stopMusic();
   ui.lobbyOverlay.hidden = false;
   ui.lobbyOverlay.setAttribute("aria-hidden", "false");
   $("appShell").inert = true;
@@ -2030,7 +2051,9 @@ async function buyAstralFeature(costMultiplier) {
   state.lastOutcome = outcome;
   creditBalance(outcome.totalWin);
   state.balanceHold = outcome.totalWin;
-  await showAstralBonus(outcome.bonusRounds, bet, { purchased: true });
+  // Purchased flights pay against the cost-scaled flight bet, so the reveal's
+  // per-flight and running totals match the credited win.
+  await showAstralBonus(outcome.bonusRounds, bet, { purchased: true, roundBets: outcome.bonusRoundBets });
   state.balanceHold = 0;
   state.gameStats.astral = recordGameResult(state.gameStats.astral, outcome.totalWin, purchaseCost);
   updateUi();
@@ -2278,19 +2301,6 @@ function enableSoundFromGesture() {
   setSoundEnabled(true, { remember: true, cue: true });
 }
 
-// Autoplay policies block audio until the visitor interacts once, so music
-// starts on the very first gesture of the visit instead of waiting for the
-// sound button or the end of the World Forge wizard.
-let audioAutoStarted = false;
-function autoEnableAudioOnFirstGesture(event) {
-  if (audioAutoStarted) return;
-  audioAutoStarted = true;
-  // A first click on the sound button itself must keep its normal toggle
-  // meaning instead of being swallowed by the auto-enable.
-  if (event.target instanceof Element && event.target.closest("#soundButton")) return;
-  if (!state.soundEnabled) setSoundEnabled(true, { remember: true, cue: false });
-}
-
 function bindEvents() {
   // Subtle premium hover feedback on every interactive control. The engine
   // throttles and randomizes it so it never becomes noise.
@@ -2490,8 +2500,6 @@ function bindEvents() {
     event.preventDefault();
     spin();
   });
-  window.addEventListener("pointerdown", autoEnableAudioOnFirstGesture);
-  window.addEventListener("keydown", autoEnableAudioOnFirstGesture);
 }
 
 async function init() {

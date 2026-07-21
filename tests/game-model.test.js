@@ -50,7 +50,36 @@ test("Astral special bets and feature purchases preserve 99.00% theoretical retu
       gameId: "astral"
     };
     assert.deepEqual(await model.simulateBonusPurchase(input), await model.simulateBonusPurchase(input));
+
+    // Purchased flights draw from the natural prize table so every revealed
+    // multiplier stays on the 0.25×–100× ladder; the cost is recovered through
+    // the scaled flight bet, and the payout is exactly sum(picks) × flightBet.
+    const outcome = await model.simulateBonusPurchase(input);
+    const picks = outcome.bonusRounds.flat();
+    const naturalMultipliers = new Set(game.bonusPrizes.map((prize) => prize.multiplier));
+    assert.equal(picks.every((value) => naturalMultipliers.has(value)), true);
+    assert.equal(picks.length, game.bonusDraws);
+    const expectedWin = picks.reduce((total, value) => total + value, 0) * outcome.flightBet;
+    assert.ok(Math.abs(outcome.totalWin - expectedWin) < 1e-9);
+    assert.deepEqual(outcome.bonusRoundBets, [outcome.flightBet]);
   }
+
+  // Feature purchases return the target RTP on average across many buys.
+  let staked = 0;
+  let returned = 0;
+  for (let nonce = 0; nonce < 6000; nonce += 1) {
+    const outcome = await model.simulateBonusPurchase({
+      serverSeed: "5c".repeat(32),
+      clientSeed: "purchase-rtp",
+      nonce,
+      bet: 2,
+      costMultiplier: 50,
+      gameId: "astral"
+    });
+    staked += outcome.purchaseCost;
+    returned += outcome.totalWin;
+  }
+  assert.ok(Math.abs(returned / staked - 0.99) < 0.05);
 });
 
 test("every game recreates the same complete outcome from the same receipt", async () => {

@@ -328,19 +328,24 @@ export async function simulateBonusPurchase({
   gameId = DEFAULT_GAME_ID
 }) {
   const game = getGame(gameId);
-  const purchasePrizes = bonusPurchasePrizeTable(gameId, costMultiplier);
-  const prizeWeight = purchasePrizes.reduce((total, prize) => total + prize.weight, 0);
+  // Purchased flights draw from the SAME natural prize table as a triggered
+  // bonus (0.25×–100×), so every revealed and locked multiplier lands on the
+  // on-screen ladder. The cost is recovered by paying each flight against a
+  // scaled bet (payoutScale) rather than by inflating the multipliers, which
+  // previously produced off-ladder values like 649× that read as broken.
+  const prizeWeight = game.bonusPrizes.reduce((total, prize) => total + prize.weight, 0);
   const rng = await createFairRng(serverSeed, clientSeed, nonce);
   const payoutScale = bonusPurchasePayoutScale(gameId, costMultiplier);
+  const flightBet = bet * payoutScale;
   const picks = [];
 
   for (let pick = 0; pick < game.bonusDraws; pick += 1) {
     const ticket = await rng.int(prizeWeight);
-    picks.push(weightedItem(ticket, purchasePrizes).multiplier);
+    picks.push(weightedItem(ticket, game.bonusPrizes).multiplier);
   }
 
   const bonusMultiplier = picks.reduce((total, value) => total + value, 0);
-  const bonusWin = bonusMultiplier * bet;
+  const bonusWin = bonusMultiplier * flightBet;
   const purchaseCost = bet * costMultiplier;
 
   return {
@@ -356,12 +361,14 @@ export async function simulateBonusPurchase({
     petalsBefore: progressBefore,
     petalsAfter: progressBefore,
     bonusRounds: [picks],
+    bonusRoundBets: [flightBet],
     baseWin: 0,
     bonusMultiplier,
     bonusWin,
     totalWin: bonusWin,
     costMultiplier,
     payoutScale,
+    flightBet,
     purchaseCost
   };
 }
